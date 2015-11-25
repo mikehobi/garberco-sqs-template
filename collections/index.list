@@ -1,13 +1,12 @@
 <div id="projectPages" data-collection-id="{id}">
     {.section collection}
         {.repeated section collections}
-            <h1>{title}</h1>
-            {.repeated section items}
-                <img src="{assetUrl}" />
-                {.section customContent.diptychImage}
-                    <img src="{assetUrl}" />
-                {.end}
+            {.section mainImage}
+                {@|apply image.block}
             {.end}
+            <h1>
+                <a href="{fullUrl}">{title}</a>
+            </h1>
         {.end}
     {.end}
 </div>

@@ -1,0 +1,11 @@
+<section class="grid js-grid">
+    <h1>{title}</h1>
+    {.repeated section items}
+        {@|apply image.block}
+        {.section customContent}
+            {.section diptychImage}
+                {@|apply image.block}
+            {.end}
+        {.end}
+    {.end}
+</section>
