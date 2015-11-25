@@ -1,4 +1,4 @@
-<div id="projectPages" data-collection-id="{id}">
+<section class="grid js-grid">
     {.section collection}
         {.repeated section collections}
             {.section mainImage}
@@ -9,4 +9,4 @@
             </h1>
         {.end}
     {.end}
-</div>
+</section>

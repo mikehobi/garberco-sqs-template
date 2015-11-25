@@ -1,4 +1,4 @@
-<section class="grid js-grid">
+<section class="index js-index">
     <h1>{title}</h1>
     {.repeated section items}
         {@|apply image.block}
