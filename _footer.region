@@ -1,6 +1,9 @@
         </main>
 
 
+        {@|apply intro.block}
+
+
         <squarespace:script src="app.js" combo="true" />
 
 

@@ -69,6 +69,10 @@
 	
 	var _router2 = _interopRequireDefault(_router);
 	
+	var _intro = __webpack_require__(/*! ./intro */ 34);
+	
+	var _intro2 = _interopRequireDefault(_intro);
+	
 	/**
 	 *
 	 * @method modInit
@@ -102,6 +106,8 @@
 	
 	  core.dom.html.removeClass("is-clipped");
 	  core.dom.body.removeClass("is-clipped");
+	
+	  _intro2["default"].teardown();
 	};
 	
 	/**
@@ -17372,6 +17378,62 @@
 	    return matchElement;
 	
 	});
+
+/***/ },
+/* 34 */
+/*!*************************!*\
+  !*** ./js_src/intro.js ***!
+  \*************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
+	
+	var _core = __webpack_require__(/*! ./core */ 1);
+	
+	var core = _interopRequireWildcard(_core);
+	
+	var _transTime = core.util.getTransitionDuration(core.dom.intro[0]);
+	
+	/**
+	 *
+	 * @public
+	 * @module intro
+	 * @description Performs the branded load-in screen sequence.
+	 *
+	 */
+	var intro = {
+	    /**
+	     *
+	     * @public
+	     * @method teardown
+	     * @memberof intro
+	     * @description Method removes loadin node from DOM.
+	     *
+	     */
+	    teardown: function teardown() {
+	        core.dom.intro.removeClass("is-active");
+	
+	        setTimeout(function () {
+	            core.dom.intro.remove();
+	
+	            setTimeout(function () {
+	                core.dom.intro = null;
+	            }, 0);
+	        }, _transTime);
+	    }
+	};
+	
+	/******************************************************************************
+	 * Export
+	*******************************************************************************/
+	exports["default"] = intro;
+	module.exports = exports["default"];
 
 /***/ }
 /******/ ]);

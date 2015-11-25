@@ -1,3 +1,5 @@
-<div data-content-field="main-content">
-    {squarespace.main-content}
+<div class="wrapper expander" data-content-field="main-content">
+    <div class="expander-top">
+        {squarespace.main-content}
+    </div>
 </div>
