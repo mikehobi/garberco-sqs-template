@@ -12,35 +12,50 @@
                         {customContent.diptychImage|apply image.block}
                     </div>
                 {.end}
-            {.or customContent.diptychSmallRight}
+            {.end}
+            {.if customContent.diptychSmallRight}
                 
-            {.or customContent.diptychLeanLeft}
+            {.end}
+            {.if customContent.diptychLeanLeft}
                 
-            {.or customContent.diptychLeanRight}
+            {.end}
+            {.if customContent.diptychLeanRight}
                 
-            {.or customContent.diptychGutterCenter}
+            {.end}
+            {.if customContent.diptychGutterCenter}
                 
-            {.or customContent.diptychFullCenter}
+            {.end}
+            {.if customContent.diptychFullCenter}
                 
-            {.or customContent.SingleSmallRight}
+            {.end}
+            {.if customContent.SingleSmallRight}
                 
-            {.or customContent.SingleSmallLeft}
+            {.end}
+            {.if customContent.SingleSmallLeft}
                 
-            {.or customContent.SingleSmallCenter}
+            {.end}
+            {.if customContent.SingleSmallCenter}
                 
-            {.or customContent.SingleHalfRightMargin}
+            {.end}
+            {.if customContent.SingleHalfRightMargin}
                 
-            {.or customContent.SingleHalfLeftMargin}
+            {.end}
+            {.if customContent.SingleHalfLeftMargin}
                 
-            {.or customContent.SingleHalfRightEdge}
+            {.end}
+            {.if customContent.SingleHalfRightEdge}
                 
-            {.or customContent.SingleHalfLeftEdge}
+            {.end}
+            {.if customContent.SingleHalfLeftEdge}
                 
-            {.or customContent.SingleHalfCenter}
+            {.end}
+            {.if customContent.SingleHalfCenter}
                 
-            {.or customContent.SingleThreeQuarterCenter}
+            {.end}
+            {.if customContent.SingleThreeQuarterCenter}
                 
-            {.or customContent.SingleFullWidth}
+            {.end}
+            {.if customContent.SingleFullWidth}
                 
             {.end}
         {.end}
