@@ -2,16 +2,19 @@
     <h1 class="project__title h4 js-project-title">{title}</h1>
     <div class="project__images js-project-images">
         {.repeated section items}
-            {.if customContent.diptychSmallLeft}
+            <div class="project__image js-project-image">
+                {@|apply image.block}
+            </div>
+            {.if customContent.diptychImage}
                 <div class="project__image js-project-image">
-                    {@|apply image.block}
+                    foo
+                    {customContent.diptychImage|apply image.block}
                 </div>
-                {.if customContent.diptychImage}
-                    <div class="project__image js-project-image">
-                        foo
-                        {customContent.diptychImage|apply image.block}
-                    </div>
-                {.end}
+            {.end}
+
+            {# These are all the unique layouts we can have for images #}
+            {.if customContent.diptychSmallLeft}
+                
             {.end}
             {.if customContent.diptychSmallRight}
                 
