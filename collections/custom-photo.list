@@ -12,35 +12,35 @@
                         {customContent.diptychImage|apply image.block}
                     </div>
                 {.end}
-            {.or if customContent.diptychSmallRight}
+            {.or customContent.diptychSmallRight}
                 
-            {.or if customContent.diptychLeanLeft}
+            {.or customContent.diptychLeanLeft}
                 
-            {.or if customContent.diptychLeanRight}
+            {.or customContent.diptychLeanRight}
                 
-            {.or if customContent.diptychGutterCenter}
+            {.or customContent.diptychGutterCenter}
                 
-            {.or if customContent.diptychFullCenter}
+            {.or customContent.diptychFullCenter}
                 
-            {.or if customContent.SingleSmallRight}
+            {.or customContent.SingleSmallRight}
                 
-            {.or if customContent.SingleSmallLeft}
+            {.or customContent.SingleSmallLeft}
                 
-            {.or if customContent.SingleSmallCenter}
+            {.or customContent.SingleSmallCenter}
                 
-            {.or if customContent.SingleHalfRightMargin}
+            {.or customContent.SingleHalfRightMargin}
                 
-            {.or if customContent.SingleHalfLeftMargin}
+            {.or customContent.SingleHalfLeftMargin}
                 
-            {.or if customContent.SingleHalfRightEdge}
+            {.or customContent.SingleHalfRightEdge}
                 
-            {.or if customContent.SingleHalfLeftEdge}
+            {.or customContent.SingleHalfLeftEdge}
                 
-            {.or if customContent.SingleHalfCenter}
+            {.or customContent.SingleHalfCenter}
                 
-            {.or if customContent.SingleThreeQuarterCenter}
+            {.or customContent.SingleThreeQuarterCenter}
                 
-            {.or if customContent.SingleFullWidth}
+            {.or customContent.SingleFullWidth}
                 
             {.end}
         {.end}
