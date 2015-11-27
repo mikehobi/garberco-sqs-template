@@ -1,11 +1,48 @@
-<section class="index js-index">
-    <h1 class="h4">{title}</h1>
-    {.repeated section items}
-        {@|apply image.block}
-        {.section customContent}
-            {.section diptychImage}
-                {@|apply image.block}
+<section class="project js-project">
+    <h1 class="project__title h4 js-project-title">{title}</h1>
+    <div class="project__images js-project-images">
+        {.repeated section items}
+            {.if customContent.diptychSmallLeft}
+                <div class="project__image js-project-image">
+                    {@|apply image.block}
+                </div>
+                {.if customContent.diptychImage}
+                    <div class="project__image js-project-image">
+                        foo
+                        {customContent.diptychImage|apply image.block}
+                    </div>
+                {.end}
+            {.or if customContent.diptychSmallRight}
+                
+            {.or if customContent.diptychLeanLeft}
+                
+            {.or if customContent.diptychLeanRight}
+                
+            {.or if customContent.diptychGutterCenter}
+                
+            {.or if customContent.diptychFullCenter}
+                
+            {.or if customContent.SingleSmallRight}
+                
+            {.or if customContent.SingleSmallLeft}
+                
+            {.or if customContent.SingleSmallCenter}
+                
+            {.or if customContent.SingleHalfRightMargin}
+                
+            {.or if customContent.SingleHalfLeftMargin}
+                
+            {.or if customContent.SingleHalfRightEdge}
+                
+            {.or if customContent.SingleHalfLeftEdge}
+                
+            {.or if customContent.SingleHalfCenter}
+                
+            {.or if customContent.SingleThreeQuarterCenter}
+                
+            {.or if customContent.SingleFullWidth}
+                
             {.end}
         {.end}
-    {.end}
+    </div>
 </section>
