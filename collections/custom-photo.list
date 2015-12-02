@@ -7,7 +7,6 @@
             </div>
             {.if customContent.diptychImage}
                 <div class="project__image js-project-image">
-                    foo
                     {customContent.diptychImage|apply image.block}
                 </div>
             {.end}
