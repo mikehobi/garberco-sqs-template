@@ -1,5 +1,5 @@
 <section class="project js-project">
-    <h1 class="project__title h4 js-project-title">{title}</h1>
+    <h1 class="project__title h4 js-project-title">{collection.title}</h1>
     <div class="project__images js-project-images">
         {.repeated section items}
             <div class="project__image js-project-image">
