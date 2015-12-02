@@ -1,18 +1,12 @@
 <section class="grid js-grid">
     {.section collection}
         {.repeated section collections}
-            {.repeated section collections}
-                {.equal? regionName "private"}
-                    {# Ignore private layouts #}
-                {.or}
-                    <a href="{fullUrl}">
-                        {.section mainImage}
-                            {@|apply image.block}
-                        {.end}
-                        <h1 class="h4">{title}</h1>
-                    </a>
+            <a href="{fullUrl}">
+                {.section mainImage}
+                    {@|apply image.block}
                 {.end}
-            {.end}
+                <h1 class="h4">{title}</h1>
+            </a>
         {.end}
     {.end}
 </section>
