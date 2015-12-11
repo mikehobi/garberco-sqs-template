@@ -30,6 +30,12 @@
             {.if customContent.diptychFullCenter}
                 
             {.end}
+            {.if customContent.diptychOverlapLeft}
+                
+            {.end}
+            {.if customContent.diptychOverlapRight}
+                
+            {.end}
             {.if customContent.SingleSmallRight}
                 
             {.end}
