@@ -95,6 +95,30 @@
         {.end}
     </div>
 {.end}
+{.if customContent.diptychGutterSmalls}
+    <div class="project__diptych project__diptych--gutter-thirds js-project-image expander">
+        <div class="diptych__left -column">
+            {@|apply image.block}
+        </div>
+        {.if customContent.diptychImage}
+            <div class="diptych__right -column">
+                {customContent.diptychImage|apply image.block}
+            </div>
+        {.end}
+    </div>
+{.end}
+{.if customContent.diptychGutterSmallsEven}
+    <div class="project__diptych project__diptych--gutter-thirds-even js-project-image expander">
+        <div class="diptych__left -column">
+            {@|apply image.block}
+        </div>
+        {.if customContent.diptychImage}
+            <div class="diptych__right -column">
+                {customContent.diptychImage|apply image.block}
+            </div>
+        {.end}
+    </div>
+{.end}
 {.if customContent.SingleSmallRight}
     <div class="project__image project__image--third-right js-project-image expander">
         {@|apply image.block}
