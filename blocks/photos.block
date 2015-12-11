@@ -108,7 +108,7 @@
     </div>
 {.end}
 {.if customContent.diptychGutterSmallsEven}
-    <div class="project__diptych project__diptych--gutter-thirds-even js-project-image expander">
+    <div class="project__diptych project__diptych--gutters-even js-project-image expander">
         <div class="diptych__left -column">
             {@|apply image.block}
         </div>
