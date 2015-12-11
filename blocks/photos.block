@@ -109,11 +109,16 @@
     </div>
 {.end}
 {.if customContent.diptychGutterSmallsEven}
-    <div class="project__diptych project__diptych--gutters-even js-project-image expander">
-        <div class="diptych__left -column">
-            {@|apply image.block}
-        </div>
+    <div class="project__diptych project__diptych--gutters-even js-project-image expander {.if systemDataId}{.or}is-right{.end}">
+        {.if systemDataId}
+            <div class="diptych__left -column">
+                {@|apply image.block}
+            </div>
+        {.end}
         {.if customContent.diptychImage}
+            {.if systemDataId}
+                <div class="-spacer -column"></div>
+            {.end}
             <div class="diptych__right -column">
                 {customContent.diptychImage|apply image.block}
             </div>
