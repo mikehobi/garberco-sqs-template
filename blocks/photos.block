@@ -101,6 +101,7 @@
             {@|apply image.block}
         </div>
         {.if customContent.diptychImage}
+            <div class="-spacer -column"></div>
             <div class="diptych__right -column">
                 {customContent.diptychImage|apply image.block}
             </div>
