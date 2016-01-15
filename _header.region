@@ -14,7 +14,7 @@
         {squarespace-headers}
     </head>
     <body class="is-clipped">
-        <header class="header js-header">
+        <header class="header js-header -text--center">
             <h1 class="h4">
                 <a href="/">{website.siteTitle}</a>
             </h1>

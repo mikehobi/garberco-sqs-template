@@ -1,7 +1,7 @@
         </main>
 
 
-        {@|apply intro.block}
+        {@|apply screens.block}
 
 
         <squarespace:script src="app.js" combo="true" />

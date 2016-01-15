@@ -65,13 +65,17 @@
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _router = __webpack_require__(/*! ./router */ 27);
+	var _intro = __webpack_require__(/*! ./intro */ 30);
+	
+	var _intro2 = _interopRequireDefault(_intro);
+	
+	var _router = __webpack_require__(/*! ./router */ 31);
 	
 	var _router2 = _interopRequireDefault(_router);
 	
-	var _intro = __webpack_require__(/*! ./intro */ 34);
+	var _projects = __webpack_require__(/*! ./projects */ 38);
 	
-	var _intro2 = _interopRequireDefault(_intro);
+	var _projects2 = _interopRequireDefault(_projects);
 	
 	/**
 	 *
@@ -80,17 +84,19 @@
 	 *
 	 */
 	var modInit = function modInit() {
+	  core.cache.init(false);
 	  core.detect.init();
 	  core.resizes.init();
 	  core.scrolls.init();
 	  _router2["default"].init();
+	  _projects2["default"].init();
 	
-	  // Expose a `useful` global { app }
+	  // Expose a global { app }
 	  window.app = {
+	    core: core,
+	    intro: _intro2["default"],
 	    router: _router2["default"],
-	    dom: core.dom,
-	    util: core.util,
-	    detect: core.detect
+	    projects: _projects2["default"]
 	  };
 	};
 	
@@ -185,6 +191,14 @@
 	
 	var _log2 = _interopRequireDefault(_log);
 	
+	var _api = __webpack_require__(/*! ./api */ 27);
+	
+	var _api2 = _interopRequireDefault(_api);
+	
+	var _cache = __webpack_require__(/*! ./cache */ 29);
+	
+	var _cache2 = _interopRequireDefault(_cache);
+	
 	exports.detect = _detect2["default"];
 	exports.dom = _dom2["default"];
 	exports.preload = _preload2["default"];
@@ -194,6 +208,8 @@
 	exports.config = _config2["default"];
 	exports.env = _env2["default"];
 	exports.log = _log2["default"];
+	exports.api = _api2["default"];
+	exports.cache = _cache2["default"];
 
 /***/ },
 /* 2 */
@@ -285,6 +301,19 @@
 	     */
 	    isDevice: function isDevice() {
 	        return this.isTouch() && this.isMobile();
+	    },
+	
+	    /**
+	     *
+	     * @public
+	     * @method isStandalone
+	     * @memberof detect
+	     * @description Must be window.standalone.
+	     * @returns {boolean}
+	     *
+	     */
+	    isStandalone: function isStandalone() {
+	        return "standalone" in window;
 	    }
 	};
 	
@@ -376,22 +405,12 @@
 	  /**
 	   *
 	   * @public
-	   * @member nav
+	   * @member shim
 	   * @memberof dom
-	   * @description The cached nav-menu node.
+	   * @description The project shim node.
 	   *
 	   */
-	  nav: (0, _js_libsJqueryDistJquery2["default"])(".js-menu-nav"),
-	
-	  /**
-	   *
-	   * @public
-	   * @member search
-	   * @memberof dom
-	   * @description The cached search-menu node.
-	   *
-	   */
-	  search: (0, _js_libsJqueryDistJquery2["default"])(".js-menu-search"),
+	  shim: (0, _js_libsJqueryDistJquery2["default"])(".js-project-shim"),
 	
 	  /**
 	   *
@@ -8338,29 +8357,12 @@
 	
 	                return true;
 	            });
-	            _imgLoader.on("load", onImageLoad).on("done", function () {
+	            _imgLoader.on("done", function () {
 	                (0, _log2["default"])("preloaded", $_visible.length, "images");
 	
 	                delayedLoad(callback);
 	            });
 	        }
-	    }
-	};
-	
-	/**
-	 *
-	 * @private
-	 * @method onImageLoad
-	 * @memberof preload
-	 * @param {element} img The image node
-	 * @description Apply `orientation` classNames to images.
-	 *
-	 */
-	var onImageLoad = function onImageLoad(img) {
-	    if (img.naturalHeight > img.naturalWidth) {
-	        img.className += " image--portrait";
-	    } else {
-	        img.className += " image--landscape";
 	    }
 	};
 	
@@ -8379,7 +8381,7 @@
 	    if ($notVisible.length) {
 	        _imgLoader = null;
 	        _imgLoader = util.loadImages($notVisible, util.isElementLoadable);
-	        _imgLoader.on("load", onImageLoad).on("done", function () {
+	        _imgLoader.on("done", function () {
 	            return (0, _log2["default"])("lazyloaded", $notVisible.length, "images");
 	        });
 	    }
@@ -8697,6 +8699,15 @@
 	        if (useVariant && data.variants) {
 	            vars = data.variants.split(",").map(map);
 	            variant = getClosestValue(vars, width);
+	
+	            // If the pixel density is higher, use a larger image ?
+	            if (window.devicePixelRatio > 1) {
+	                // Splice off the variant that was matched
+	                vars.splice(vars.indexOf(variant, 1));
+	
+	                // Apply the new, larger variant as the format
+	                variant = getClosestValue(vars, variant);
+	            }
 	
 	            $img.attr(_config2["default"].lazyImageAttr, data.imgSrc + "?format=" + variant + "w");
 	        } else {
@@ -15040,6 +15051,672 @@
 
 /***/ },
 /* 27 */
+/*!****************************!*\
+  !*** ./js_src/core/api.js ***!
+  \****************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+	
+	var _js_libsJqueryDistJquery = __webpack_require__(/*! js_libs/jquery/dist/jquery */ 4);
+	
+	var _js_libsJqueryDistJquery2 = _interopRequireDefault(_js_libsJqueryDistJquery);
+	
+	var _paramalama = __webpack_require__(/*! paramalama */ 28);
+	
+	var _paramalama2 = _interopRequireDefault(_paramalama);
+	
+	var _cache = __webpack_require__(/*! ./cache */ 29);
+	
+	var _cache2 = _interopRequireDefault(_cache);
+	
+	var _rSlash = /^\/|\/$/g;
+	
+	/**
+	 *
+	 * @public
+	 * @module api
+	 * @description Provide some api methods for accessing content via JS.
+	 *
+	 */
+	var api = {
+	    /**
+	     *
+	     * @public
+	     * @member data
+	     * @memberof api
+	     * @description URLs this little api needs to use.
+	     *
+	     */
+	    data: {
+	        squarespace: {
+	            url: location.origin,
+	            api: [location.origin, "api"].join("/")
+	        }
+	    },
+	
+	    /**
+	     *
+	     * @public
+	     * @member dataType
+	     * @memberof api
+	     * @description Default dataType for the `request` api method.
+	     *
+	     */
+	    dataType: "json",
+	
+	    /**
+	     *
+	     * @public
+	     * @member format
+	     * @memberof api
+	     * @description Default format for the `request` api method.
+	     *
+	     */
+	    format: "json",
+	
+	    /**
+	     *
+	     * @public
+	     * @member method
+	     * @memberof api
+	     * @description Default method for the `request` api method.
+	     *
+	     */
+	    method: "GET",
+	
+	    /**
+	     *
+	     * @public
+	     * @method urify
+	     * @param {string} uri The collection uri
+	     * @memberof api
+	     * @description Ensures a leading/trailing slash.
+	     * @returns {string}
+	     *
+	     */
+	    urify: function urify(uri) {
+	        return ["/", uri.replace(_rSlash, ""), "/"].join("");
+	    },
+	
+	    /**
+	     *
+	     * @public
+	     * @method endpoint
+	     * @param {string} uri The collection uri
+	     * @memberof api
+	     * @description Creates the fullUrl from a collection uri.
+	     * @returns {string}
+	     *
+	     */
+	    endpoint: function endpoint(uri) {
+	        return [this.data.squarespace.url, uri.replace(_rSlash, "")].join("/");
+	    },
+	
+	    /**
+	     *
+	     * @public
+	     * @method apipoint
+	     * @param {string} uri The API uri
+	     * @memberof api
+	     * @description Creates the fullUrl from an API uri.
+	     * @returns {string}
+	     *
+	     */
+	    apipoint: function apipoint(uri) {
+	        return [this.data.squarespace.api, uri.replace(_rSlash, "")].join("/");
+	    },
+	
+	    /**
+	     *
+	     * @public
+	     * @method request
+	     * @param {string} url The API URL
+	     * @param {object} params Merge params to send
+	     * @param {object} options Merge config to pass to $.ajax()
+	     * @memberof api
+	     * @description Creates the fullUrl from an API uri.
+	     * @returns {object}
+	     *
+	     */
+	    request: function request(url, params, options) {
+	        var data = _js_libsJqueryDistJquery2["default"].extend({
+	            format: this.format,
+	            nocache: true
+	        }, params);
+	        var opts = _js_libsJqueryDistJquery2["default"].extend({
+	            url: url,
+	            data: data,
+	            dataType: this.dataType,
+	            method: this.method
+	        }, options);
+	
+	        return _js_libsJqueryDistJquery2["default"].ajax(opts);
+	    },
+	
+	    /**
+	     *
+	     * @public
+	     * @method index
+	     * @param {string} uri The index uri
+	     * @param {object} params Merge params to send
+	     * @param {object} options Merge options to send
+	     * @memberof api
+	     * @description Retrieves collections from a given index.
+	     * @returns {object}
+	     *
+	     */
+	    index: function index(uri, params, options) {
+	        var i = 0;
+	        var def = new _js_libsJqueryDistJquery2["default"].Deferred();
+	        var colls = [];
+	        var cached = _cache2["default"].get(uri);
+	        var handle = function handle(data) {
+	            for (i = data.collections.length; i--;) {
+	                colls.push(data.collections[i].urlId);
+	            }
+	
+	            api.collections(colls, params, options).done(function (items) {
+	                return def.resolve(items);
+	            });
+	        };
+	
+	        if (cached) {
+	            setTimeout(function () {
+	                return handle(cached);
+	            }, 1);
+	        } else {
+	            this.request(this.endpoint(uri)).done(function (data) {
+	                _cache2["default"].set(data.collection.urlId, data.collection);
+	
+	                handle(data.collection);
+	            }).fail(function (xhr, status, error) {
+	                return def.reject(error);
+	            });
+	        }
+	
+	        return def;
+	    },
+	
+	    /**
+	     *
+	     * @public
+	     * @method collection
+	     * @param {string} uri The collection uri
+	     * @param {object} params Merge params to send
+	     * @param {object} options Merge options to send
+	     * @memberof api
+	     * @description Retrieves items from a given collection.
+	     * @returns {object}
+	     *
+	     */
+	    collection: function collection(uri, params, options) {
+	        var collection = {};
+	        var def = new _js_libsJqueryDistJquery2["default"].Deferred();
+	        var cached = _cache2["default"].get(uri);
+	        var seg = uri.split("?")[0];
+	
+	        params = _js_libsJqueryDistJquery2["default"].extend(params || {}, (0, _paramalama2["default"])(uri));
+	
+	        if (cached) {
+	            setTimeout(function () {
+	                return def.resolve(cached);
+	            }, 1);
+	        } else {
+	            this.request(this.endpoint(seg), params, options).done(function (data) {
+	                // Resolve with `responseText`
+	                if (typeof data === "string") {
+	                    _cache2["default"].set(uri, data);
+	
+	                    def.resolve(data);
+	                } else {
+	                    // Collection?
+	                    collection = {
+	                        collection: data.collection,
+	                        item: data.item || null,
+	                        items: data.items || null,
+	                        pagination: data.pagination || null
+	                    };
+	
+	                    _cache2["default"].set(uri, collection);
+	
+	                    def.resolve(data.items || data.item ? collection : null);
+	                }
+	            }).fail(function (xhr, status, error) {
+	                def.reject(error);
+	            });
+	        }
+	
+	        return def;
+	    },
+	
+	    /**
+	     *
+	     * @public
+	     * @method collections
+	     * @param {array} uris The collection uris to query for
+	     * @param {object} params Merge params to send
+	     * @param {object} options Merge options to send
+	     * @memberof api
+	     * @description Retrieves items from a given set of collection.
+	     * @returns {object}
+	     *
+	     */
+	    collections: function collections(uris, params, options) {
+	        var curr = 0;
+	        var i = uris.length;
+	        var items = {};
+	        var def = new _js_libsJqueryDistJquery2["default"].Deferred();
+	        var func = function func(uri, data) {
+	            curr++;
+	
+	            if (data) {
+	                items[uri] = data;
+	            }
+	
+	            if (curr === uris.length) {
+	                def.resolve(items);
+	            }
+	        };
+	
+	        for (i; i--;) {
+	            this.collection(uris[i], params, options).done(func.bind(null, uris[i]));
+	        }
+	
+	        return def;
+	    }
+	};
+	
+	/******************************************************************************
+	 * Export
+	*******************************************************************************/
+	exports["default"] = api;
+	module.exports = exports["default"];
+
+/***/ },
+/* 28 */
+/*!************************************!*\
+  !*** ./~/paramalama/paramalama.js ***!
+  \************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	/*!
+	 *
+	 * Parse query string into object literal representation
+	 *
+	 * @compat: jQuery, Ender, Zepto
+	 * @author: @kitajchuk
+	 *
+	 *
+	 */
+	(function ( factory ) {
+	    
+	    if ( true ) {
+	        module.exports = factory();
+	
+	    } else if ( typeof window !== "undefined" ) {
+	        window.paramalama = factory();
+	    }
+	    
+	})(function () {
+	    
+	    var paramalama = function ( str ) {
+	        var query = decodeURIComponent( str ).match( /[#|?].*$/g ),
+	            ret = {};
+	        
+	        if ( query ) {
+	            query = query[ 0 ].replace( /^\?|^#|^\/|\/$|\[|\]/g, "" );
+	            query = query.split( "&" );
+	            
+	            for ( var i = query.length; i--; ) {
+	                var pair = query[ i ].split( "=" ),
+	                    key = pair[ 0 ],
+	                    val = pair[ 1 ];
+	                
+	                if ( ret[ key ] ) {
+	                    // #2 https://github.com/kitajchuk/paramalama/issues/2
+	                    // This supposedly will work as of ECMA-262
+	                    // This works since we are not passing objects across frame boundaries
+	                    // and we are not considering Array-like objects. This WILL be an Array.
+	                    if ( {}.toString.call( ret[ key ] ) !== "[object Array]" ) {
+	                        ret[ key ] = [ ret[ key ] ];
+	                    }
+	                    
+	                    ret[ key ].push( val );
+	                    
+	                } else {
+	                    ret[ key ] = val;
+	                }
+	            }
+	        }
+	        
+	        return ret;
+	    };
+	    
+	    if ( typeof $ !== "undefined" ) {
+	        $.paramalama = paramalama;
+	    }
+	
+	    return paramalama;
+	    
+	});
+
+
+/***/ },
+/* 29 */
+/*!******************************!*\
+  !*** ./js_src/core/cache.js ***!
+  \******************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+	
+	var _js_libsJqueryDistJquery = __webpack_require__(/*! js_libs/jquery/dist/jquery */ 4);
+	
+	var _js_libsJqueryDistJquery2 = _interopRequireDefault(_js_libsJqueryDistJquery);
+	
+	var _log = __webpack_require__(/*! ./log */ 7);
+	
+	var _log2 = _interopRequireDefault(_log);
+	
+	var _cache = null;
+	var _timestamp = null;
+	var _cacheLocal = {}; // In-Memory {object} cache
+	var _initialized = false;
+	var _cacheAccess = "instrument-cache";
+	var _timeAccess = "instrument-timestamp";
+	var _duration = 604800000; // 1 Week in milliseconds
+	var _allocated = 5242880; // (1024 * 1024 * 5) - 5MB
+	
+	/**
+	 *
+	 * @public
+	 * @module cache
+	 * @description Provide some data CASH!!!.
+	 *              Local Storage is synchronous - so we don't want to set
+	 *              every time cache is modified. Ideally we can use an app event
+	 *              hook to set the cache to device when we have a free moment.
+	 *              Ideally, we're just looking at NOT BLOCKING REQUESTS just to
+	 *              set some data to the device storage.
+	 *
+	 *              There are 2 places where XHR requests happen in `OUR` app:
+	 *              The api module and PageController.
+	 *              This excludes media content requests - audio and video.
+	 *              But that's fine I think.
+	 *
+	 *              Some stuff I was reading:
+	 *              http://www.sitepoint.com/html5-local-storage-revisited/
+	 *              http://www.html5rocks.com/en/tutorials/offline/quota-research/
+	 *
+	 */
+	var cache = {
+	    /**
+	     *
+	     * @public
+	     * @method init
+	     * @param {boolean} enableStorage Should we load from LocalStorage initially ?
+	     * @memberof cache
+	     * @description Initialize the cache - looks at Local Storage
+	     * @returns {object} if already initialized
+	     *
+	     */
+	    init: function init(enableStorage) {
+	        if (_initialized) {
+	            return this.get();
+	        }
+	
+	        _initialized = true;
+	        _cache = window.localStorage.getItem(_cacheAccess);
+	        _timestamp = window.localStorage.getItem(_timeAccess);
+	
+	        // Cache exists - Timestamp exists
+	        if (_cache && _timestamp) {
+	            _cache = JSON.parse(_cache);
+	            _timestamp = parseInt(_timestamp, 10);
+	
+	            // Neither exist - setup the cache and timestamp
+	            // Timestamp remains null for this case
+	        } else {
+	                _cache = {};
+	                _timestamp = Date.now();
+	            }
+	
+	        (0, _log2["default"])("cache initialized", _cache, _timestamp);
+	
+	        if (enableStorage) {
+	            this.tryFlush();
+	
+	            // Storage disabled, flush it clean...
+	        } else {
+	                this.flush();
+	            }
+	    },
+	
+	    /**
+	     *
+	     * @public
+	     * @method tryFlush
+	     * @memberof cache
+	     * @description Flush the cache if necessary
+	     *
+	     */
+	    tryFlush: function tryFlush() {
+	        // Timestamp so check how long data has been stored
+	        // This condition establishes a 1 week duration before data flush
+	        // This condition also checks the size stored vs what is allocated - 5MB
+	        if (Date.now() - _timestamp >= _duration || _allocated - JSON.stringify(window.localStorage).length <= 0) {
+	            this.flush();
+	        }
+	    },
+	
+	    /**
+	     *
+	     * @public
+	     * @method flush
+	     * @memberof cache
+	     * @description Manually flush the Local Storage cache
+	     *
+	     */
+	    flush: function flush() {
+	        // New empty cache
+	        _cache = {};
+	
+	        // New empty local cache
+	        _cacheLocal = {};
+	
+	        // New Timestamp for NOW
+	        _timestamp = Date.now();
+	
+	        // Store the new cache object
+	        this.save();
+	    },
+	
+	    /**
+	     *
+	     * @public
+	     * @method save
+	     * @memberof cache
+	     * @description Perform the actual synchronous write to Local Storage
+	     *
+	     */
+	    save: function save() {
+	        window.localStorage.setItem(_timeAccess, _timestamp);
+	        window.localStorage.setItem(_cacheAccess, JSON.stringify(_cache));
+	    },
+	
+	    /**
+	     *
+	     * @public
+	     * @method slug
+	     * @param {string} uri The string to slugify
+	     * @memberof cache
+	     * @description Slug a uri string
+	     * @returns {string}
+	     *
+	     */
+	    slug: function slug(uri) {
+	        return uri.replace(/^\/|\/$/g, "").replace(/\/|\?|\&|=|\s/g, "-").toLowerCase();
+	    },
+	
+	    /**
+	     *
+	     * @public
+	     * @method set
+	     * @param {string} id The index key
+	     * @param {mixed} val The value to store
+	     * @memberof cache
+	     * @description Set a key's value in the cache
+	     *
+	     */
+	    set: function set(id, val) {
+	        id = this.slug(id);
+	
+	        _cache[id] = val;
+	
+	        // Maybe don't do this EVERY time
+	        // @see module notes above about this
+	        this.save();
+	    },
+	
+	    /**
+	     *
+	     * @public
+	     * @method get
+	     * @param {string} id The index key
+	     * @memberof cache
+	     * @description Get a key's value from the cache
+	     * @returns {mixed}
+	     *
+	     */
+	    get: function get(id) {
+	        id = id && this.slug(id);
+	
+	        return id ? this.getValue(_cache[id]) : _cache;
+	    },
+	
+	    /**
+	     *
+	     * @public
+	     * @method getValue
+	     * @param {mixed} val The accessed value
+	     * @memberof cache
+	     * @description Get a value so cache is non-mutable from outside
+	     * @returns {mixed}
+	     *
+	     */
+	    getValue: function getValue(val) {
+	        return typeof val === "string" ? String(val) : val ? _js_libsJqueryDistJquery2["default"].extend(_js_libsJqueryDistJquery2["default"].isArray(val) ? [] : {}, val) : null;
+	    },
+	
+	    /**
+	     *
+	     * @public
+	     * @method setLocal
+	     * @param {string} id The index key
+	     * @param {mixed} val The value to store
+	     * @memberof cache
+	     * @description Set a key's value in the local cache
+	     *
+	     */
+	    setLocal: function setLocal(id, val) {
+	        id = this.slug(id);
+	
+	        _cacheLocal[id] = val;
+	    },
+	
+	    /**
+	     *
+	     * @public
+	     * @method getLocal
+	     * @param {string} id The index key
+	     * @memberof cache
+	     * @description Get a key's value from the local cache
+	     * @returns {mixed}
+	     *
+	     */
+	    getLocal: function getLocal(id) {
+	        id = id && this.slug(id);
+	
+	        return id ? this.getValue(_cacheLocal[id]) : _cacheLocal;
+	    }
+	};
+	
+	/******************************************************************************
+	 * Export
+	*******************************************************************************/
+	exports["default"] = cache;
+	module.exports = exports["default"];
+
+/***/ },
+/* 30 */
+/*!*************************!*\
+  !*** ./js_src/intro.js ***!
+  \*************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
+	
+	var _core = __webpack_require__(/*! ./core */ 1);
+	
+	var core = _interopRequireWildcard(_core);
+	
+	var _transTime = core.util.getTransitionDuration(core.dom.intro[0]);
+	
+	/**
+	 *
+	 * @public
+	 * @module intro
+	 * @description Performs the branded load-in screen sequence.
+	 *
+	 */
+	var intro = {
+	    /**
+	     *
+	     * @public
+	     * @method teardown
+	     * @memberof intro
+	     * @description Method removes loadin node from DOM.
+	     *
+	     */
+	    teardown: function teardown() {
+	        core.dom.intro.removeClass("is-active");
+	
+	        setTimeout(function () {
+	            core.dom.intro.remove();
+	
+	            setTimeout(function () {
+	                core.dom.intro = null;
+	            }, 0);
+	        }, _transTime);
+	    }
+	};
+	
+	/******************************************************************************
+	 * Export
+	*******************************************************************************/
+	exports["default"] = intro;
+	module.exports = exports["default"];
+
+/***/ },
+/* 31 */
 /*!**************************!*\
   !*** ./js_src/router.js ***!
   \**************************/
@@ -15059,13 +15736,17 @@
 	
 	var _js_libsJqueryDistJquery2 = _interopRequireDefault(_js_libsJqueryDistJquery);
 	
-	var _properjsPagecontroller = __webpack_require__(/*! properjs-pagecontroller */ 28);
+	var _properjsPagecontroller = __webpack_require__(/*! properjs-pagecontroller */ 32);
 	
 	var _properjsPagecontroller2 = _interopRequireDefault(_properjsPagecontroller);
 	
 	var _core = __webpack_require__(/*! ./core */ 1);
 	
 	var core = _interopRequireWildcard(_core);
+	
+	var _animate = __webpack_require__(/*! ./animate */ 37);
+	
+	var _animate2 = _interopRequireDefault(_animate);
 	
 	var _pageDuration = core.util.getTransitionDuration(core.dom.page[0]);
 	
@@ -15107,7 +15788,7 @@
 	
 	        this.controller.setConfig(["*"]);
 	
-	        this.controller.setModules([core.preload]);
+	        this.controller.setModules([core.preload, _animate2["default"]]);
 	
 	        this.controller.on("page-controller-router-transition-out", this.changePageOut.bind(this));
 	        this.controller.on("page-controller-router-refresh-document", this.changeContent.bind(this));
@@ -15326,7 +16007,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 28 */
+/* 32 */
 /*!*****************************************************!*\
   !*** ./~/properjs-pagecontroller/PageController.js ***!
   \*****************************************************/
@@ -15348,20 +16029,20 @@
 	 *
 	 */
 	(function ( factory ) {
-	    
+	
 	    if ( true ) {
 	        module.exports = factory();
 	
 	    } else if ( typeof window !== "undefined" ) {
 	        window.PageController = factory();
 	    }
-	    
+	
 	})(function () {
 	
 	    // Useful stuff
-	    var Router = __webpack_require__( /*! properjs-router */ 29 ),
+	    var Router = __webpack_require__( /*! properjs-router */ 33 ),
 	        Controller = __webpack_require__( /*! properjs-controller */ 13 ),
-	        
+	
 	        _router = null,
 	        _config = [],
 	        _modules = [],
@@ -15380,84 +16061,84 @@
 	        _isSamePage = false,
 	        _silentMode = false,
 	        _silentCallback = null,
-	    
+	
 	        // Singleton
 	        _instance = null,
-	    
-	    
+	
+	
 	    // Private functions
 	    fire = function ( event, arg ) {
 	        if ( !_silentMode ) {
 	            _instance.fire( (_eventPrefix + event), arg );
 	        }
 	    },
-	    
-	    
+	
+	
 	    isFunction = function ( fn ) {
 	        return (typeof fn === "function");
 	    },
-	    
-	    
+	
+	
 	    isSameObject = function ( o1, o2 ) {
 	        return (JSON.stringify( o1 ) === JSON.stringify( o2 ));
 	    },
-	    
-	    
+	
+	
 	    execInit = function ( method ) {
 	        // One time module initialization
 	        for ( var i = _modules.length; i--; ) {
-	            if ( _modules[ i ].__registered && !_modules[ i ].__initialized && isFunction( _modules[ i ].init ) ) {
+	            if ( !_modules[ i ].__initialized && isFunction( _modules[ i ].init ) ) {
 	                _modules[ i ].__initialized = true;
 	                _modules[ i ].init();
 	            }
 	        }
 	    },
-	    
-	    
+	
+	
 	    execUnload = function () {
 	        if ( _silentMode ) {
 	            return;
 	        }
-	        
+	
 	        // Unload currently active modules only
 	        for ( var i = _synced.active.length; i--; ) {
-	            if ( _synced.active[ i ].__registered && isFunction( _synced.active[ i ].unload ) ) {
+	            if ( isFunction( _synced.active[ i ].unload ) ) {
 	                _synced.active[ i ].unload();
 	            }
 	        }
 	    },
-	    
-	    
+	
+	
 	    execOnload = function () {
 	        if ( _silentMode ) {
 	            return;
 	        }
-	        
+	
 	        // Unload newly active modules only
 	        for ( var i = _synced.active.length; i--; ) {
-	            if ( _synced.active[ i ].__registered && isFunction( _synced.active[ i ].onload ) ) {
+	            if ( isFunction( _synced.active[ i ].onload ) ) {
 	                _synced.active[ i ].onload();
 	            }
 	        }
 	    },
-	    
-	    
+	
+	
 	    getRouteDataToString = function ( data ) {
 	        var ret = data.uri,
 	            i;
-	    
+	
 	        for ( i in data.query ) {
 	            ret += "-" + i + "-" + data.query[ i ];
 	        }
-	    
+	
 	        for ( i in data.params ) {
 	            ret += "-" + i + "-" + data.params[ i ];
 	        }
-	    
+	
 	        return ret;
 	    },
-	    
-	    
+	
+	
 	    /**
 	     * @fires page-controller-router-synced-modules
 	     */
@@ -15465,72 +16146,72 @@
 	        if ( _silentMode ) {
 	            return;
 	        }
-	        
+	
 	        _synced.active = [];
 	        _synced.inactive = [];
-	    
+	
 	        for ( var i = _modules.length; i--; ) {
 	            var module = _modules[ i ];
-	    
-	            if ( _modules[ i ].__registered && isFunction( module.isActive ) ) {
+	
+	            if ( isFunction( module.isActive ) ) {
 	                // isActive method should rebuild module variables
 	                if ( module.isActive() ) {
 	                    _synced.active.push( module );
-	    
+	
 	                } else {
 	                    _synced.inactive.push( module );
 	                }
 	            }
 	        }
-	    
+	
 	        fire( "router-synced-modules", _synced );
 	    },
-	    
-	    
+	
+	
 	    onRouterResponse = function ( data ) {
 	        function __route() {
 	            if ( (Date.now() - _timeBefore) >= _instance._transitionTime ) {
 	                _instance.stop();
-	    
+	
 	                handleRouterResponse( data );
 	            }
 	        }
-	    
+	
 	        _instance.go( __route );
 	    },
-	    
-	    
+	
+	
 	    onPopGetRouter = function ( data ) {
 	        onPreGetRouter( data.request );
 	    
 	        setTimeout( function () {
 	            handleRouterResponse( data );
-	    
+	
 	        }, _instance._transitionTime );
 	    },
-	    
-	    
+	
+	
 	    /**
 	     * @fires page-controller-router-transition-out
 	     * @fires page-controller-router-samepage
 	     */
 	    onPreGetRouter = function ( data ) {
 	        var isSameRequest = (_currentToString === getRouteDataToString( data ));
-	    
+	
 	        if ( isSameRequest ) {
 	            fire( "router-samepage", data );
 	            _isSamePage = true;
 	            return;
 	        }
-	    
+	
 	        _timeBefore = Date.now();
-	    
+	
 	        if ( !_isFirstRoute ) {
 	            fire( "router-transition-out", data );
 	        }
 	    },
-	    
-	    
+	
+	
 	    /**
 	     * @fires page-controller-router-refresh-document
 	     * @fires page-controller-router-transition-in
@@ -15540,23 +16221,25 @@
 	            _isSamePage = false;
 	            return;
 	        }
-	    
+	
 	        var data = {
 	            response: res.response.responseText,
 	            request: res.request,
 	            status: res.status
 	        };
-	    
+	
 	        _currentRoute = data.request.uri;
 	        _currentQuery = data.request.query;
 	        _currentToString = getRouteDataToString( data.request );
-	    
+	
 	        // Think of this as window.onload, happens once
 	        if ( _isFirstRoute ) {
 	            _isFirstRoute = false;
 	            syncModules();
 	            execOnload();
-	    
+	
+	            fire( "initialized-page", data.response );
+	
 	        // All other Router sequences fall here
 	        } else {
 	            // Allow transition duration to take place
@@ -15564,32 +16247,32 @@
 	                // 0.1 Sync modules and unload active ones
 	                syncModules();
 	                execUnload();
-	    
+	
 	                // 0.2 Refresh the document content
 	                fire( "router-refresh-document", data.response );
-	    
+	
 	                // 0.3 Sync modules and onload newly active ones
 	                syncModules();
 	                execOnload();
-	    
+	
 	                // 0.4 Trigger transition of content to come back in
 	                fire( "router-transition-in", data );
-	                
+	
 	                // 0.5 Check `silent` mode
 	                if ( _silentMode ) {
 	                    _silentMode = false;
-	                    
+	
 	                    if ( isFunction( _silentCallback ) ) {
 	                        _silentCallback( data );
 	                        _silentCallback = null;
 	                    }
 	                }
-	    
+	
 	            }, _instance._transitionTime );
 	        }
 	    };
-	    
-	    
+	
+	
 	    /**
 	     *
 	     * Page transition manager
@@ -15609,9 +16292,9 @@
 	        // Singleton
 	        if ( !_instance ) {
 	            _instance = this;
-	    
+	
 	            options = (options || {});
-	    
+	
 	            /**
 	             *
 	             * The duration of your transition for page content
@@ -15621,7 +16304,7 @@
 	             *
 	             */
 	            this._transitionTime = (options.transitionTime || _timeDelay);
-	    
+	
 	            /**
 	             *
 	             * The flag to anchor to top of page on transitions
@@ -15636,12 +16319,12 @@
 	                preventDefault: true
 	            });
 	        }
-	    
+	
 	        return _instance;
 	    };
-	    
+	
 	    PageController.prototype = new Controller();
-	    
+	
 	    /**
 	     *
 	     * Initialize controller on page
@@ -15653,9 +16336,9 @@
 	        if ( _initialized ) {
 	            return;
 	        }
-	    
+	
 	        _initialized = true;
-	    
+	
 	        /**
 	         *
 	         * Instance of Router
@@ -15663,24 +16346,21 @@
 	         *
 	         */
 	        _router = new Router( this._routerOptions );
-	    
+	
 	        if ( _router._matcher.parse( window.location.href, _config ).matched ) {
 	            _router.bind();
-	            
+	
 	            for ( var i = _config.length; i--; ) {
 	                _router.get( _config[ i ], onRouterResponse );
 	            }
-	        
+	
 	            _router.on( "preget", onPreGetRouter );
 	            _router.on( "popget", onPopGetRouter );
-	    
+	
 	            execInit();
-	    
-	        } else {
-	            //console.log( "[PageController : page not in routes]" );
 	        }
 	    };
-	    
+	
 	    /**
 	     *
 	     * Trigger the router on a uri and run PageController `silently`, so no events fire.
@@ -15695,7 +16375,7 @@
 	        _silentCallback = cb;
 	        _router.trigger( uri );
 	    };
-	    
+	
 	    /**
 	     *
 	     * Set the Router configuration
@@ -15707,7 +16387,7 @@
 	    PageController.prototype.setConfig = function ( config ) {
 	        _config = config;
 	    };
-	    
+	
 	    /**
 	     *
 	     * Set the module configuration
@@ -15720,12 +16400,12 @@
 	        if ( !modules ) {
 	            return;
 	        }
-	    
+	
 	        for ( var i = modules.length; i--; ) {
 	            this.addModule( modules[ i ] );
 	        }
 	    };
-	    
+	
 	    /**
 	     *
 	     * Add to the module configuration
@@ -15736,31 +16416,13 @@
 	     */
 	    PageController.prototype.addModule = function ( module ) {
 	        if ( _modules.indexOf( module ) === -1 && isFunction( module.isActive ) && isFunction( module.onload ) && isFunction( module.unload ) ) {
-	            module.__registered = true;
-	    
 	            _modules.push( module );
-	    
+	
 	        } else {
 	            throw new Error( "PageController ERROR - All registered modules require isActive, onload and unload methods." );
 	        }
 	    };
-	    
-	    /**
-	     *
-	     * Add to the module configuration
-	     * @memberof PageController
-	     * @method unregisterModule
-	     * @param {object} module The module object to unregister
-	     *
-	     */
-	    PageController.prototype.unregisterModule = function ( module ) {
-	        for ( var i = _modules.length; i--; ) {
-	            if ( _modules[ i ] === module ) {
-	                _modules[ i ].__registered = false;
-	            }
-	        }
-	    };
-	    
+	
 	    /**
 	     *
 	     * Returns the array of modules
@@ -15772,7 +16434,7 @@
 	    PageController.prototype.getModules = function () {
 	        return _modules;
 	    };
-	    
+	
 	    /**
 	     *
 	     * Returns the MatchRoute config
@@ -15784,7 +16446,7 @@
 	    PageController.prototype.getConfig = function () {
 	        return _config;
 	    };
-	    
+	
 	    /**
 	     *
 	     * Returns the instances Router
@@ -15796,7 +16458,7 @@
 	    PageController.prototype.getRouter = function () {
 	        return _router;
 	    };
-	    
+	
 	    /**
 	     *
 	     * Returns the instances PushState
@@ -15808,7 +16470,7 @@
 	    PageController.prototype.getPusher = function () {
 	        return _router._pusher;
 	    };
-	    
+	
 	    /**
 	     *
 	     * Returns the instances MatchRoute
@@ -15820,7 +16482,7 @@
 	    PageController.prototype.getMatcher = function () {
 	        return _router._matcher;
 	    };
-	    
+	
 	    /**
 	     *
 	     * Returns the current route pathed
@@ -15832,7 +16494,7 @@
 	    PageController.prototype.getRoute = function () {
 	        return _currentRoute;
 	    };
-	    
+	
 	    /**
 	     *
 	     * Returns the current query params object
@@ -15844,7 +16506,7 @@
 	    PageController.prototype.getQuery = function () {
 	        return _currentQuery;
 	    };
-	    
+	
 	    /**
 	     *
 	     * Returns true if current page path equals slug
@@ -15859,13 +16521,13 @@
 	    PageController.prototype.is = function ( slug, looseMatch ) {
 	        var ret = false,
 	            reg;
-	    
+	
 	        reg = new RegExp( looseMatch ? ("^" + slug) : ("^" + slug + "$") );
 	        ret = reg.test( _currentRoute );
-	    
+	
 	        return ret;
 	    };
-	    
+	
 	    /**
 	     *
 	     * Flushes the current route known as `active`
@@ -15876,13 +16538,13 @@
 	    PageController.prototype.flushRoute = function () {
 	        _currentToString = "";
 	    };
-	    
+	
 	    return PageController;
 	
 	});
 
 /***/ },
-/* 29 */
+/* 33 */
 /*!***************************************************************!*\
   !*** ./~/properjs-pagecontroller/~/properjs-router/Router.js ***!
   \***************************************************************/
@@ -15907,9 +16569,9 @@
 	    
 	})(function () {
 	
-	    var PushState = __webpack_require__( /*! properjs-pushstate */ 30 ),
-	        MatchRoute = __webpack_require__( /*! properjs-matchroute */ 31 ),
-	        matchElement = __webpack_require__( /*! properjs-matchelement */ 33 ),
+	    var PushState = __webpack_require__( /*! properjs-pushstate */ 34 ),
+	        MatchRoute = __webpack_require__( /*! properjs-matchroute */ 35 ),
+	        matchElement = __webpack_require__( /*! properjs-matchelement */ 36 ),
 	        _rSameDomain = new RegExp( document.domain ),
 	        _initDelay = 200,
 	        _triggerEl;
@@ -16225,25 +16887,33 @@
 	         */
 	        _handler: function ( el, e ) {
 	            var self = this,
-	                elem = (matchElement( el, "a" ) || matchElement( e.target, "a" ));
+	                elem = (matchElement( el, "a" ) || matchElement( e.target, "a" )),
+	                isDomain = elem && _rSameDomain.test( elem.href ),
+	                isHashed = elem && elem.href.indexOf( "#" ) !== -1,
+	                isMatched = elem && this._matcher.test( elem.href ),
+	                isIgnore = elem && elem.className.indexOf( "js-router--ignore" ) !== -1,
+	                isMetaKey = elem && e.metaKey;
 	            
-	            if ( elem ) {
-	                if ( _rSameDomain.test( elem.href ) && elem.href.indexOf( "#" ) === -1 && this._matcher.test( elem.href ) && elem.className.indexOf( "js-router--ignore" ) === -1 ) {
-	                    this._preventDefault( e );
+	            // 0.1 => Ensure url passes MatchRoute config
+	            // 0.2 => Ensure url is on the Document's Domain
+	            // 0.3 => Ensure url is not a #hash
+	            // 0.4 => Ensure the element does not contain a `js-router--ignore` className
+	            // 0.5 => Ensure the Event.metaKey is not TRUE - Command+click
+	            if ( isMatched && isDomain && !isHashed && !isIgnore && !isMetaKey ) {
+	                this._preventDefault( e );
+	                
+	                for ( var i = this._callbacks.get.length; i--; ) {
+	                    var data = this._matcher.parse( elem.href, this._callbacks.get[ i ]._routerRoutes );
 	                    
-	                    for ( var i = this._callbacks.get.length; i--; ) {
-	                        var data = this._matcher.parse( elem.href, this._callbacks.get[ i ]._routerRoutes );
-	                        
-	                        if ( data.matched ) {
-	                            this._fire( "preget", elem.href, data );
-	                            break;
-	                        }
+	                    if ( data.matched ) {
+	                        this._fire( "preget", elem.href, data );
+	                        break;
 	                    }
-	                    
-	                    this._pusher.push( elem.href, function ( response, status ) {
-	                        self._fire( "get", elem.href, response, status );
-	                    });
 	                }
+	                
+	                this._pusher.push( elem.href, function ( response, status ) {
+	                    self._fire( "get", elem.href, response, status );
+	                });
 	            }
 	        },
 	        
@@ -16349,7 +17019,7 @@
 	});
 
 /***/ },
-/* 30 */
+/* 34 */
 /*!***************************************************************************************!*\
   !*** ./~/properjs-pagecontroller/~/properjs-router/~/properjs-pushstate/PushState.js ***!
   \***************************************************************************************/
@@ -16890,7 +17560,7 @@
 	});
 
 /***/ },
-/* 31 */
+/* 35 */
 /*!*****************************************************************************************!*\
   !*** ./~/properjs-pagecontroller/~/properjs-router/~/properjs-matchroute/MatchRoute.js ***!
   \*****************************************************************************************/
@@ -16915,7 +17585,7 @@
 	    
 	})(function () {
 	
-	    var paramalama = __webpack_require__( /*! paramalama */ 32 ),
+	    var paramalama = __webpack_require__( /*! paramalama */ 28 ),
 	
 	    /**
 	     *
@@ -17249,76 +17919,7 @@
 	});
 
 /***/ },
-/* 32 */
-/*!************************************!*\
-  !*** ./~/paramalama/paramalama.js ***!
-  \************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	/*!
-	 *
-	 * Parse query string into object literal representation
-	 *
-	 * @compat: jQuery, Ender, Zepto
-	 * @author: @kitajchuk
-	 *
-	 *
-	 */
-	(function ( factory ) {
-	    
-	    if ( true ) {
-	        module.exports = factory();
-	
-	    } else if ( typeof window !== "undefined" ) {
-	        window.paramalama = factory();
-	    }
-	    
-	})(function () {
-	    
-	    var paramalama = function ( str ) {
-	        var query = decodeURIComponent( str ).match( /[#|?].*$/g ),
-	            ret = {};
-	        
-	        if ( query ) {
-	            query = query[ 0 ].replace( /^\?|^#|^\/|\/$|\[|\]/g, "" );
-	            query = query.split( "&" );
-	            
-	            for ( var i = query.length; i--; ) {
-	                var pair = query[ i ].split( "=" ),
-	                    key = pair[ 0 ],
-	                    val = pair[ 1 ];
-	                
-	                if ( ret[ key ] ) {
-	                    // #2 https://github.com/kitajchuk/paramalama/issues/2
-	                    // This supposedly will work as of ECMA-262
-	                    // This works since we are not passing objects across frame boundaries
-	                    // and we are not considering Array-like objects. This WILL be an Array.
-	                    if ( {}.toString.call( ret[ key ] ) !== "[object Array]" ) {
-	                        ret[ key ] = [ ret[ key ] ];
-	                    }
-	                    
-	                    ret[ key ].push( val );
-	                    
-	                } else {
-	                    ret[ key ] = val;
-	                }
-	            }
-	        }
-	        
-	        return ret;
-	    };
-	    
-	    if ( typeof $ !== "undefined" ) {
-	        $.paramalama = paramalama;
-	    }
-	
-	    return paramalama;
-	    
-	});
-
-
-/***/ },
-/* 33 */
+/* 36 */
 /*!*************************************************!*\
   !*** ./~/properjs-matchelement/matchElement.js ***!
   \*************************************************/
@@ -17380,10 +17981,10 @@
 	});
 
 /***/ },
-/* 34 */
-/*!*************************!*\
-  !*** ./js_src/intro.js ***!
-  \*************************/
+/* 37 */
+/*!***************************!*\
+  !*** ./js_src/animate.js ***!
+  \***************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -17398,41 +17999,293 @@
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _transTime = core.util.getTransitionDuration(core.dom.intro[0]);
+	var $_jsElements = null;
+	var _isActive = false;
 	
 	/**
 	 *
 	 * @public
-	 * @module intro
-	 * @description Performs the branded load-in screen sequence.
+	 * @module animate
+	 * @description Handle a site-wide default animation style for elements in view.
 	 *
 	 */
-	var intro = {
+	var animate = {
+	    /**
+	     *
+	     * @public
+	     * @method init
+	     * @memberof animate
+	     * @description Method runs once when window loads.
+	     *
+	     */
+	    init: function init() {
+	        core.log("animate initialized");
+	
+	        core.util.emitter.on("app--update-animate", this.onUpdateAnimate.bind(this));
+	    },
+	
+	    /**
+	     *
+	     * @public
+	     * @method isActive
+	     * @memberof animate
+	     * @description Method informs PageController of active status.
+	     * @returns {boolean}
+	     *
+	     */
+	    isActive: function isActive() {
+	        return this.getElements() > 0;
+	    },
+	
+	    /**
+	     *
+	     * @public
+	     * @method onload
+	     * @memberof animate
+	     * @description Method performs onloading actions for this module.
+	     *
+	     */
+	    onload: function onload() {
+	        _isActive = true;
+	
+	        core.util.emitter.on("app--scroll", updateAnimate);
+	        core.util.emitter.on("app--resize", updateAnimate);
+	
+	        updateAnimate();
+	    },
+	
+	    /**
+	     *
+	     * @public
+	     * @method unload
+	     * @memberof animate
+	     * @description Method performs unloading actions for this module.
+	     *
+	     */
+	    unload: function unload() {
+	        this.teardown();
+	    },
+	
 	    /**
 	     *
 	     * @public
 	     * @method teardown
-	     * @memberof intro
-	     * @description Method removes loadin node from DOM.
+	     * @memberof animate
+	     * @description Method performs cleanup after this module. Remmoves events, null vars etc...
 	     *
 	     */
 	    teardown: function teardown() {
-	        core.dom.intro.removeClass("is-active");
+	        $_jsElements = null;
+	        _isActive = false;
+	    },
 	
-	        setTimeout(function () {
-	            core.dom.intro.remove();
+	    /**
+	     *
+	     * @public
+	     * @method getElements
+	     * @memberof animate
+	     * @description Method queries DOM for this modules node.
+	     * @returns {number}
+	     *
+	     */
+	    getElements: function getElements() {
+	        $_jsElements = core.dom.body.find(".js-animate");
 	
-	            setTimeout(function () {
-	                core.dom.intro = null;
-	            }, 0);
-	        }, _transTime);
+	        return $_jsElements.length;
+	    },
+	
+	    /**
+	     *
+	     * @public
+	     * @method onUpdateAnimate
+	     * @memberof animate
+	     * @description Handle updating node list and activating elements.
+	     *
+	     */
+	    onUpdateAnimate: function onUpdateAnimate() {
+	        this.getElements();
+	
+	        if (!_isActive) {
+	            this.onload();
+	        }
+	
+	        updateAnimate();
+	    }
+	};
+	
+	/**
+	 *
+	 * @private
+	 * @method updateAnimate
+	 * @memberof animate
+	 * @description Update animation nodes.
+	 *
+	 */
+	var updateAnimate = function updateAnimate() {
+	    var $elems = $_jsElements;
+	    var $elem = null;
+	    var i = $elems.length;
+	
+	    for (i; i--;) {
+	        $elem = $elems.eq(i);
+	
+	        if (core.util.isElementInViewport($elem[0])) {
+	            $elem.addClass("is-active");
+	        } else {
+	            $elem.removeClass("is-active");
+	        }
 	    }
 	};
 	
 	/******************************************************************************
 	 * Export
 	*******************************************************************************/
-	exports["default"] = intro;
+	exports["default"] = animate;
+	module.exports = exports["default"];
+
+/***/ },
+/* 38 */
+/*!****************************!*\
+  !*** ./js_src/projects.js ***!
+  \****************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+	
+	var _js_libsJqueryDistJquery = __webpack_require__(/*! js_libs/jquery/dist/jquery */ 4);
+	
+	var _js_libsJqueryDistJquery2 = _interopRequireDefault(_js_libsJqueryDistJquery);
+	
+	var _core = __webpack_require__(/*! ./core */ 1);
+	
+	var core = _interopRequireWildcard(_core);
+	
+	var $_jsPlates = null;
+	var _isActive = false;
+	var _transTime = core.util.getTransitionDuration(core.dom.shim[0]);
+	
+	/**
+	 *
+	 * @public
+	 * @module projects
+	 * @description Handle interactions associated with project grids / details
+	 *
+	 */
+	var projects = {
+	    /**
+	     *
+	     * @public
+	     * @method init
+	     * @memberof projects
+	     * @description Method runs once when window loads.
+	     *
+	     */
+	    init: function init() {
+	        core.dom.shim.detach();
+	
+	        core.dom.page.on("click", onPageClick);
+	        core.dom.body.on("click", ".js-project-tile", onTileClick);
+	
+	        core.log("projects initialized");
+	    },
+	
+	    openShim: function openShim() {
+	        _isActive = true;
+	
+	        core.dom.html.addClass("is-neverflow is-shim-active");
+	        core.dom.body.append(core.dom.shim);
+	
+	        setTimeout(function () {
+	            return core.dom.shim.addClass("is-active");
+	        }, 10);
+	    },
+	
+	    closeShim: function closeShim() {
+	        core.util.emitter.stop();
+	
+	        core.dom.shim.removeClass("is-active");
+	        core.dom.html.removeClass("is-neverflow");
+	
+	        setTimeout(function () {
+	            $_jsPlates = null;
+	
+	            core.dom.html.removeClass("is-shim-active");
+	            core.dom.shim.detach().empty();
+	
+	            setTimeout(function () {
+	                return _isActive = false;
+	            }, 10);
+	        }, _transTime);
+	    }
+	};
+	
+	var onUpdateEmitter = function onUpdateEmitter() {
+	    var $plate = null;
+	    var i = $_jsPlates.length;
+	
+	    for (i; i--;) {
+	        $plate = $_jsPlates.eq(i);
+	
+	        if (core.util.isElementInViewport($plate[0])) {
+	            $plate.addClass("is-active");
+	        } else {
+	            $plate.removeClass("is-active");
+	        }
+	    }
+	};
+	
+	var onPageClick = function onPageClick(e) {
+	    e.preventDefault();
+	
+	    if (!(0, _js_libsJqueryDistJquery2["default"])(e.target).closest(".js-project-tile").length) {
+	        projects.closeShim();
+	    }
+	};
+	
+	var onTileClick = function onTileClick(e) {
+	    e.preventDefault();
+	
+	    if (_isActive) {
+	        return false;
+	    }
+	
+	    projects.openShim();
+	
+	    _js_libsJqueryDistJquery2["default"].ajax({
+	        url: this.href,
+	        data: {
+	            nocache: true
+	        },
+	        method: "GET",
+	        dataType: "html"
+	    }).done(function (response) {
+	        var $node = (0, _js_libsJqueryDistJquery2["default"])(response);
+	        var $project = $node.filter(".js-page").find(".js-project");
+	
+	        $_jsPlates = $project.find(".js-project-plate");
+	
+	        core.dom.shim.html($project);
+	
+	        core.util.loadImages($project.find(".js-lazy-image"), core.util.noop).on("done", function () {
+	            onUpdateEmitter();
+	
+	            core.util.emitter.go(onUpdateEmitter);
+	        });
+	    });
+	};
+	
+	/******************************************************************************
+	 * Export
+	*******************************************************************************/
+	exports["default"] = projects;
 	module.exports = exports["default"];
 
 /***/ }
