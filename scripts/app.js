@@ -95,8 +95,6 @@
 	            _app = this;
 	        }
 	
-	        // HEY, BK, YOU ARE HERE!
-	
 	        this.loadType = core.dom.page.data("pageLoadType");
 	        this.project = null;
 	        this.isProjectTileClicked = false;
@@ -271,6 +269,8 @@
 	        key: "onMouseEnter",
 	        value: function onMouseEnter(e) {
 	            this.clearTimeoutById(this.timeoutId);
+	
+	            console.log(e);
 	
 	            var $tile = (0, _js_libsJqueryDistJquery2["default"])(e.currentTarget);
 	
