@@ -1,11 +1,15 @@
-<section class="intro js-intro screen is-active -text--center">
+<section class="overlay js-overlay screen -text--center is-active">
     <div class="valigner">
         <div class="valigner__cell">
-            <h1 class="h1">{website.siteTitle}</h1>
+            <h1 class="h1 js-overlay-title">{collection.title}</h1>
         </div>
     </div>
 </section>
 
 
 
-<section class="js-project-shim screen screen--project-shim"></section>
+<section class='project js-project screen {.section collection}{.equal? typeName "custom-photo"}is-active{.end}{.end}'>
+    {.repeated section items}
+        {@|apply photos.block}
+    {.end}
+</section>

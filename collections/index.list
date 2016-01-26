@@ -1,11 +1,10 @@
-<section class="grid js-grid">
+<section class="homepage js-homepage grid js-grid">
     {.section collection}
         {.repeated section collections}
-            <a href="{fullUrl}" class="grid__item animate js-animate expander-bottom js-project-tile js-router--ignore">
+            <a href="{fullUrl}" class="grid__item animate js-animate expander-bottom js-project-tile js-router--ignore" data-title="{title}">
                 {.section mainImage}
                     {@|apply image.block}
                 {.end}
-                <h1 class="grid__lock h4">{title}</h1>
             </a>
         {.end}
     {.end}

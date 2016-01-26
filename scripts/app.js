@@ -43,424 +43,285 @@
 /******/ ([
 /* 0 */
 /*!***********************!*\
-  !*** ./js_src/app.js ***!
+  !*** ./js_src/App.js ***!
   \***********************/
 /***/ function(module, exports, __webpack_require__) {
 
-	/*!
-	 *
-	 * App javascript
-	 *
-	 * Initializes Web App.
-	 *
-	 *
-	 */
 	"use strict";
 	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
 	
-	var _core = __webpack_require__(/*! ./core */ 1);
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var _js_libsJqueryDistJquery = __webpack_require__(/*! js_libs/jquery/dist/jquery */ 1);
+	
+	var _js_libsJqueryDistJquery2 = _interopRequireDefault(_js_libsJqueryDistJquery);
+	
+	var _core = __webpack_require__(/*! ./core */ 4);
 	
 	var core = _interopRequireWildcard(_core);
-	
-	var _intro = __webpack_require__(/*! ./intro */ 30);
-	
-	var _intro2 = _interopRequireDefault(_intro);
 	
 	var _router = __webpack_require__(/*! ./router */ 31);
 	
 	var _router2 = _interopRequireDefault(_router);
 	
-	var _projects = __webpack_require__(/*! ./projects */ 38);
+	var _overlay = __webpack_require__(/*! ./overlay */ 38);
 	
-	var _projects2 = _interopRequireDefault(_projects);
+	var _overlay2 = _interopRequireDefault(_overlay);
 	
-	/**
-	 *
-	 * @method modInit
-	 * @description Start modules that are NOT PageController plugs..
-	 *
-	 */
-	var modInit = function modInit() {
-	  core.cache.init(false);
-	  core.detect.init();
-	  core.resizes.init();
-	  core.scrolls.init();
-	  _router2["default"].init();
-	  _projects2["default"].init();
+	var _Project = __webpack_require__(/*! ./Project */ 39);
 	
-	  // Expose a global { app }
-	  window.app = {
-	    core: core,
-	    intro: _intro2["default"],
-	    router: _router2["default"],
-	    projects: _projects2["default"]
-	  };
-	};
+	var _Project2 = _interopRequireDefault(_Project);
+	
+	var _app = null;
 	
 	/**
 	 *
-	 * @method appInit
-	 * @description Tears down the branded load screen Instrument.
+	 * @public
+	 * @class App
+	 * @classdesc Load the App application Class to handle it ALL.
 	 *
 	 */
-	var appInit = function appInit() {
-	  core.util.emitter.off("app--init", appInit);
-	  core.util.emitter.off("app--preload-done", appInit);
 	
-	  core.dom.html.removeClass("is-clipped");
-	  core.dom.body.removeClass("is-clipped");
+	var App = (function () {
+	    function App() {
+	        _classCallCheck(this, App);
 	
-	  _intro2["default"].teardown();
-	};
+	        if (!_app) {
+	            _app = this;
+	        }
 	
-	/**
-	 *
-	 * @method Window.onload
-	 * @description Handles the Window.onload Event.
-	 *
-	 */
+	        // HEY, BK, YOU ARE HERE!
+	
+	        this.loadType = core.dom.page.data("pageLoadType");
+	        this.project = null;
+	        this.isProjectTileClicked = false;
+	        this.timeoutId = null;
+	        this.timeoutDelay = 300;
+	        this.core = core;
+	        this.router = _router2["default"];
+	        this.overlay = _overlay2["default"];
+	
+	        this.initModules();
+	        this.initProject();
+	        this.bindEvents();
+	
+	        core.log("App", this);
+	
+	        return _app;
+	    }
+	
+	    /******************************************************************************
+	     * Bootstrap
+	    *******************************************************************************/
+	
+	    _createClass(App, [{
+	        key: "destroy",
+	        value: function destroy() {
+	            this.core.dom.page.off("click", this._onPageClick);
+	            this.core.dom.body.off("click", this._onTileClick);
+	            this.core.dom.page.off("mouseenter", this._onMouseEnter);
+	            this.core.dom.page.off("mouseleave", this._onMouseLeave);
+	        }
+	    }, {
+	        key: "initProject",
+	        value: function initProject() {
+	            if (this.loadType !== "collection") {
+	                this.core.dom.project.detach();
+	            } else {
+	                this.project = new _Project2["default"](this, {
+	                    url: window.location.pathname,
+	                    onLoad: false
+	                });
+	            }
+	        }
+	    }, {
+	        key: "initModules",
+	        value: function initModules() {
+	            this.core.detect.init(this);
+	            this.core.resizes.init(this);
+	            this.core.scrolls.init(this);
+	            this.router.init(this);
+	            this.overlay.init(this);
+	        }
+	    }, {
+	        key: "loadHomepage",
+	        value: function loadHomepage() {
+	            var dataType = { dataType: "html" };
+	            var format = { format: "full", nocache: true };
+	
+	            this.core.api.collection("/", format, dataType).done(this.onLoadHomepage.bind(this));
+	        }
+	    }, {
+	        key: "bindEvents",
+	        value: function bindEvents() {
+	            this._onPageClick = this.onPageClick.bind(this);
+	            this._onTileClick = this.onTileClick.bind(this);
+	            this._onPreloadDone = this.onPreloadDone.bind(this);
+	            this._onMouseEnter = this.onMouseEnter.bind(this);
+	            this._onMouseLeave = this.onMouseLeave.bind(this);
+	            this._onLogoClick = this.onLogoClick.bind(this);
+	
+	            this.core.util.emitter.on("app--preload-done", this._onPreloadDone);
+	            this.core.dom.page.on("click", this._onPageClick);
+	            this.core.dom.body.on("click", ".js-project-tile", this._onTileClick);
+	            this.core.dom.page.on("mouseenter", ".js-project-tile", this._onMouseEnter);
+	            this.core.dom.page.on("mouseleave", ".js-project-tile", this._onMouseLeave);
+	            this.core.dom.logo.on("click", this._onLogoClick);
+	        }
+	    }, {
+	        key: "enableDocument",
+	        value: function enableDocument() {
+	            this.core.dom.html.removeClass("is-clipped");
+	            this.core.dom.body.removeClass("is-clipped");
+	        }
+	    }, {
+	        key: "isProjectActive",
+	        value: function isProjectActive() {
+	            return this.project !== null;
+	        }
+	    }, {
+	        key: "destroyProject",
+	        value: function destroyProject() {
+	            if (this.project) {
+	                this.enableDocument();
+	                this.project.destroy();
+	                this.project = null;
+	            }
+	        }
+	    }, {
+	        key: "clearTimeoutById",
+	        value: function clearTimeoutById(timeoutId) {
+	            try {
+	                clearTimeout(timeoutId);
+	            } catch (error) {
+	                throw error;
+	            }
+	        }
+	    }, {
+	        key: "onLoadHomepage",
+	        value: function onLoadHomepage(response) {
+	            var _this = this;
+	
+	            var $node = (0, _js_libsJqueryDistJquery2["default"])(response);
+	            var $grid = null;
+	
+	            if (typeof response === "object") {
+	                $grid = (0, _js_libsJqueryDistJquery2["default"])(response.response).find(".js-homepage").children();
+	            } else {
+	                $grid = $node.filter(".js-page").find(".js-homepage").children();
+	            }
+	
+	            this.core.dom.homepage.html($grid);
+	
+	            core.util.loadImages($grid.find(".js-lazy-image"), this.core.util.noop).on("done", function () {
+	                _this.core.util.emitter.fire("app--update-animate", $grid.find(".js-animate"));
+	            });
+	        }
+	    }, {
+	        key: "onPreloadDone",
+	        value: function onPreloadDone() {
+	            this.core.util.emitter.off("app--preload-done", this._onPreloadDone);
+	
+	            this.overlay.close();
+	
+	            if (this.loadType === "collection") {
+	                this.loadHomepage();
+	            } else {
+	                this.enableDocument();
+	            }
+	        }
+	    }, {
+	        key: "onLogoClick",
+	        value: function onLogoClick(e) {
+	            e.preventDefault();
+	
+	            this.router.push("/", function () {});
+	
+	            if (this.project) {
+	                this.destroyProject();
+	            }
+	        }
+	    }, {
+	        key: "onPageClick",
+	        value: function onPageClick(e) {
+	            e.preventDefault();
+	
+	            if (!(0, _js_libsJqueryDistJquery2["default"])(e.target).closest(".js-project-tile").length) {
+	                this.router.push("/", function () {});
+	
+	                this.destroyProject();
+	            }
+	        }
+	    }, {
+	        key: "onTileClick",
+	        value: function onTileClick(e) {
+	            e.preventDefault();
+	
+	            this.project = new _Project2["default"](this, {
+	                url: e.currentTarget.pathname,
+	                onLoad: function onLoad() {}
+	            });
+	        }
+	    }, {
+	        key: "onMouseEnter",
+	        value: function onMouseEnter(e) {
+	            this.clearTimeoutById(this.timeoutId);
+	
+	            var $tile = (0, _js_libsJqueryDistJquery2["default"])(e.currentTarget);
+	
+	            this.overlay.setTitle($tile.data("title"));
+	
+	            if (!this.overlay.isActive()) {
+	                this.overlay.open();
+	            }
+	        }
+	    }, {
+	        key: "onMouseLeave",
+	        value: function onMouseLeave() {
+	            var _this2 = this;
+	
+	            this.timeoutId = setTimeout(function () {
+	                if (!_this2.project) {
+	                    _this2.overlay.close();
+	                }
+	            }, this.timeoutDelay);
+	        }
+	    }]);
+	
+	    return App;
+	})();
+	
 	window.onload = function () {
-	
-	  // Initialize { app } modules
-	  modInit();
-	
-	  // Start-er-up after content preloads
-	  core.util.emitter.on("app--preload-done", appInit);
+	    window.app = new App();
 	};
 
 /***/ },
 /* 1 */
-/*!******************************!*\
-  !*** ./js_src/core/index.js ***!
-  \******************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 *
-	 * @public
-	 * @module core
-	 * @description Holds the different core modules.
-	 *
-	 */
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-	
-	var _detect = __webpack_require__(/*! ./detect */ 2);
-	
-	var _detect2 = _interopRequireDefault(_detect);
-	
-	var _dom = __webpack_require__(/*! ./dom */ 3);
-	
-	var _dom2 = _interopRequireDefault(_dom);
-	
-	var _preload = __webpack_require__(/*! ./preload */ 9);
-	
-	var _preload2 = _interopRequireDefault(_preload);
-	
-	var _resizes = __webpack_require__(/*! ./resizes */ 23);
-	
-	var _resizes2 = _interopRequireDefault(_resizes);
-	
-	var _scrolls = __webpack_require__(/*! ./scrolls */ 26);
-	
-	var _scrolls2 = _interopRequireDefault(_scrolls);
-	
-	var _util = __webpack_require__(/*! ./util */ 10);
-	
-	var util = _interopRequireWildcard(_util);
-	
-	var _config = __webpack_require__(/*! ./config */ 22);
-	
-	var _config2 = _interopRequireDefault(_config);
-	
-	var _env = __webpack_require__(/*! ./env */ 8);
-	
-	var _env2 = _interopRequireDefault(_env);
-	
-	var _log = __webpack_require__(/*! ./log */ 7);
-	
-	var _log2 = _interopRequireDefault(_log);
-	
-	var _api = __webpack_require__(/*! ./api */ 27);
-	
-	var _api2 = _interopRequireDefault(_api);
-	
-	var _cache = __webpack_require__(/*! ./cache */ 29);
-	
-	var _cache2 = _interopRequireDefault(_cache);
-	
-	exports.detect = _detect2["default"];
-	exports.dom = _dom2["default"];
-	exports.preload = _preload2["default"];
-	exports.resizes = _resizes2["default"];
-	exports.scrolls = _scrolls2["default"];
-	exports.util = util;
-	exports.config = _config2["default"];
-	exports.env = _env2["default"];
-	exports.log = _log2["default"];
-	exports.api = _api2["default"];
-	exports.cache = _cache2["default"];
-
-/***/ },
-/* 2 */
-/*!*******************************!*\
-  !*** ./js_src/core/detect.js ***!
-  \*******************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-	
-	var _dom = __webpack_require__(/*! ./dom */ 3);
-	
-	var _dom2 = _interopRequireDefault(_dom);
-	
-	var _log = __webpack_require__(/*! ./log */ 7);
-	
-	var _log2 = _interopRequireDefault(_log);
-	
-	/**
-	 *
-	 * @public
-	 * @module detect
-	 * @description Handles basic detection of touch devices.
-	 *
-	 */
-	var detect = {
-	    /**
-	     *
-	     * @public
-	     * @method init
-	     * @memberof detect
-	     * @description Initializes the detect module.
-	     *
-	     */
-	    init: function init() {
-	        this._isTouch = "ontouchstart" in window || window.DocumentTouch && document instanceof window.DocumentTouch;
-	        this._isMobile = /Android|BlackBerry|iPhone|iPad|iPod|IEMobile|Opera Mini/gi.test(window.navigator.userAgent);
-	
-	        if (this._isTouch) {
-	            _dom2["default"].html.addClass("is-touchable");
-	        } else {
-	            _dom2["default"].html.addClass("is-hoverable");
-	        }
-	
-	        (0, _log2["default"])("detect initialized");
-	    },
-	
-	    /**
-	     *
-	     * @public
-	     * @method isMobile
-	     * @memberof detect
-	     * @description Check for high-end mobile device user agents.
-	     * @returns {boolean}
-	     *
-	     */
-	    isMobile: function isMobile() {
-	        return this._isMobile;
-	    },
-	
-	    /**
-	     *
-	     * @public
-	     * @method isTouch
-	     * @memberof detect
-	     * @description Check whether this is a touch device or not.
-	     * [See Modernizr]{@link https://github.com/Modernizr/Modernizr/blob/master/feature-detects/touchevents.js}
-	     * @returns {boolean}
-	     *
-	     */
-	    isTouch: function isTouch() {
-	        return this._isTouch;
-	    },
-	
-	    /**
-	     *
-	     * @public
-	     * @method isDevice
-	     * @memberof detect
-	     * @description Must be `isMobile` and `isTouch`.
-	     * @returns {boolean}
-	     *
-	     */
-	    isDevice: function isDevice() {
-	        return this.isTouch() && this.isMobile();
-	    },
-	
-	    /**
-	     *
-	     * @public
-	     * @method isStandalone
-	     * @memberof detect
-	     * @description Must be window.standalone.
-	     * @returns {boolean}
-	     *
-	     */
-	    isStandalone: function isStandalone() {
-	        return "standalone" in window;
-	    }
-	};
-	
-	/******************************************************************************
-	 * Export
-	*******************************************************************************/
-	exports["default"] = detect;
-	module.exports = exports["default"];
-
-/***/ },
-/* 3 */
-/*!****************************!*\
-  !*** ./js_src/core/dom.js ***!
-  \****************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-	
-	var _js_libsJqueryDistJquery = __webpack_require__(/*! js_libs/jquery/dist/jquery */ 4);
-	
-	var _js_libsJqueryDistJquery2 = _interopRequireDefault(_js_libsJqueryDistJquery);
-	
-	var $_jsHeader = (0, _js_libsJqueryDistJquery2["default"])(".js-header");
-	
-	/**
-	 *
-	 * @public
-	 * @module dom
-	 * @description Holds high-level cached Nodes.
-	 *
-	 */
-	var dom = {
-	  /**
-	   *
-	   * @public
-	   * @member doc
-	   * @memberof dom
-	   * @description The cached document node.
-	   *
-	   */
-	  doc: (0, _js_libsJqueryDistJquery2["default"])(document),
-	
-	  /**
-	   *
-	   * @public
-	   * @member win
-	   * @memberof dom
-	   * @description The cached window node.
-	   *
-	   */
-	  win: (0, _js_libsJqueryDistJquery2["default"])(window),
-	
-	  /**
-	   *
-	   * @public
-	   * @member html
-	   * @memberof dom
-	   * @description The cached documentElement node.
-	   *
-	   */
-	  html: (0, _js_libsJqueryDistJquery2["default"])(document.documentElement),
-	
-	  /**
-	   *
-	   * @public
-	   * @member body
-	   * @memberof dom
-	   * @description The cached body node.
-	   *
-	   */
-	  body: (0, _js_libsJqueryDistJquery2["default"])(document.body),
-	
-	  /**
-	   *
-	   * @public
-	   * @member page
-	   * @memberof dom
-	   * @description The cached page container node.
-	   *
-	   */
-	  page: (0, _js_libsJqueryDistJquery2["default"])(".js-page"),
-	
-	  /**
-	   *
-	   * @public
-	   * @member shim
-	   * @memberof dom
-	   * @description The project shim node.
-	   *
-	   */
-	  shim: (0, _js_libsJqueryDistJquery2["default"])(".js-project-shim"),
-	
-	  /**
-	   *
-	   * @public
-	   * @member header
-	   * @memberof dom
-	   * @description The cached header node.
-	   *
-	   */
-	  header: $_jsHeader.data("$util", $_jsHeader.find(".js-header-util")),
-	
-	  /**
-	   *
-	   * @public
-	   * @member intro
-	   * @memberof dom
-	   * @description The cached brand moment node.
-	   *
-	   */
-	  intro: (0, _js_libsJqueryDistJquery2["default"])(".js-intro")
-	};
-	
-	/******************************************************************************
-	 * Export
-	*******************************************************************************/
-	exports["default"] = dom;
-	module.exports = exports["default"];
-
-/***/ },
-/* 4 */
 /*!***************************************!*\
   !*** ./js_libs/jquery/dist/jquery.js ***!
   \***************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function(global) {module.exports = global["$"] = __webpack_require__(/*! -!./~/expose-loader?jQuery!./js_libs/jquery/dist/jquery.js */ 5);
+	/* WEBPACK VAR INJECTION */(function(global) {module.exports = global["$"] = __webpack_require__(/*! -!./~/expose-loader?jQuery!./js_libs/jquery/dist/jquery.js */ 2);
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 5 */
+/* 2 */
 /*!****************************************************************!*\
   !*** ./~/expose-loader?jQuery!./js_libs/jquery/dist/jquery.js ***!
   \****************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function(global) {module.exports = global["jQuery"] = __webpack_require__(/*! -!./js_libs/jquery/dist/jquery.js */ 6);
+	/* WEBPACK VAR INJECTION */(function(global) {module.exports = global["jQuery"] = __webpack_require__(/*! -!./js_libs/jquery/dist/jquery.js */ 3);
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 6 */
+/* 3 */
 /*!***************************************!*\
   !*** ./js_libs/jquery/dist/jquery.js ***!
   \***************************************/
@@ -8119,6 +7980,338 @@
 
 
 /***/ },
+/* 4 */
+/*!******************************!*\
+  !*** ./js_src/core/index.js ***!
+  \******************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 *
+	 * @public
+	 * @module core
+	 * @description Holds the different core modules.
+	 *
+	 */
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+	
+	var _detect = __webpack_require__(/*! ./detect */ 5);
+	
+	var _detect2 = _interopRequireDefault(_detect);
+	
+	var _dom = __webpack_require__(/*! ./dom */ 6);
+	
+	var _dom2 = _interopRequireDefault(_dom);
+	
+	var _preload = __webpack_require__(/*! ./preload */ 9);
+	
+	var _preload2 = _interopRequireDefault(_preload);
+	
+	var _resizes = __webpack_require__(/*! ./resizes */ 23);
+	
+	var _resizes2 = _interopRequireDefault(_resizes);
+	
+	var _scrolls = __webpack_require__(/*! ./scrolls */ 26);
+	
+	var _scrolls2 = _interopRequireDefault(_scrolls);
+	
+	var _util = __webpack_require__(/*! ./util */ 10);
+	
+	var util = _interopRequireWildcard(_util);
+	
+	var _config = __webpack_require__(/*! ./config */ 22);
+	
+	var _config2 = _interopRequireDefault(_config);
+	
+	var _env = __webpack_require__(/*! ./env */ 8);
+	
+	var _env2 = _interopRequireDefault(_env);
+	
+	var _log = __webpack_require__(/*! ./log */ 7);
+	
+	var _log2 = _interopRequireDefault(_log);
+	
+	var _api = __webpack_require__(/*! ./api */ 27);
+	
+	var _api2 = _interopRequireDefault(_api);
+	
+	var _cache = __webpack_require__(/*! ./cache */ 29);
+	
+	var _cache2 = _interopRequireDefault(_cache);
+	
+	exports.detect = _detect2["default"];
+	exports.dom = _dom2["default"];
+	exports.preload = _preload2["default"];
+	exports.resizes = _resizes2["default"];
+	exports.scrolls = _scrolls2["default"];
+	exports.util = util;
+	exports.config = _config2["default"];
+	exports.env = _env2["default"];
+	exports.log = _log2["default"];
+	exports.api = _api2["default"];
+	exports.cache = _cache2["default"];
+
+/***/ },
+/* 5 */
+/*!*******************************!*\
+  !*** ./js_src/core/detect.js ***!
+  \*******************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+	
+	var _dom = __webpack_require__(/*! ./dom */ 6);
+	
+	var _dom2 = _interopRequireDefault(_dom);
+	
+	var _log = __webpack_require__(/*! ./log */ 7);
+	
+	var _log2 = _interopRequireDefault(_log);
+	
+	/**
+	 *
+	 * @public
+	 * @module detect
+	 * @description Handles basic detection of touch devices.
+	 *
+	 */
+	var detect = {
+	    /**
+	     *
+	     * @public
+	     * @method init
+	     * @memberof detect
+	     * @description Initializes the detect module.
+	     *
+	     */
+	    init: function init() {
+	        this._isTouch = "ontouchstart" in window || window.DocumentTouch && document instanceof window.DocumentTouch;
+	        this._isMobile = /Android|BlackBerry|iPhone|iPad|iPod|IEMobile|Opera Mini/gi.test(window.navigator.userAgent);
+	
+	        if (this._isTouch) {
+	            _dom2["default"].html.addClass("is-touchable");
+	        } else {
+	            _dom2["default"].html.addClass("is-hoverable");
+	        }
+	
+	        (0, _log2["default"])("detect initialized");
+	    },
+	
+	    /**
+	     *
+	     * @public
+	     * @method isMobile
+	     * @memberof detect
+	     * @description Check for high-end mobile device user agents.
+	     * @returns {boolean}
+	     *
+	     */
+	    isMobile: function isMobile() {
+	        return this._isMobile;
+	    },
+	
+	    /**
+	     *
+	     * @public
+	     * @method isTouch
+	     * @memberof detect
+	     * @description Check whether this is a touch device or not.
+	     * [See Modernizr]{@link https://github.com/Modernizr/Modernizr/blob/master/feature-detects/touchevents.js}
+	     * @returns {boolean}
+	     *
+	     */
+	    isTouch: function isTouch() {
+	        return this._isTouch;
+	    },
+	
+	    /**
+	     *
+	     * @public
+	     * @method isDevice
+	     * @memberof detect
+	     * @description Must be `isMobile` and `isTouch`.
+	     * @returns {boolean}
+	     *
+	     */
+	    isDevice: function isDevice() {
+	        return this.isTouch() && this.isMobile();
+	    },
+	
+	    /**
+	     *
+	     * @public
+	     * @method isStandalone
+	     * @memberof detect
+	     * @description Must be window.standalone.
+	     * @returns {boolean}
+	     *
+	     */
+	    isStandalone: function isStandalone() {
+	        return "standalone" in window;
+	    }
+	};
+	
+	/******************************************************************************
+	 * Export
+	*******************************************************************************/
+	exports["default"] = detect;
+	module.exports = exports["default"];
+
+/***/ },
+/* 6 */
+/*!****************************!*\
+  !*** ./js_src/core/dom.js ***!
+  \****************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+	
+	var _js_libsJqueryDistJquery = __webpack_require__(/*! js_libs/jquery/dist/jquery */ 1);
+	
+	var _js_libsJqueryDistJquery2 = _interopRequireDefault(_js_libsJqueryDistJquery);
+	
+	var $_jsHeader = (0, _js_libsJqueryDistJquery2["default"])(".js-header");
+	var $_jsOverlay = (0, _js_libsJqueryDistJquery2["default"])(".js-overlay");
+	
+	/**
+	 *
+	 * @public
+	 * @module dom
+	 * @description Holds high-level cached Nodes.
+	 *
+	 */
+	var dom = {
+	  /**
+	   *
+	   * @public
+	   * @member doc
+	   * @memberof dom
+	   * @description The cached document node.
+	   *
+	   */
+	  doc: (0, _js_libsJqueryDistJquery2["default"])(document),
+	
+	  /**
+	   *
+	   * @public
+	   * @member win
+	   * @memberof dom
+	   * @description The cached window node.
+	   *
+	   */
+	  win: (0, _js_libsJqueryDistJquery2["default"])(window),
+	
+	  /**
+	   *
+	   * @public
+	   * @member html
+	   * @memberof dom
+	   * @description The cached documentElement node.
+	   *
+	   */
+	  html: (0, _js_libsJqueryDistJquery2["default"])(document.documentElement),
+	
+	  /**
+	   *
+	   * @public
+	   * @member body
+	   * @memberof dom
+	   * @description The cached body node.
+	   *
+	   */
+	  body: (0, _js_libsJqueryDistJquery2["default"])(document.body),
+	
+	  /**
+	   *
+	   * @public
+	   * @member page
+	   * @memberof dom
+	   * @description The cached page container node.
+	   *
+	   */
+	  page: (0, _js_libsJqueryDistJquery2["default"])(".js-page"),
+	
+	  /**
+	   *
+	   * @public
+	   * @member project
+	   * @memberof dom
+	   * @description The project view node.
+	   *
+	   */
+	  project: (0, _js_libsJqueryDistJquery2["default"])(".js-project"),
+	
+	  /**
+	   *
+	   * @public
+	   * @member logo
+	   * @memberof dom
+	   * @description The logo element.
+	   *
+	   */
+	  logo: (0, _js_libsJqueryDistJquery2["default"])(".js-logo"),
+	
+	  /**
+	   *
+	   * @public
+	   * @member homepage
+	   * @memberof dom
+	   * @description The homepage grid element.
+	   *
+	   */
+	  homepage: (0, _js_libsJqueryDistJquery2["default"])(".js-homepage"),
+	
+	  /**
+	   *
+	   * @public
+	   * @member header
+	   * @memberof dom
+	   * @description The cached header node.
+	   *
+	   */
+	  header: $_jsHeader.data("$util", $_jsHeader.find(".js-header-util")),
+	
+	  /**
+	   *
+	   * @public
+	   * @member intro
+	   * @memberof dom
+	   * @description The cached brand moment node.
+	   *
+	   */
+	  overlay: {
+	    element: $_jsOverlay,
+	    elementTitle: $_jsOverlay.find(".js-overlay-title")
+	  }
+	};
+	
+	/******************************************************************************
+	 * Export
+	*******************************************************************************/
+	exports["default"] = dom;
+	module.exports = exports["default"];
+
+/***/ },
 /* 7 */
 /*!****************************!*\
   !*** ./js_src/core/log.js ***!
@@ -8248,7 +8441,7 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 	
-	var _dom = __webpack_require__(/*! ./dom */ 3);
+	var _dom = __webpack_require__(/*! ./dom */ 6);
 	
 	var _dom2 = _interopRequireDefault(_dom);
 	
@@ -8422,7 +8615,7 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 	
-	var _js_libsJqueryDistJquery = __webpack_require__(/*! js_libs/jquery/dist/jquery */ 4);
+	var _js_libsJqueryDistJquery = __webpack_require__(/*! js_libs/jquery/dist/jquery */ 1);
 	
 	var _js_libsJqueryDistJquery2 = _interopRequireDefault(_js_libsJqueryDistJquery);
 	
@@ -8458,7 +8651,7 @@
 	
 	var _fgLoadjs2 = _interopRequireDefault(_fgLoadjs);
 	
-	var _dom = __webpack_require__(/*! ./dom */ 3);
+	var _dom = __webpack_require__(/*! ./dom */ 6);
 	
 	var _dom2 = _interopRequireDefault(_dom);
 	
@@ -8466,7 +8659,7 @@
 	
 	var _config2 = _interopRequireDefault(_config);
 	
-	var _detect = __webpack_require__(/*! ./detect */ 2);
+	var _detect = __webpack_require__(/*! ./detect */ 5);
 	
 	var _detect2 = _interopRequireDefault(_detect);
 	
@@ -14427,24 +14620,6 @@
 	  /**
 	   *
 	   * @public
-	   * @member defaultDragBeltOptions
-	   * @memberof config
-	   * @description The base options for Draggable().
-	   *
-	   */
-	  defaultDragBeltOptions: {
-	    type: "x",
-	    edgeResistance: 0.6,
-	    dragResistance: 0.25,
-	    throwProps: true,
-	    cursor: "grab",
-	    lockAxis: true,
-	    zIndexBoost: false
-	  },
-	
-	  /**
-	   *
-	   * @public
 	   * @member sqsMaxImgWidth
 	   * @memberof config
 	   * @description The max width Squarespace allows for images.
@@ -14476,46 +14651,6 @@
 	  /**
 	   *
 	   * @public
-	   * @member defaultCategory
-	   * @memberof config
-	   * @description The non-category that signifies "all".
-	   *
-	   */
-	  defaultCategory: "All",
-	
-	  /**
-	   *
-	   * @public
-	   * @member caseStudyCollection
-	   * @memberof config
-	   * @description The collection typeName configured for case studies.
-	   *
-	   */
-	  caseStudyCustomType: "custom_case_study",
-	
-	  /**
-	   *
-	   * @public
-	   * @member caseStudyCollection
-	   * @memberof config
-	   * @description The collection typeName configured for device video screens.
-	   *
-	   */
-	  deviceVideoCustomType: "custom_device_video",
-	
-	  /**
-	   *
-	   * @public
-	   * @member caseStudyCollection
-	   * @memberof config
-	   * @description The collection typeName configured for custom video posts.
-	   *
-	   */
-	  customVideoCustomType: "custom_video",
-	
-	  /**
-	   *
-	   * @public
 	   * @member defaultEasing
 	   * @memberof config
 	   * @description The default easing function for javascript Tweens.
@@ -14532,36 +14667,6 @@
 	   *
 	   */
 	  defaultDuration: 300,
-	
-	  /**
-	   *
-	   * @public
-	   * @member defaultVideoChannel
-	   * @memberof config
-	   * @description The [MediaBox]{@link https://github.com/ProperJS/MediaBox} channel used for video.
-	   *
-	   */
-	  defaultVideoChannel: "vid",
-	
-	  /**
-	   *
-	   * @public
-	   * @member autoplayVideoChannel
-	   * @memberof config
-	   * @description The [MediaBox]{@link https://github.com/ProperJS/MediaBox} channel used for autoplay video.
-	   *
-	   */
-	  autoplayVideoChannel: "vid--autoplay",
-	
-	  /**
-	   *
-	   * @public
-	   * @member defaultAudioChannel
-	   * @memberof config
-	   * @description The [MediaBox]{@link https://github.com/ProperJS/MediaBox} channel used for audio.
-	   *
-	   */
-	  defaultAudioChannel: "bgm",
 	
 	  /**
 	   *
@@ -14592,16 +14697,6 @@
 	   *
 	   */
 	  imageLoaderAttr: "data-imageloader",
-	
-	  /**
-	   *
-	   * @public
-	   * @member activateLinkAttr
-	   * @memberof config
-	   * @description The string attribute for link hover activation.
-	   *
-	   */
-	  activateLinkAttr: "data-title",
 	
 	  /**
 	   *
@@ -14872,11 +14967,11 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 	
-	var _dom = __webpack_require__(/*! ./dom */ 3);
+	var _dom = __webpack_require__(/*! ./dom */ 6);
 	
 	var _dom2 = _interopRequireDefault(_dom);
 	
-	var _detect = __webpack_require__(/*! ./detect */ 2);
+	var _detect = __webpack_require__(/*! ./detect */ 5);
 	
 	var _detect2 = _interopRequireDefault(_detect);
 	
@@ -15064,13 +15159,15 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 	
-	var _js_libsJqueryDistJquery = __webpack_require__(/*! js_libs/jquery/dist/jquery */ 4);
+	var _js_libsJqueryDistJquery = __webpack_require__(/*! js_libs/jquery/dist/jquery */ 1);
 	
 	var _js_libsJqueryDistJquery2 = _interopRequireDefault(_js_libsJqueryDistJquery);
 	
 	var _paramalama = __webpack_require__(/*! paramalama */ 28);
 	
 	var _paramalama2 = _interopRequireDefault(_paramalama);
+	
+	//import config from "./config";
 	
 	var _cache = __webpack_require__(/*! ./cache */ 29);
 	
@@ -15233,7 +15330,7 @@
 	            }, 1);
 	        } else {
 	            this.request(this.endpoint(uri)).done(function (data) {
-	                _cache2["default"].set(data.collection.urlId, data.collection);
+	                //cache.set( data.collection.urlId, data.collection );
 	
 	                handle(data.collection);
 	            }).fail(function (xhr, status, error) {
@@ -15272,7 +15369,7 @@
 	            this.request(this.endpoint(seg), params, options).done(function (data) {
 	                // Resolve with `responseText`
 	                if (typeof data === "string") {
-	                    _cache2["default"].set(uri, data);
+	                    //cache.set( uri, data );
 	
 	                    def.resolve(data);
 	                } else {
@@ -15284,7 +15381,7 @@
 	                        pagination: data.pagination || null
 	                    };
 	
-	                    _cache2["default"].set(uri, collection);
+	                    //cache.set( uri, collection );
 	
 	                    def.resolve(data.items || data.item ? collection : null);
 	                }
@@ -15418,252 +15515,33 @@
 	"use strict";
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 	
-	var _js_libsJqueryDistJquery = __webpack_require__(/*! js_libs/jquery/dist/jquery */ 4);
+	var _Store = __webpack_require__(/*! ./Store */ 30);
 	
-	var _js_libsJqueryDistJquery2 = _interopRequireDefault(_js_libsJqueryDistJquery);
-	
-	var _log = __webpack_require__(/*! ./log */ 7);
-	
-	var _log2 = _interopRequireDefault(_log);
-	
-	var _cache = null;
-	var _timestamp = null;
-	var _cacheLocal = {}; // In-Memory {object} cache
-	var _initialized = false;
-	var _cacheAccess = "instrument-cache";
-	var _timeAccess = "instrument-timestamp";
-	var _duration = 604800000; // 1 Week in milliseconds
-	var _allocated = 5242880; // (1024 * 1024 * 5) - 5MB
+	var _Store2 = _interopRequireDefault(_Store);
 	
 	/**
 	 *
 	 * @public
 	 * @module cache
-	 * @description Provide some data CASH!!!.
-	 *              Local Storage is synchronous - so we don't want to set
-	 *              every time cache is modified. Ideally we can use an app event
-	 *              hook to set the cache to device when we have a free moment.
-	 *              Ideally, we're just looking at NOT BLOCKING REQUESTS just to
-	 *              set some data to the device storage.
-	 *
-	 *              There are 2 places where XHR requests happen in `OUR` app:
-	 *              The api module and PageController.
-	 *              This excludes media content requests - audio and video.
-	 *              But that's fine I think.
-	 *
-	 *              Some stuff I was reading:
-	 *              http://www.sitepoint.com/html5-local-storage-revisited/
-	 *              http://www.html5rocks.com/en/tutorials/offline/quota-research/
+	 * @description Return Singleton instances of the cache Store.
 	 *
 	 */
-	var cache = {
-	    /**
-	     *
-	     * @public
-	     * @method init
-	     * @param {boolean} enableStorage Should we load from LocalStorage initially ?
-	     * @memberof cache
-	     * @description Initialize the cache - looks at Local Storage
-	     * @returns {object} if already initialized
-	     *
-	     */
-	    init: function init(enableStorage) {
-	        if (_initialized) {
-	            return this.get();
-	        }
-	
-	        _initialized = true;
-	        _cache = window.localStorage.getItem(_cacheAccess);
-	        _timestamp = window.localStorage.getItem(_timeAccess);
-	
-	        // Cache exists - Timestamp exists
-	        if (_cache && _timestamp) {
-	            _cache = JSON.parse(_cache);
-	            _timestamp = parseInt(_timestamp, 10);
-	
-	            // Neither exist - setup the cache and timestamp
-	            // Timestamp remains null for this case
-	        } else {
-	                _cache = {};
-	                _timestamp = Date.now();
-	            }
-	
-	        (0, _log2["default"])("cache initialized", _cache, _timestamp);
-	
-	        if (enableStorage) {
-	            this.tryFlush();
-	
-	            // Storage disabled, flush it clean...
-	        } else {
-	                this.flush();
-	            }
-	    },
-	
-	    /**
-	     *
-	     * @public
-	     * @method tryFlush
-	     * @memberof cache
-	     * @description Flush the cache if necessary
-	     *
-	     */
-	    tryFlush: function tryFlush() {
-	        // Timestamp so check how long data has been stored
-	        // This condition establishes a 1 week duration before data flush
-	        // This condition also checks the size stored vs what is allocated - 5MB
-	        if (Date.now() - _timestamp >= _duration || _allocated - JSON.stringify(window.localStorage).length <= 0) {
-	            this.flush();
-	        }
-	    },
-	
-	    /**
-	     *
-	     * @public
-	     * @method flush
-	     * @memberof cache
-	     * @description Manually flush the Local Storage cache
-	     *
-	     */
-	    flush: function flush() {
-	        // New empty cache
-	        _cache = {};
-	
-	        // New empty local cache
-	        _cacheLocal = {};
-	
-	        // New Timestamp for NOW
-	        _timestamp = Date.now();
-	
-	        // Store the new cache object
-	        this.save();
-	    },
-	
-	    /**
-	     *
-	     * @public
-	     * @method save
-	     * @memberof cache
-	     * @description Perform the actual synchronous write to Local Storage
-	     *
-	     */
-	    save: function save() {
-	        window.localStorage.setItem(_timeAccess, _timestamp);
-	        window.localStorage.setItem(_cacheAccess, JSON.stringify(_cache));
-	    },
-	
-	    /**
-	     *
-	     * @public
-	     * @method slug
-	     * @param {string} uri The string to slugify
-	     * @memberof cache
-	     * @description Slug a uri string
-	     * @returns {string}
-	     *
-	     */
-	    slug: function slug(uri) {
-	        return uri.replace(/^\/|\/$/g, "").replace(/\/|\?|\&|=|\s/g, "-").toLowerCase();
-	    },
-	
-	    /**
-	     *
-	     * @public
-	     * @method set
-	     * @param {string} id The index key
-	     * @param {mixed} val The value to store
-	     * @memberof cache
-	     * @description Set a key's value in the cache
-	     *
-	     */
-	    set: function set(id, val) {
-	        id = this.slug(id);
-	
-	        _cache[id] = val;
-	
-	        // Maybe don't do this EVERY time
-	        // @see module notes above about this
-	        this.save();
-	    },
-	
-	    /**
-	     *
-	     * @public
-	     * @method get
-	     * @param {string} id The index key
-	     * @memberof cache
-	     * @description Get a key's value from the cache
-	     * @returns {mixed}
-	     *
-	     */
-	    get: function get(id) {
-	        id = id && this.slug(id);
-	
-	        return id ? this.getValue(_cache[id]) : _cache;
-	    },
-	
-	    /**
-	     *
-	     * @public
-	     * @method getValue
-	     * @param {mixed} val The accessed value
-	     * @memberof cache
-	     * @description Get a value so cache is non-mutable from outside
-	     * @returns {mixed}
-	     *
-	     */
-	    getValue: function getValue(val) {
-	        return typeof val === "string" ? String(val) : val ? _js_libsJqueryDistJquery2["default"].extend(_js_libsJqueryDistJquery2["default"].isArray(val) ? [] : {}, val) : null;
-	    },
-	
-	    /**
-	     *
-	     * @public
-	     * @method setLocal
-	     * @param {string} id The index key
-	     * @param {mixed} val The value to store
-	     * @memberof cache
-	     * @description Set a key's value in the local cache
-	     *
-	     */
-	    setLocal: function setLocal(id, val) {
-	        id = this.slug(id);
-	
-	        _cacheLocal[id] = val;
-	    },
-	
-	    /**
-	     *
-	     * @public
-	     * @method getLocal
-	     * @param {string} id The index key
-	     * @memberof cache
-	     * @description Get a key's value from the local cache
-	     * @returns {mixed}
-	     *
-	     */
-	    getLocal: function getLocal(id) {
-	        id = id && this.slug(id);
-	
-	        return id ? this.getValue(_cacheLocal[id]) : _cacheLocal;
-	    }
-	};
-	
-	/******************************************************************************
-	 * Export
-	*******************************************************************************/
-	exports["default"] = cache;
+	exports["default"] = new _Store2["default"]({
+	  // If TRUE the Store will use LocalStorage...
+	  enableStorage: false
+	});
 	module.exports = exports["default"];
 
 /***/ },
 /* 30 */
-/*!*************************!*\
-  !*** ./js_src/intro.js ***!
-  \*************************/
+/*!******************************!*\
+  !*** ./js_src/core/Store.js ***!
+  \******************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -15672,47 +15550,298 @@
 	    value: true
 	});
 	
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 	
-	var _core = __webpack_require__(/*! ./core */ 1);
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 	
-	var core = _interopRequireWildcard(_core);
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	var _transTime = core.util.getTransitionDuration(core.dom.intro[0]);
+	var _js_libsJqueryDistJquery = __webpack_require__(/*! js_libs/jquery/dist/jquery */ 1);
+	
+	var _js_libsJqueryDistJquery2 = _interopRequireDefault(_js_libsJqueryDistJquery);
+	
+	var _log = __webpack_require__(/*! ./log */ 7);
+	
+	var _log2 = _interopRequireDefault(_log);
+	
+	// Singleton
+	var _instance = null;
+	var _initialized = false;
+	
+	// In-Memory {object} cache
+	var _cache = {};
+	var _timestamp = null;
+	var _cacheAccess = "instrument-cache";
+	var _timeAccess = "instrument-timestamp";
+	
+	// 1 Week in milliseconds
+	var _duration = 604800000;
+	
+	// (1024 * 1024 * 5) - 5MB
+	var _allocated = 5242880;
 	
 	/**
 	 *
 	 * @public
-	 * @module intro
-	 * @description Performs the branded load-in screen sequence.
+	 * @class Store
+	 * @param {object} options The Store settings
+	 * @classdesc Handles how data / content is cached and stored for webapp.
+	 *
+	 *            Local Storage is synchronous - so we don't want to set
+	 *            every time cache is modified. Ideally we can use an app event
+	 *            hook to set the cache to device when we have a free moment.
+	 *            Ideally, we're just looking at NOT BLOCKING REQUESTS just to
+	 *            set some data to the device storage.
+	 *
+	 *            There are 2 places where XHR requests happen in `OUR` app:
+	 *            The api module and PageController.
+	 *            This excludes media content requests - audio and video.
+	 *            But that's fine I think.
+	 *
+	 *            Some stuff I was reading:
+	 *            http://www.sitepoint.com/html5-local-storage-revisited/
+	 *            http://www.html5rocks.com/en/tutorials/offline/quota-research/
 	 *
 	 */
-	var intro = {
+	
+	var Store = (function () {
+	    function Store(options) {
+	        _classCallCheck(this, Store);
+	
+	        if (!_instance) {
+	            _instance = this;
+	
+	            this._opts = options;
+	            this._init();
+	        }
+	
+	        return _instance;
+	    }
+	
+	    /******************************************************************************
+	     * Export
+	    *******************************************************************************/
+	
 	    /**
 	     *
 	     * @public
-	     * @method teardown
-	     * @memberof intro
-	     * @description Method removes loadin node from DOM.
+	     * @instance
+	     * @method _init
+	     * @memberof Store
+	     * @description One time Store initialization
 	     *
 	     */
-	    teardown: function teardown() {
-	        core.dom.intro.removeClass("is-active");
 	
-	        setTimeout(function () {
-	            core.dom.intro.remove();
+	    _createClass(Store, [{
+	        key: "_init",
+	        value: function _init() {
+	            if (_initialized) {
+	                return;
+	            }
 	
-	            setTimeout(function () {
-	                core.dom.intro = null;
-	            }, 0);
-	        }, _transTime);
-	    }
-	};
+	            _initialized = true;
 	
-	/******************************************************************************
-	 * Export
-	*******************************************************************************/
-	exports["default"] = intro;
+	            if (this._opts.enableStorage) {
+	                this.tryFlush();
+	            } else {
+	                this.tryClean();
+	            }
+	
+	            (0, _log2["default"])("Singleton Store initialized", this);
+	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @instance
+	         * @method tryClean
+	         * @memberof Store
+	         * @description If initialized with storage disabled, attempt to remove old storage if it exists
+	         *
+	         */
+	    }, {
+	        key: "tryClean",
+	        value: function tryClean() {
+	            window.localStorage.removeItem(_timeAccess);
+	            window.localStorage.removeItem(_cacheAccess);
+	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @instance
+	         * @method tryFlush
+	         * @memberof Store
+	         * @description Flush the cache if necessary
+	         *
+	         */
+	    }, {
+	        key: "tryFlush",
+	        value: function tryFlush() {
+	            _cache = window.localStorage.getItem(_cacheAccess);
+	            _timestamp = window.localStorage.getItem(_timeAccess);
+	
+	            // Store exists - Timestamp exists
+	            if (_cache && _timestamp) {
+	                _cache = JSON.parse(_cache);
+	                _timestamp = parseInt(_timestamp, 10);
+	
+	                // Neither exist - setup the cache and timestamp
+	                // Timestamp remains null for this case
+	            } else {
+	                    _cache = {};
+	                    _timestamp = Date.now();
+	                }
+	
+	            // Timestamp so check how long data has been stored
+	            // This condition establishes a 1 week duration before data flush
+	            // This condition also checks the size stored vs what is allocated - 5MB
+	            if (Date.now() - _timestamp >= _duration || _allocated - JSON.stringify(window.localStorage).length <= 0) {
+	                this.flush();
+	            }
+	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @instance
+	         * @method flush
+	         * @memberof Store
+	         * @description Manually flush the Local Storage cache
+	         *
+	         */
+	    }, {
+	        key: "flush",
+	        value: function flush() {
+	            // New empty cache
+	            _cache = {};
+	
+	            // New Timestamp for NOW
+	            _timestamp = Date.now();
+	
+	            // Store the new cache object
+	            this.save();
+	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @instance
+	         * @method save
+	         * @memberof Store
+	         * @description Perform the actual synchronous write to Local Storage
+	         *
+	         */
+	    }, {
+	        key: "save",
+	        value: function save() {
+	            if (!this._opts.enableStorage) {
+	                (0, _log2["default"])("Cache Storage disabled - Not writing to LocalStorage");
+	                return;
+	            }
+	
+	            window.localStorage.setItem(_timeAccess, _timestamp);
+	            window.localStorage.setItem(_cacheAccess, JSON.stringify(_cache));
+	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @instance
+	         * @method slug
+	         * @param {string} uri The string to slugify
+	         * @memberof Store
+	         * @description Slug a uri string
+	         * @returns {string}
+	         *
+	         */
+	    }, {
+	        key: "slug",
+	        value: function slug(uri) {
+	            uri = uri.replace(/^\/|\/$/g, "").replace(/\/|\?|\&|=|\s/g, "-").toLowerCase();
+	            uri = uri === "" ? "homepage" : uri;
+	
+	            return uri;
+	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @instance
+	         * @method set
+	         * @param {string} id The index key
+	         * @param {mixed} val The value to store
+	         * @memberof Store
+	         * @description Set a key's value in the cache
+	         *
+	         */
+	    }, {
+	        key: "set",
+	        value: function set(id, val) {
+	            id = this.slug(id);
+	
+	            _cache[id] = val;
+	
+	            this.save();
+	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @instance
+	         * @method get
+	         * @param {string} id The index key
+	         * @memberof Store
+	         * @description Get a key's value from the cache
+	         * @returns {mixed}
+	         *
+	         */
+	    }, {
+	        key: "get",
+	        value: function get(id) {
+	            id = id && this.slug(id);
+	
+	            return id ? this.getValue(_cache[id]) : _cache;
+	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @instance
+	         * @method getValue
+	         * @param {mixed} val The accessed value
+	         * @memberof Store
+	         * @description Get a value so cache is non-mutable from outside
+	         * @returns {mixed}
+	         *
+	         */
+	    }, {
+	        key: "getValue",
+	        value: function getValue(val) {
+	            return typeof val === "string" ? String(val) : val ? _js_libsJqueryDistJquery2["default"].extend(_js_libsJqueryDistJquery2["default"].isArray(val) ? [] : {}, val) : null;
+	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @instance
+	         * @method remove
+	         * @param {string} id The index key
+	         * @memberof Store
+	         * @description Remove a key/val pair from the cache
+	         *
+	         */
+	    }, {
+	        key: "remove",
+	        value: function remove(id) {
+	            delete _cache[id];
+	        }
+	    }]);
+	
+	    return Store;
+	})();
+	
+	exports["default"] = Store;
 	module.exports = exports["default"];
 
 /***/ },
@@ -15732,7 +15861,7 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 	
-	var _js_libsJqueryDistJquery = __webpack_require__(/*! js_libs/jquery/dist/jquery */ 4);
+	var _js_libsJqueryDistJquery = __webpack_require__(/*! js_libs/jquery/dist/jquery */ 1);
 	
 	var _js_libsJqueryDistJquery2 = _interopRequireDefault(_js_libsJqueryDistJquery);
 	
@@ -15740,7 +15869,7 @@
 	
 	var _properjsPagecontroller2 = _interopRequireDefault(_properjsPagecontroller);
 	
-	var _core = __webpack_require__(/*! ./core */ 1);
+	var _core = __webpack_require__(/*! ./core */ 4);
 	
 	var core = _interopRequireWildcard(_core);
 	
@@ -15762,13 +15891,15 @@
 	     *
 	     * @public
 	     * @method init
+	     * @param {App} app Instance of the main application
 	     * @memberof router
 	     * @description Initialize the router module.
 	     *
 	     */
-	    init: function init() {
+	    init: function init(app) {
+	        this.app = app;
 	        this.bindCaptureLinks();
-	        this.createPageController();
+	        this.initPageController();
 	
 	        core.log("router initialized");
 	    },
@@ -15776,12 +15907,14 @@
 	    /**
 	     *
 	     * @public
-	     * @method createPageController
+	     * @method initPageController
 	     * @memberof router
 	     * @description Create the PageController instance.
 	     *
 	     */
-	    createPageController: function createPageController() {
+	    initPageController: function initPageController() {
+	        var _this = this;
+	
 	        this.controller = new _properjsPagecontroller2["default"]({
 	            transitionTime: _pageDuration
 	        });
@@ -15793,8 +15926,55 @@
 	        this.controller.on("page-controller-router-transition-out", this.changePageOut.bind(this));
 	        this.controller.on("page-controller-router-refresh-document", this.changeContent.bind(this));
 	        this.controller.on("page-controller-router-transition-in", this.changePageIn.bind(this));
+	        this.controller.on("page-controller-initialized-page", function (html) {
+	            _this.cachePage(core.dom.html, (0, _js_libsJqueryDistJquery2["default"])(html).filter(".js-page")[0].innerHTML);
+	            _this.cacheStaticContext(window.Static.SQUARESPACE_CONTEXT);
+	        });
 	
 	        this.controller.initPage();
+	    },
+	
+	    /**
+	     *
+	     * @public
+	     * @method cachePage
+	     * @param {jQuery} $object The node for use
+	     * @param {string} response The XHR responseText
+	     * @memberof router
+	     * @description Cache the DOM content for a page once its parsed out.
+	     *
+	     */
+	    cachePage: function cachePage($object, response) {
+	        core.cache.set(this.getPageKey(), {
+	            $object: $object,
+	            response: response
+	        });
+	    },
+	
+	    /**
+	     *
+	     * @public
+	     * @method cacheStaticContext
+	     * @param {object} json The Static.SQUARESPACE_CONTEXT ref
+	     * @memberof router
+	     * @description Cache the sqs context once its been parsed out.
+	     *
+	     */
+	    cacheStaticContext: function cacheStaticContext(json) {
+	        core.cache.set(this.getPageKey() + "-context", json);
+	    },
+	
+	    /**
+	     *
+	     * @public
+	     * @method getPageKey
+	     * @memberof router
+	     * @description Determine the key for local page cache storage.
+	     * @returns {string}
+	     *
+	     */
+	    getPageKey: function getPageKey() {
+	        return "" + window.location.pathname + window.location.search;
 	    },
 	
 	    /**
@@ -15896,6 +16076,10 @@
 	        core.scrolls.topout(0);
 	        core.scrolls.clearStates();
 	
+	        setTimeout(function () {
+	            core.util.emitter.fire("app--intro-art");
+	        }, _pageDuration);
+	
 	        core.util.emitter.off("app--preload-done", this.onPreloadDone);
 	    },
 	
@@ -15911,26 +16095,30 @@
 	     */
 	    getStaticContext: function getStaticContext(resHTML) {
 	        // Match the { data } in Static.SQUARESPACE_CONTEXT
-	        var ctx = resHTML.match(/Static\.SQUARESPACE_CONTEXT\s=\s(.*?)\};/);
+	        var ctx = core.cache.get(this.getPageKey() + "-context");
 	
-	        if (ctx && ctx[1]) {
-	            ctx = ctx[1];
+	        if (!ctx) {
+	            ctx = resHTML.match(/Static\.SQUARESPACE_CONTEXT\s=\s(.*?)\};/);
 	
-	            // Put the ending {object} bracket back in there :-(
-	            ctx = ctx + "}";
+	            if (ctx && ctx[1]) {
+	                ctx = ctx[1];
 	
-	            // Parse the string as a valid piece of JSON content
-	            try {
-	                ctx = JSON.parse(ctx);
-	            } catch (error) {
-	                throw error;
-	            }
+	                // Put the ending {object} bracket back in there :-(
+	                ctx = ctx + "}";
 	
-	            // We now have the new pages context for Metrics
-	            //core.log( "router:getStaticContext", ctx );
-	        } else {
+	                // Parse the string as a valid piece of JSON content
+	                try {
+	                    ctx = JSON.parse(ctx);
+	                } catch (error) {
+	                    throw error;
+	                }
+	
+	                // Cache context locally
+	                this.cacheStaticContext(ctx);
+	            } else {
 	                ctx = false;
 	            }
+	        }
 	
 	        return ctx;
 	    },
@@ -15939,11 +16127,12 @@
 	     *
 	     * @public
 	     * @method changePageOut
+	     * @param {object} data The data object supplied by PageController from PushState
 	     * @memberof router
 	     * @description Trigger transition-out animation.
 	     *
 	     */
-	    changePageOut: function changePageOut() {
+	    changePageOut: function changePageOut() /* data */{
 	        core.util.disableMouseWheel(true);
 	        core.util.disableTouchMove(true);
 	
@@ -15963,12 +16152,23 @@
 	     *
 	     */
 	    changeContent: function changeContent(html) {
-	        var $doc = (0, _js_libsJqueryDistJquery2["default"])(html);
-	        var res = $doc.filter(".js-page")[0].innerHTML;
+	        var $object = null;
+	        var response = null;
+	        var cached = core.cache.get(this.getPageKey());
 	
-	        core.dom.page[0].innerHTML = res;
+	        if (cached) {
+	            $object = cached.$object;
+	            response = cached.response;
+	        } else {
+	            $object = (0, _js_libsJqueryDistJquery2["default"])(html).filter("title, div, main, section, header, footer, span");
+	            response = $object.filter(".js-page")[0].innerHTML;
 	
-	        this.pushTrack(html, $doc);
+	            this.cachePage($object, response);
+	        }
+	
+	        core.dom.page[0].innerHTML = response;
+	
+	        this.pushTrack(html, $object);
 	
 	        core.util.emitter.fire("app--cleanup");
 	    },
@@ -17995,7 +18195,7 @@
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
 	
-	var _core = __webpack_require__(/*! ./core */ 1);
+	var _core = __webpack_require__(/*! ./core */ 4);
 	
 	var core = _interopRequireWildcard(_core);
 	
@@ -18145,9 +18345,9 @@
 
 /***/ },
 /* 38 */
-/*!****************************!*\
-  !*** ./js_src/projects.js ***!
-  \****************************/
+/*!***************************!*\
+  !*** ./js_src/overlay.js ***!
+  \***************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -18158,136 +18358,263 @@
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
 	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-	
-	var _js_libsJqueryDistJquery = __webpack_require__(/*! js_libs/jquery/dist/jquery */ 4);
-	
-	var _js_libsJqueryDistJquery2 = _interopRequireDefault(_js_libsJqueryDistJquery);
-	
-	var _core = __webpack_require__(/*! ./core */ 1);
+	var _core = __webpack_require__(/*! ./core */ 4);
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var $_jsPlates = null;
 	var _isActive = false;
-	var _transTime = core.util.getTransitionDuration(core.dom.shim[0]);
+	var _transTime = core.util.getTransitionDuration(core.dom.overlay.element[0]);
 	
 	/**
 	 *
 	 * @public
-	 * @module projects
-	 * @description Handle interactions associated with project grids / details
+	 * @module overlay
+	 * @description Performs the branded load-in screen sequence.
 	 *
 	 */
-	var projects = {
+	var overlay = {
 	    /**
 	     *
 	     * @public
 	     * @method init
-	     * @memberof projects
-	     * @description Method runs once when window loads.
+	     * @memberof overlay
+	     * @description Initialize the overlay element.
 	     *
 	     */
 	    init: function init() {
-	        core.dom.shim.detach();
-	
-	        core.dom.page.on("click", onPageClick);
-	        core.dom.body.on("click", ".js-project-tile", onTileClick);
-	
-	        core.log("projects initialized");
+	        if (core.dom.overlay.element.is(".is-active")) {
+	            _isActive = true;
+	        } else {
+	            core.dom.overlay.element.detach();
+	        }
 	    },
 	
-	    openShim: function openShim() {
+	    open: function open() {
 	        _isActive = true;
 	
-	        core.dom.html.addClass("is-neverflow is-shim-active");
-	        core.dom.body.append(core.dom.shim);
+	        core.dom.html.addClass("is-overlay-active");
+	        core.dom.page.append(core.dom.overlay.element);
 	
 	        setTimeout(function () {
-	            return core.dom.shim.addClass("is-active");
+	            return core.dom.overlay.element.addClass("is-active");
 	        }, 10);
 	    },
 	
-	    closeShim: function closeShim() {
-	        core.util.emitter.stop();
-	
-	        core.dom.shim.removeClass("is-active");
-	        core.dom.html.removeClass("is-neverflow");
+	    close: function close() {
+	        core.dom.overlay.element.removeClass("is-active");
 	
 	        setTimeout(function () {
-	            $_jsPlates = null;
+	            _isActive = false;
 	
-	            core.dom.html.removeClass("is-shim-active");
-	            core.dom.shim.detach().empty();
-	
-	            setTimeout(function () {
-	                return _isActive = false;
-	            }, 10);
+	            core.dom.html.removeClass("is-overlay-active");
+	            core.dom.overlay.element.detach();
 	        }, _transTime);
+	    },
+	
+	    setTitle: function setTitle(text) {
+	        core.dom.overlay.elementTitle.html(text);
+	    },
+	
+	    isActive: function isActive() {
+	        return _isActive;
 	    }
-	};
-	
-	var onUpdateEmitter = function onUpdateEmitter() {
-	    var $plate = null;
-	    var i = $_jsPlates.length;
-	
-	    for (i; i--;) {
-	        $plate = $_jsPlates.eq(i);
-	
-	        if (core.util.isElementInViewport($plate[0])) {
-	            $plate.addClass("is-active");
-	        } else {
-	            $plate.removeClass("is-active");
-	        }
-	    }
-	};
-	
-	var onPageClick = function onPageClick(e) {
-	    e.preventDefault();
-	
-	    if (!(0, _js_libsJqueryDistJquery2["default"])(e.target).closest(".js-project-tile").length) {
-	        projects.closeShim();
-	    }
-	};
-	
-	var onTileClick = function onTileClick(e) {
-	    e.preventDefault();
-	
-	    if (_isActive) {
-	        return false;
-	    }
-	
-	    projects.openShim();
-	
-	    _js_libsJqueryDistJquery2["default"].ajax({
-	        url: this.href,
-	        data: {
-	            nocache: true
-	        },
-	        method: "GET",
-	        dataType: "html"
-	    }).done(function (response) {
-	        var $node = (0, _js_libsJqueryDistJquery2["default"])(response);
-	        var $project = $node.filter(".js-page").find(".js-project");
-	
-	        $_jsPlates = $project.find(".js-project-plate");
-	
-	        core.dom.shim.html($project);
-	
-	        core.util.loadImages($project.find(".js-lazy-image"), core.util.noop).on("done", function () {
-	            onUpdateEmitter();
-	
-	            core.util.emitter.go(onUpdateEmitter);
-	        });
-	    });
 	};
 	
 	/******************************************************************************
 	 * Export
 	*******************************************************************************/
-	exports["default"] = projects;
+	exports["default"] = overlay;
+	module.exports = exports["default"];
+
+/***/ },
+/* 39 */
+/*!***************************!*\
+  !*** ./js_src/Project.js ***!
+  \***************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var _js_libsJqueryDistJquery = __webpack_require__(/*! js_libs/jquery/dist/jquery */ 1);
+	
+	var _js_libsJqueryDistJquery2 = _interopRequireDefault(_js_libsJqueryDistJquery);
+	
+	var _core = __webpack_require__(/*! ./core */ 4);
+	
+	var core = _interopRequireWildcard(_core);
+	
+	var _router = __webpack_require__(/*! ./router */ 31);
+	
+	var _router2 = _interopRequireDefault(_router);
+	
+	var _overlay = __webpack_require__(/*! ./overlay */ 38);
+	
+	var _overlay2 = _interopRequireDefault(_overlay);
+	
+	/**
+	 *
+	 * @public
+	 * @class Project
+	 * @classdesc Load the Project collection into its container
+	 *
+	 */
+	
+	var Project = (function () {
+	    function Project(app, options) {
+	        _classCallCheck(this, Project);
+	
+	        this.app = app;
+	        this.opts = options;
+	        this.$plates = null;
+	        this.isLoaded = false;
+	
+	        if (this.opts.onLoad) {
+	            this.loadCollection();
+	        } else {
+	            this.initCollection();
+	        }
+	
+	        core.log("Project", this);
+	    }
+	
+	    /******************************************************************************
+	     * Export
+	    *******************************************************************************/
+	
+	    _createClass(Project, [{
+	        key: "destroy",
+	        value: function destroy() {
+	            this.close();
+	        }
+	    }, {
+	        key: "cycleAnimation",
+	        value: function cycleAnimation() {
+	            this.onUpdateEmitter();
+	
+	            core.util.emitter.go(this._onUpdateEmitter);
+	        }
+	    }, {
+	        key: "initCollection",
+	        value: function initCollection() {
+	            this.isLoaded = true;
+	            this.$plates = core.dom.project.find(".js-project-plate");
+	            this._onUpdateEmitter = this.onUpdateEmitter.bind(this);
+	            this.cycleAnimation();
+	        }
+	    }, {
+	        key: "loadCollection",
+	        value: function loadCollection() {
+	            var dataType = { dataType: "html" };
+	            var format = { format: "full", nocache: true };
+	            var cached = core.cache.get("project-" + this.opts.url);
+	
+	            this.open();
+	
+	            _router2["default"].push(this.opts.url, function () {});
+	
+	            if (cached) {
+	                this.onLoadCollection(cached);
+	            } else {
+	                core.api.collection(this.opts.url, format, dataType).done(this.onLoadCollection.bind(this));
+	            }
+	        }
+	    }, {
+	        key: "onUpdateEmitter",
+	        value: function onUpdateEmitter() {
+	            var $plate = null;
+	            var i = this.$plates.length;
+	
+	            for (i; i--;) {
+	                $plate = this.$plates.eq(i);
+	
+	                if (core.util.isElementInViewport($plate[0])) {
+	                    $plate.addClass("is-active");
+	                } else {
+	                    $plate.removeClass("is-active");
+	                }
+	            }
+	        }
+	    }, {
+	        key: "onLoadCollection",
+	        value: function onLoadCollection(response) {
+	            var _this = this;
+	
+	            var $node = (0, _js_libsJqueryDistJquery2["default"])(response);
+	            var $project = null;
+	
+	            if (typeof response === "object") {
+	                $project = (0, _js_libsJqueryDistJquery2["default"])(response.response);
+	            } else {
+	                $project = $node.filter(".js-page").find(".js-project");
+	            }
+	
+	            this.isLoaded = true;
+	            this.$plates = $project.find(".js-project-plate");
+	            this._onUpdateEmitter = this.onUpdateEmitter.bind(this);
+	
+	            core.dom.project.html(this.$plates);
+	
+	            core.util.loadImages(this.$plates.find(".js-lazy-image"), core.util.noop).on("done", function () {
+	                if (_overlay2["default"].isActive()) {
+	                    _overlay2["default"].close();
+	                }
+	
+	                if (typeof _this.opts.onLoad === "function") {
+	                    _this.opts.onLoad();
+	                }
+	
+	                _this.cycleAnimation();
+	            });
+	
+	            core.cache.set("project-" + this.opts.url, response);
+	        }
+	    }, {
+	        key: "open",
+	        value: function open() {
+	            core.dom.html.addClass("is-neverflow is-project-active");
+	            core.dom.page.append(core.dom.project);
+	
+	            setTimeout(function () {
+	                return core.dom.project.addClass("is-active");
+	            }, 10);
+	        }
+	    }, {
+	        key: "close",
+	        value: function close() {
+	            var _this2 = this;
+	
+	            core.util.emitter.stop();
+	
+	            core.dom.project.removeClass("is-active");
+	            core.dom.html.removeClass("is-neverflow");
+	
+	            setTimeout(function () {
+	                _this2.$plates = null;
+	
+	                core.dom.html.removeClass("is-project-active");
+	                core.dom.project.detach().empty();
+	            }, core.util.getTransitionDuration(core.dom.project[0]));
+	        }
+	    }]);
+	
+	    return Project;
+	})();
+	
+	exports["default"] = Project;
 	module.exports = exports["default"];
 
 /***/ }
 /******/ ]);
-//# sourceMappingURL=app.js.map
+//# sourceMappingURL=App.js.map

@@ -1,7 +1,1 @@
-<section class="project js-project">
-    <div class="project__images js-project-images">
-        {.repeated section items}
-            {@|apply photos.block}
-        {.end}
-    </div>
-</section>
+<section class="homepage js-homepage grid js-grid"></section>

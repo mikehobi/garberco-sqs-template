@@ -16,7 +16,7 @@
     <body class="is-clipped">
         <header class="header js-header -text--center">
             <h1 class="h4">
-                <a href="/">{website.siteTitle}</a>
+                <a href="/" class="js-logo js-router--ignore">{website.siteTitle}</a>
             </h1>
         </header>
 
@@ -24,4 +24,4 @@
         <squarespace:navigation navigationId="nav" template="nav" />
 
 
-        <main class="page js-page">
+        <main class="page js-page" {.section collection}data-page-load-type='{.equal? typeName "index"}index{.or}collection{.end}'{.end}>

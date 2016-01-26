@@ -1,7 +1,0 @@
-<section class="project js-project">
-    <div class="project__images js-project-images">
-        {.section item}
-            {@|apply photos.block}
-        {.end}
-    </div>
-</section>
