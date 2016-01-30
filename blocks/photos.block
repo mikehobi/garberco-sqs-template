@@ -170,6 +170,16 @@
         {@|apply image.block}
     </div>
 {.end}
+{.if customContent.SingleThreeQuarterLeft}
+    <div class="project__image project__image--threeq-left js-project-plate animate">
+        {@|apply image.block}
+    </div>
+{.end}
+{.if customContent.SingleThreeQuarterRight}
+    <div class="project__image project__image--threeq-right js-project-plate animate">
+        {@|apply image.block}
+    </div>
+{.end}
 {.if customContent.SingleFullWidth}
     <div class="project__image project__image--full js-project-plate animate">
         {@|apply image.block}

@@ -65,15 +65,15 @@
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _router = __webpack_require__(/*! ./router */ 31);
+	var _router = __webpack_require__(/*! ./router */ 30);
 	
 	var _router2 = _interopRequireDefault(_router);
 	
-	var _overlay = __webpack_require__(/*! ./overlay */ 38);
+	var _overlay = __webpack_require__(/*! ./overlay */ 37);
 	
 	var _overlay2 = _interopRequireDefault(_overlay);
 	
-	var _Project = __webpack_require__(/*! ./Project */ 39);
+	var _Project = __webpack_require__(/*! ./Project */ 38);
 	
 	var _Project2 = _interopRequireDefault(_Project);
 	
@@ -269,8 +269,6 @@
 	        key: "onMouseEnter",
 	        value: function onMouseEnter(e) {
 	            this.clearTimeoutById(this.timeoutId);
-	
-	            console.log(e);
 	
 	            var $tile = (0, _js_libsJqueryDistJquery2["default"])(e.currentTarget);
 	
@@ -8015,11 +8013,11 @@
 	
 	var _preload2 = _interopRequireDefault(_preload);
 	
-	var _resizes = __webpack_require__(/*! ./resizes */ 23);
+	var _resizes = __webpack_require__(/*! ./resizes */ 22);
 	
 	var _resizes2 = _interopRequireDefault(_resizes);
 	
-	var _scrolls = __webpack_require__(/*! ./scrolls */ 26);
+	var _scrolls = __webpack_require__(/*! ./scrolls */ 25);
 	
 	var _scrolls2 = _interopRequireDefault(_scrolls);
 	
@@ -8027,7 +8025,7 @@
 	
 	var util = _interopRequireWildcard(_util);
 	
-	var _config = __webpack_require__(/*! ./config */ 22);
+	var _config = __webpack_require__(/*! ./config */ 21);
 	
 	var _config2 = _interopRequireDefault(_config);
 	
@@ -8039,11 +8037,11 @@
 	
 	var _log2 = _interopRequireDefault(_log);
 	
-	var _api = __webpack_require__(/*! ./api */ 27);
+	var _api = __webpack_require__(/*! ./api */ 26);
 	
 	var _api2 = _interopRequireDefault(_api);
 	
-	var _cache = __webpack_require__(/*! ./cache */ 29);
+	var _cache = __webpack_require__(/*! ./cache */ 28);
 	
 	var _cache2 = _interopRequireDefault(_cache);
 	
@@ -8430,7 +8428,6 @@
   \********************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	//import $ from "js_libs/jquery/dist/jquery";
 	"use strict";
 	
 	Object.defineProperty(exports, "__esModule", {
@@ -8453,9 +8450,13 @@
 	
 	var _log2 = _interopRequireDefault(_log);
 	
-	var _config = __webpack_require__(/*! ./config */ 22);
+	var _config = __webpack_require__(/*! ./config */ 21);
 	
 	var _config2 = _interopRequireDefault(_config);
+	
+	var _properjsImageloader = __webpack_require__(/*! properjs-imageloader */ 15);
+	
+	var _properjsImageloader2 = _interopRequireDefault(_properjsImageloader);
 	
 	var $_images = null;
 	var $_visible = null;
@@ -8516,6 +8517,8 @@
 	        $_images = null;
 	        $_visible = null;
 	
+	        _properjsImageloader2["default"].killInstances();
+	
 	        _imgLoader = null;
 	    },
 	
@@ -8533,22 +8536,13 @@
 	        $_images = $images || _dom2["default"].page.find(_config2["default"].lazyImageSelector);
 	        $_visible = util.getElementsInView($_images);
 	
-	        var done = 0;
-	
 	        if (!$_visible.length) {
 	            delayedLoad(callback);
 	        } else {
 	            (0, _log2["default"])("preload will load", $_visible.length, "out of", $_images.length, "images");
 	
 	            _imgLoader = util.loadImages($_visible, function () {
-	                done++;
-	
-	                util.emitter.fire("app--preload-data", {
-	                    total: $_visible.length,
-	                    done: done
-	                });
-	
-	                return true;
+	                return util.noop;
 	            });
 	            _imgLoader.on("done", function () {
 	                (0, _log2["default"])("preloaded", $_visible.length, "images");
@@ -8623,31 +8617,31 @@
 	
 	var _hammerjs2 = _interopRequireDefault(_hammerjs);
 	
-	var _properjsController = __webpack_require__(/*! properjs-controller */ 13);
+	var _properjsController = __webpack_require__(/*! properjs-controller */ 12);
 	
 	var _properjsController2 = _interopRequireDefault(_properjsController);
 	
-	var _properjsScrollcontroller = __webpack_require__(/*! properjs-scrollcontroller */ 14);
+	var _properjsScrollcontroller = __webpack_require__(/*! properjs-scrollcontroller */ 13);
 	
 	var _properjsScrollcontroller2 = _interopRequireDefault(_properjsScrollcontroller);
 	
-	var _properjsResizecontroller = __webpack_require__(/*! properjs-resizecontroller */ 15);
+	var _properjsResizecontroller = __webpack_require__(/*! properjs-resizecontroller */ 14);
 	
 	var _properjsResizecontroller2 = _interopRequireDefault(_properjsResizecontroller);
 	
-	var _properjsImageloader = __webpack_require__(/*! properjs-imageloader */ 16);
+	var _properjsImageloader = __webpack_require__(/*! properjs-imageloader */ 15);
 	
 	var _properjsImageloader2 = _interopRequireDefault(_properjsImageloader);
 	
-	var _properjsMediabox = __webpack_require__(/*! properjs-mediabox */ 17);
+	var _properjsMediabox = __webpack_require__(/*! properjs-mediabox */ 16);
 	
 	var _properjsMediabox2 = _interopRequireDefault(_properjsMediabox);
 	
-	var _fgLoadcss = __webpack_require__(/*! fg-loadcss */ 20);
+	var _fgLoadcss = __webpack_require__(/*! fg-loadcss */ 19);
 	
 	var _fgLoadcss2 = _interopRequireDefault(_fgLoadcss);
 	
-	var _fgLoadjs = __webpack_require__(/*! fg-loadjs */ 21);
+	var _fgLoadjs = __webpack_require__(/*! fg-loadjs */ 20);
 	
 	var _fgLoadjs2 = _interopRequireDefault(_fgLoadjs);
 	
@@ -8655,7 +8649,7 @@
 	
 	var _dom2 = _interopRequireDefault(_dom);
 	
-	var _config = __webpack_require__(/*! ./config */ 22);
+	var _config = __webpack_require__(/*! ./config */ 21);
 	
 	var _config2 = _interopRequireDefault(_config);
 	
@@ -9134,15 +9128,15 @@
   \******************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_RESULT__;/*! Hammer.JS - v2.0.4 - 2014-09-28
+	var __WEBPACK_AMD_DEFINE_RESULT__;/*! Hammer.JS - v2.0.6 - 2015-12-23
 	 * http://hammerjs.github.io/
 	 *
-	 * Copyright (c) 2014 Jorik Tangelder;
-	 * Licensed under the MIT license */
+	 * Copyright (c) 2015 Jorik Tangelder;
+	 * Licensed under the  license */
 	(function(window, document, exportName, undefined) {
 	  'use strict';
 	
-	var VENDOR_PREFIXES = ['', 'webkit', 'moz', 'MS', 'ms', 'o'];
+	var VENDOR_PREFIXES = ['', 'webkit', 'Moz', 'MS', 'ms', 'o'];
 	var TEST_ELEMENT = document.createElement('div');
 	
 	var TYPE_FUNCTION = 'function';
@@ -9208,14 +9202,68 @@
 	}
 	
 	/**
+	 * wrap a method with a deprecation warning and stack trace
+	 * @param {Function} method
+	 * @param {String} name
+	 * @param {String} message
+	 * @returns {Function} A new function wrapping the supplied method.
+	 */
+	function deprecate(method, name, message) {
+	    var deprecationMessage = 'DEPRECATED METHOD: ' + name + '\n' + message + ' AT \n';
+	    return function() {
+	        var e = new Error('get-stack-trace');
+	        var stack = e && e.stack ? e.stack.replace(/^[^\(]+?[\n$]/gm, '')
+	            .replace(/^\s+at\s+/gm, '')
+	            .replace(/^Object.<anonymous>\s*\(/gm, '{anonymous}()@') : 'Unknown Stack Trace';
+	
+	        var log = window.console && (window.console.warn || window.console.log);
+	        if (log) {
+	            log.call(window.console, deprecationMessage, stack);
+	        }
+	        return method.apply(this, arguments);
+	    };
+	}
+	
+	/**
+	 * extend object.
+	 * means that properties in dest will be overwritten by the ones in src.
+	 * @param {Object} target
+	 * @param {...Object} objects_to_assign
+	 * @returns {Object} target
+	 */
+	var assign;
+	if (typeof Object.assign !== 'function') {
+	    assign = function assign(target) {
+	        if (target === undefined || target === null) {
+	            throw new TypeError('Cannot convert undefined or null to object');
+	        }
+	
+	        var output = Object(target);
+	        for (var index = 1; index < arguments.length; index++) {
+	            var source = arguments[index];
+	            if (source !== undefined && source !== null) {
+	                for (var nextKey in source) {
+	                    if (source.hasOwnProperty(nextKey)) {
+	                        output[nextKey] = source[nextKey];
+	                    }
+	                }
+	            }
+	        }
+	        return output;
+	    };
+	} else {
+	    assign = Object.assign;
+	}
+	
+	/**
 	 * extend object.
 	 * means that properties in dest will be overwritten by the ones in src.
 	 * @param {Object} dest
 	 * @param {Object} src
-	 * @param {Boolean} [merge]
+	 * @param {Boolean=false} [merge]
 	 * @returns {Object} dest
 	 */
-	function extend(dest, src, merge) {
+	var extend = deprecate(function extend(dest, src, merge) {
 	    var keys = Object.keys(src);
 	    var i = 0;
 	    while (i < keys.length) {
@@ -9225,7 +9273,7 @@
 	        i++;
 	    }
 	    return dest;
-	}
+	}, 'extend', 'Use `assign`.');
 	
 	/**
 	 * merge the values from src in the dest.
@@ -9234,9 +9282,9 @@
 	 * @param {Object} src
 	 * @returns {Object} dest
 	 */
-	function merge(dest, src) {
+	var merge = deprecate(function merge(dest, src) {
 	    return extend(dest, src, true);
-	}
+	}, 'merge', 'Use `assign`.');
 	
 	/**
 	 * simple class inheritance
@@ -9253,7 +9301,7 @@
 	    childP._super = baseP;
 	
 	    if (properties) {
-	        extend(childP, properties);
+	        assign(childP, properties);
 	    }
 	}
 	
@@ -9456,8 +9504,8 @@
 	 * @returns {DocumentView|Window}
 	 */
 	function getWindowForElement(element) {
-	    var doc = element.ownerDocument;
-	    return (doc.defaultView || doc.parentWindow);
+	    var doc = element.ownerDocument || element;
+	    return (doc.defaultView || doc.parentWindow || window);
 	}
 	
 	var MOBILE_REGEX = /mobile|tablet|ip(ad|hone|od)|android/i;
@@ -9636,8 +9684,16 @@
 	    computeDeltaXY(session, input);
 	    input.offsetDirection = getDirection(input.deltaX, input.deltaY);
 	
+	    var overallVelocity = getVelocity(input.deltaTime, input.deltaX, input.deltaY);
+	    input.overallVelocityX = overallVelocity.x;
+	    input.overallVelocityY = overallVelocity.y;
+	    input.overallVelocity = (abs(overallVelocity.x) > abs(overallVelocity.y)) ? overallVelocity.x : overallVelocity.y;
+	
 	    input.scale = firstMultiple ? getScale(firstMultiple.pointers, pointers) : 1;
 	    input.rotation = firstMultiple ? getRotation(firstMultiple.pointers, pointers) : 0;
+	
+	    input.maxPointers = !session.prevInput ? input.pointers.length : ((input.pointers.length >
+	        session.prevInput.maxPointers) ? input.pointers.length : session.prevInput.maxPointers);
 	
 	    computeIntervalInputData(session, input);
 	
@@ -9682,8 +9738,8 @@
 	        velocity, velocityX, velocityY, direction;
 	
 	    if (input.eventType != INPUT_CANCEL && (deltaTime > COMPUTE_INTERVAL || last.velocity === undefined)) {
-	        var deltaX = last.deltaX - input.deltaX;
-	        var deltaY = last.deltaY - input.deltaY;
+	        var deltaX = input.deltaX - last.deltaX;
+	        var deltaY = input.deltaY - last.deltaY;
 	
 	        var v = getVelocity(deltaTime, deltaX, deltaY);
 	        velocityX = v.x;
@@ -9788,9 +9844,9 @@
 	    }
 	
 	    if (abs(x) >= abs(y)) {
-	        return x > 0 ? DIRECTION_LEFT : DIRECTION_RIGHT;
+	        return x < 0 ? DIRECTION_LEFT : DIRECTION_RIGHT;
 	    }
-	    return y > 0 ? DIRECTION_UP : DIRECTION_DOWN;
+	    return y < 0 ? DIRECTION_UP : DIRECTION_DOWN;
 	}
 	
 	/**
@@ -9833,7 +9889,7 @@
 	 * @return {Number} rotation
 	 */
 	function getRotation(start, end) {
-	    return getAngle(end[1], end[0], PROPS_CLIENT_XY) - getAngle(start[1], start[0], PROPS_CLIENT_XY);
+	    return getAngle(end[1], end[0], PROPS_CLIENT_XY) + getAngle(start[1], start[0], PROPS_CLIENT_XY);
 	}
 	
 	/**
@@ -9926,7 +9982,7 @@
 	var POINTER_WINDOW_EVENTS = 'pointermove pointerup pointercancel';
 	
 	// IE10 has prefixed support, and case-sensitive
-	if (window.MSPointerEvent) {
+	if (window.MSPointerEvent && !window.PointerEvent) {
 	    POINTER_ELEMENT_EVENTS = 'MSPointerDown';
 	    POINTER_WINDOW_EVENTS = 'MSPointerMove MSPointerUp MSPointerCancel';
 	}
@@ -10250,7 +10306,7 @@
 	            value = this.compute();
 	        }
 	
-	        if (NATIVE_TOUCH_ACTION) {
+	        if (NATIVE_TOUCH_ACTION && this.manager.element.style) {
 	            this.manager.element.style[PREFIXED_TOUCH_ACTION] = value;
 	        }
 	        this.actions = value.toLowerCase().trim();
@@ -10301,6 +10357,23 @@
 	        var hasPanY = inStr(actions, TOUCH_ACTION_PAN_Y);
 	        var hasPanX = inStr(actions, TOUCH_ACTION_PAN_X);
 	
+	        if (hasNone) {
+	            //do not prevent defaults if this is a tap gesture
+	
+	            var isTapPointer = input.pointers.length === 1;
+	            var isTapMovement = input.distance < 2;
+	            var isTapTouchTime = input.deltaTime < 250;
+	
+	            if (isTapPointer && isTapMovement && isTapTouchTime) {
+	                return;
+	            }
+	        }
+	
+	        if (hasPanX && hasPanY) {
+	            // `pan-x pan-y` means browser handles all scrolling/panning, do not prevent
+	            return;
+	        }
+	
 	        if (hasNone ||
 	            (hasPanY && direction & DIRECTION_HORIZONTAL) ||
 	            (hasPanX && direction & DIRECTION_VERTICAL)) {
@@ -10332,9 +10405,12 @@
 	    var hasPanX = inStr(actions, TOUCH_ACTION_PAN_X);
 	    var hasPanY = inStr(actions, TOUCH_ACTION_PAN_Y);
 	
-	    // pan-x and pan-y can be combined
+	    // if both pan-x and pan-y are set (different recognizers
+	    // for different directions, e.g. horizontal pan but vertical swipe?)
+	    // we need none (as otherwise with pan-x pan-y combined none of these
+	    // recognizers will work, since the browser would handle all panning
 	    if (hasPanX && hasPanY) {
-	        return TOUCH_ACTION_PAN_X + ' ' + TOUCH_ACTION_PAN_Y;
+	        return TOUCH_ACTION_NONE;
 	    }
 	
 	    // pan-x OR pan-y
@@ -10392,10 +10468,11 @@
 	 * @param {Object} options
 	 */
 	function Recognizer(options) {
+	    this.options = assign({}, this.defaults, options || {});
+	
 	    this.id = uniqueId();
 	
 	    this.manager = null;
-	    this.options = merge(options || {}, this.defaults);
 	
 	    // default is enable true
 	    this.options.enable = ifUndefined(this.options.enable, true);
@@ -10419,7 +10496,7 @@
 	     * @return {Recognizer}
 	     */
 	    set: function(options) {
-	        extend(this.options, options);
+	        assign(this.options, options);
 	
 	        // also update the touchAction, in case something changed about the directions/enabled state
 	        this.manager && this.manager.touchAction.update();
@@ -10523,20 +10600,24 @@
 	        var self = this;
 	        var state = this.state;
 	
-	        function emit(withState) {
-	            self.manager.emit(self.options.event + (withState ? stateStr(state) : ''), input);
+	        function emit(event) {
+	            self.manager.emit(event, input);
 	        }
 	
 	        // 'panstart' and 'panmove'
 	        if (state < STATE_ENDED) {
-	            emit(true);
+	            emit(self.options.event + stateStr(state));
 	        }
 	
-	        emit(); // simple 'eventName' events
+	        emit(self.options.event); // simple 'eventName' events
+	
+	        if (input.additionalEvent) { // additional event(panleft, panright, pinchin, pinchout...)
+	            emit(input.additionalEvent);
+	        }
 	
 	        // panend and pancancel
 	        if (state >= STATE_ENDED) {
-	            emit(true);
+	            emit(self.options.event + stateStr(state));
 	        }
 	    },
 	
@@ -10576,7 +10657,7 @@
 	    recognize: function(inputData) {
 	        // make a new copy of the inputData
 	        // so we can change the inputData without messing up the other recognizers
-	        var inputDataClone = extend({}, inputData);
+	        var inputDataClone = assign({}, inputData);
 	
 	        // is is enabled and allow recognizing?
 	        if (!boolOrFn(this.options.enable, [this, inputDataClone])) {
@@ -10801,14 +10882,15 @@
 	    },
 	
 	    emit: function(input) {
+	
 	        this.pX = input.deltaX;
 	        this.pY = input.deltaY;
 	
 	        var direction = directionStr(input.direction);
-	        if (direction) {
-	            this.manager.emit(this.options.event + direction, input);
-	        }
 	
+	        if (direction) {
+	            input.additionalEvent = this.options.event + direction;
+	        }
 	        this._super.emit.call(this, input);
 	    }
 	});
@@ -10844,11 +10926,11 @@
 	    },
 	
 	    emit: function(input) {
-	        this._super.emit.call(this, input);
 	        if (input.scale !== 1) {
 	            var inOut = input.scale < 1 ? 'in' : 'out';
-	            this.manager.emit(this.options.event + inOut, input);
+	            input.additionalEvent = this.options.event + inOut;
 	        }
+	        this._super.emit.call(this, input);
 	    }
 	});
 	
@@ -10873,8 +10955,8 @@
 	    defaults: {
 	        event: 'press',
 	        pointers: 1,
-	        time: 500, // minimal time of the pointer to be pressed
-	        threshold: 5 // a minimal movement is ok, but keep it low
+	        time: 251, // minimal time of the pointer to be pressed
+	        threshold: 9 // a minimal movement is ok, but keep it low
 	    },
 	
 	    getTouchAction: function() {
@@ -10972,7 +11054,7 @@
 	    defaults: {
 	        event: 'swipe',
 	        threshold: 10,
-	        velocity: 0.65,
+	        velocity: 0.3,
 	        direction: DIRECTION_HORIZONTAL | DIRECTION_VERTICAL,
 	        pointers: 1
 	    },
@@ -10986,21 +11068,22 @@
 	        var velocity;
 	
 	        if (direction & (DIRECTION_HORIZONTAL | DIRECTION_VERTICAL)) {
-	            velocity = input.velocity;
+	            velocity = input.overallVelocity;
 	        } else if (direction & DIRECTION_HORIZONTAL) {
-	            velocity = input.velocityX;
+	            velocity = input.overallVelocityX;
 	        } else if (direction & DIRECTION_VERTICAL) {
-	            velocity = input.velocityY;
+	            velocity = input.overallVelocityY;
 	        }
 	
 	        return this._super.attrTest.call(this, input) &&
-	            direction & input.direction &&
+	            direction & input.offsetDirection &&
 	            input.distance > this.options.threshold &&
+	            input.maxPointers == this.options.pointers &&
 	            abs(velocity) > this.options.velocity && input.eventType & INPUT_END;
 	    },
 	
 	    emit: function(input) {
-	        var direction = directionStr(input.direction);
+	        var direction = directionStr(input.offsetDirection);
 	        if (direction) {
 	            this.manager.emit(this.options.event + direction, input);
 	        }
@@ -11043,7 +11126,7 @@
 	        taps: 1,
 	        interval: 300, // max time between the multi-tap taps
 	        time: 250, // max time of the pointer to be down (like finger on the screen)
-	        threshold: 2, // a minimal movement is ok, but keep it low
+	        threshold: 9, // a minimal movement is ok, but keep it low
 	        posThreshold: 10 // a multi-tap can be a bit off the initial position
 	    },
 	
@@ -11117,7 +11200,7 @@
 	    },
 	
 	    emit: function() {
-	        if (this.state == STATE_RECOGNIZED ) {
+	        if (this.state == STATE_RECOGNIZED) {
 	            this._input.tapCount = this.count;
 	            this.manager.emit(this.options.event, this._input);
 	        }
@@ -11125,7 +11208,7 @@
 	});
 	
 	/**
-	 * Simple way to create an manager with a default set of recognizers.
+	 * Simple way to create a manager with a default set of recognizers.
 	 * @param {HTMLElement} element
 	 * @param {Object} [options]
 	 * @constructor
@@ -11139,7 +11222,7 @@
 	/**
 	 * @const {string}
 	 */
-	Hammer.VERSION = '2.0.4';
+	Hammer.VERSION = '2.0.6';
 	
 	/**
 	 * default settings
@@ -11191,12 +11274,12 @@
 	     */
 	    preset: [
 	        // RecognizerClass, options, [recognizeWith, ...], [requireFailure, ...]
-	        [RotateRecognizer, { enable: false }],
-	        [PinchRecognizer, { enable: false }, ['rotate']],
-	        [SwipeRecognizer,{ direction: DIRECTION_HORIZONTAL }],
-	        [PanRecognizer, { direction: DIRECTION_HORIZONTAL }, ['swipe']],
+	        [RotateRecognizer, {enable: false}],
+	        [PinchRecognizer, {enable: false}, ['rotate']],
+	        [SwipeRecognizer, {direction: DIRECTION_HORIZONTAL}],
+	        [PanRecognizer, {direction: DIRECTION_HORIZONTAL}, ['swipe']],
 	        [TapRecognizer],
-	        [TapRecognizer, { event: 'doubletap', taps: 2 }, ['tap']],
+	        [TapRecognizer, {event: 'doubletap', taps: 2}, ['tap']],
 	        [PressRecognizer]
 	    ],
 	
@@ -11263,9 +11346,8 @@
 	 * @constructor
 	 */
 	function Manager(element, options) {
-	    options = options || {};
+	    this.options = assign({}, Hammer.defaults, options || {});
 	
-	    this.options = merge(options, Hammer.defaults);
 	    this.options.inputTarget = this.options.inputTarget || element;
 	
 	    this.handlers = {};
@@ -11278,7 +11360,7 @@
 	
 	    toggleCssProps(this, true);
 	
-	    each(options.recognizers, function(item) {
+	    each(this.options.recognizers, function(item) {
 	        var recognizer = this.add(new (item[0])(item[1]));
 	        item[2] && recognizer.recognizeWith(item[2]);
 	        item[3] && recognizer.requireFailure(item[3]);
@@ -11292,7 +11374,7 @@
 	     * @returns {Manager}
 	     */
 	    set: function(options) {
-	        extend(this.options, options);
+	        assign(this.options, options);
 	
 	        // Options that need a little more setup
 	        if (options.touchAction) {
@@ -11426,11 +11508,19 @@
 	            return this;
 	        }
 	
-	        var recognizers = this.recognizers;
 	        recognizer = this.get(recognizer);
-	        recognizers.splice(inArray(recognizers, recognizer), 1);
 	
-	        this.touchAction.update();
+	        // let's make sure this recognizer exists
+	        if (recognizer) {
+	            var recognizers = this.recognizers;
+	            var index = inArray(recognizers, recognizer);
+	
+	            if (index !== -1) {
+	                recognizers.splice(index, 1);
+	                this.touchAction.update();
+	            }
+	        }
+	
 	        return this;
 	    },
 	
@@ -11461,7 +11551,7 @@
 	            if (!handler) {
 	                delete handlers[event];
 	            } else {
-	                handlers[event].splice(inArray(handlers[event], handler), 1);
+	                handlers[event] && handlers[event].splice(inArray(handlers[event], handler), 1);
 	            }
 	        });
 	        return this;
@@ -11517,6 +11607,9 @@
 	 */
 	function toggleCssProps(manager, add) {
 	    var element = manager.element;
+	    if (!element.style) {
+	        return;
+	    }
 	    each(manager.options.cssProps, function(value, name) {
 	        element.style[prefixed(element.style, name)] = add ? value : '';
 	    });
@@ -11534,7 +11627,7 @@
 	    data.target.dispatchEvent(gestureEvent);
 	}
 	
-	extend(Hammer, {
+	assign(Hammer, {
 	    INPUT_START: INPUT_START,
 	    INPUT_MOVE: INPUT_MOVE,
 	    INPUT_END: INPUT_END,
@@ -11581,12 +11674,18 @@
 	    each: each,
 	    merge: merge,
 	    extend: extend,
+	    assign: assign,
 	    inherit: inherit,
 	    bindFn: bindFn,
 	    prefixed: prefixed
 	});
 	
-	if ("function" == TYPE_FUNCTION && __webpack_require__(/*! !webpack amd options */ 12)) {
+	// this prevents errors when Hammer is loaded in the presence of an AMD
+	//  style loader but by script tag, not by the loader.
+	var freeGlobal = (typeof window !== 'undefined' ? window : (typeof self !== 'undefined' ? self : {})); // jshint ignore:line
+	freeGlobal.Hammer = Hammer;
+	
+	if (true) {
 	    !(__WEBPACK_AMD_DEFINE_RESULT__ = function() {
 	        return Hammer;
 	    }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
@@ -11601,17 +11700,6 @@
 
 /***/ },
 /* 12 */
-/*!****************************************!*\
-  !*** (webpack)/buildin/amd-options.js ***!
-  \****************************************/
-/***/ function(module, exports) {
-
-	/* WEBPACK VAR INJECTION */(function(__webpack_amd_options__) {module.exports = __webpack_amd_options__;
-	
-	/* WEBPACK VAR INJECTION */}.call(exports, {}))
-
-/***/ },
-/* 13 */
 /*!*********************************************!*\
   !*** ./~/properjs-controller/Controller.js ***!
   \*********************************************/
@@ -11919,7 +12007,7 @@
 	});
 
 /***/ },
-/* 14 */
+/* 13 */
 /*!*********************************************************!*\
   !*** ./~/properjs-scrollcontroller/ScrollController.js ***!
   \*********************************************************/
@@ -11945,7 +12033,7 @@
 	    
 	})(function () {
 	
-	    var Controller = __webpack_require__( /*! properjs-controller */ 13 ),
+	    var Controller = __webpack_require__( /*! properjs-controller */ 12 ),
 	        
 	        // Current scroll position
 	        _currentY = null,
@@ -12097,7 +12185,7 @@
 	});
 
 /***/ },
-/* 15 */
+/* 14 */
 /*!*********************************************************!*\
   !*** ./~/properjs-resizecontroller/ResizeController.js ***!
   \*********************************************************/
@@ -12123,7 +12211,7 @@
 	    
 	})(function () {
 	
-	    var Controller = __webpack_require__( /*! properjs-controller */ 13 ),
+	    var Controller = __webpack_require__( /*! properjs-controller */ 12 ),
 	
 	        // Orientation?
 	        _hasOrientation = ("orientation" in window),
@@ -12306,7 +12394,7 @@
 	});
 
 /***/ },
-/* 16 */
+/* 15 */
 /*!***********************************************!*\
   !*** ./~/properjs-imageloader/ImageLoader.js ***!
   \***********************************************/
@@ -12394,11 +12482,17 @@
 	            }
 	    
 	        } else {
-	            caf( _raf );
-	    
-	            _raf = null;
-	            _ini = false;
+	            stop();
 	        }
+	    }
+	    
+	    
+	    // Stops the animation cycle queue for loading images
+	    function stop () {
+	        caf( _raf );
+	    
+	        _raf = null;
+	        _ini = false;
 	    }
 	    
 	    
@@ -12449,6 +12543,22 @@
 	     */
 	    var ImageLoader = function () {
 	        return this.init.apply( this, arguments );
+	    };
+	    
+	    
+	    /**
+	     *
+	     * Stop all instances and reset the stack for EVERYTHING
+	     * @method killInstances
+	     * @memberof ImageLoader
+	     *
+	     */
+	    ImageLoader.killInstances = function () {
+	        stop();
+	        
+	        _all = 0;
+	        _num = 0;
+	        _instances = [];
 	    };
 	    
 	    
@@ -12721,10 +12831,7 @@
 	                        addClass( element, ImageLoader.IS_HANDLED );
 	    
 	                        if ( (self._numLoaded === self._num2Load) && !self._resolved ) {
-	                            self._resolved = true;
-	    
-	                            // Fires the predefined "done" event
-	                            self.fire( "done" );
+	                            self._resolveInstance( true );
 	    
 	                        } else if ( typeof callback === "function" ) {
 	                            // Errors first
@@ -12738,10 +12845,7 @@
 	                    self.fire( "error", element );
 	    
 	                    if ( (self._numLoaded === self._num2Load) && !self._resolved ) {
-	                        self._resolved = true;
-	    
-	                        // Fires the predefined "done" event
-	                        self.fire( "done" );
+	                        self._resolveInstance( true );
 	    
 	                    } else if ( typeof callback === "function" ) {
 	                        // Errors first
@@ -12781,6 +12885,24 @@
 	                    self.load( elem );
 	                }
 	            }
+	        },
+	        
+	        /**
+	         *
+	         * Resolve an instance and remove it from the stack
+	         * @memberof ImageLoader
+	         * @method _resolveInstance
+	         *
+	         */
+	        _resolveInstance: function () {
+	            // Resolved state
+	            this._resolved = true;
+	            
+	            // Fires the predefined "done" event
+	            this.fire( "done" );
+	            
+	            // Purge the instance from the stack
+	            _instances.splice( _instances.indexOf( this ), 1 );
 	        },
 	    
 	        /**
@@ -12837,7 +12959,7 @@
 	});
 
 /***/ },
-/* 17 */
+/* 16 */
 /*!*****************************************!*\
   !*** ./~/properjs-mediabox/MediaBox.js ***!
   \*****************************************/
@@ -12871,8 +12993,8 @@
 	})(function () {
 	
 	
-	    var Easing = __webpack_require__( /*! properjs-easing */ 18 ),
-	        Tween = __webpack_require__( /*! properjs-tween */ 19 ),
+	    var Easing = __webpack_require__( /*! properjs-easing */ 17 ),
+	        Tween = __webpack_require__( /*! properjs-tween */ 18 ),
 	        raf = window.requestAnimationFrame,
 	        caf = window.cancelAnimationFrame,
 	
@@ -13875,13 +13997,13 @@
 	         *
 	         * MediaBox fade in audio/video volume
 	         * @memberof MediaBox
-	         * @method fadeVolumeIn
+	         * @method fadeMediaIn
 	         * @param {string} id string reference id for audio
 	         * @param {number} duration tween time in ms
 	         * @param {function} easing optional easing to use
 	         *
 	         */
-	        fadeVolumeIn: function ( id, duration, easing ) {
+	        fadeMediaIn: function ( id, duration, easing ) {
 	            var obj = this.getMedia( id ),
 	                self = this,
 	                volume;
@@ -13909,7 +14031,7 @@
 	                    ease: ( isFunction( easing ) ) ? easing : Easing.linear,
 	                    duration: (duration || 1000),
 	                    update: function ( v ) {
-	                        self.setVolume( id, v );
+	                        self.setVolume( id, (v > volume) ? volume : v );
 	                    },
 	                    complete: function () {
 	                        self.setVolume( id, volume );
@@ -13924,13 +14046,13 @@
 	         *
 	         * MediaBox fade out audio/video volume
 	         * @memberof MediaBox
-	         * @method fadeVolumeOut
+	         * @method fadeMediaOut
 	         * @param {string} id string reference id for audio
 	         * @param {number} duration tween time in ms
 	         * @param {function} easing optional easing to use
 	         *
 	         */
-	        fadeVolumeOut: function ( id, duration, easing ) {
+	        fadeMediaOut: function ( id, duration, easing ) {
 	            var obj = this.getMedia( id );
 	    
 	            if ( obj && obj.state === MediaBox.STATE_STOPPING ) {
@@ -14037,14 +14159,14 @@
 	            // Look at video index
 	            for ( id in _video ) {
 	                if ( _video[ id ].channel === channel && _video[ id ].state === MediaBox.STATE_PLAYING ) {
-	                    this.fadeVolumeOut( id, duration );
+	                    this.fadeMediaOut( id, duration );
 	                }
 	            }
 	    
 	            // Look at audio index
 	            for ( id in _audio ) {
 	                if ( _audio[ id ].channel === channel && _audio[ id ].state === MediaBox.STATE_PLAYING ) {
-	                    this.fadeVolumeOut( id, duration );
+	                    this.fadeMediaOut( id, duration );
 	                }
 	            }
 	    
@@ -14066,14 +14188,14 @@
 	            // Look at video index
 	            for ( id in _video ) {
 	                if ( _video[ id ].channel === channel && _video[ id ].state === MediaBox.STATE_STOPPED ) {
-	                    this.fadeVolumeIn( id, duration );
+	                    this.fadeMediaIn( id, duration );
 	                }
 	            }
 	    
 	            // Look at audio index
 	            for ( id in _audio ) {
 	                if ( _audio[ id ].channel === channel && _audio[ id ].state === MediaBox.STATE_STOPPED ) {
-	                    this.fadeVolumeIn( id, duration );
+	                    this.fadeMediaIn( id, duration );
 	                }
 	            }
 	    
@@ -14096,18 +14218,18 @@
 	            // Look at video index
 	            for ( id in _video ) {
 	                if ( _video[ id ].channel === channel && _video[ id ].state === MediaBox.STATE_PLAYING ) {
-	                    this.fadeVolumeOut( id, duration );
+	                    this.fadeMediaOut( id, duration );
 	                }
 	            }
 	    
 	            // Look at audio index
 	            for ( id in _audio ) {
 	                if ( _audio[ id ].channel === channel && _audio[ id ].state === MediaBox.STATE_PLAYING ) {
-	                    this.fadeVolumeOut( id, duration );
+	                    this.fadeMediaOut( id, duration );
 	                }
 	            }
 	    
-	            return this.fadeVolumeIn( objId, duration );
+	            return this.fadeMediaIn( objId, duration );
 	        },
 	    
 	        /**
@@ -14163,7 +14285,7 @@
 	});
 
 /***/ },
-/* 18 */
+/* 17 */
 /*!*************************************!*\
   !*** ./~/properjs-easing/Easing.js ***!
   \*************************************/
@@ -14360,7 +14482,7 @@
 	});
 
 /***/ },
-/* 19 */
+/* 18 */
 /*!***********************************!*\
   !*** ./~/properjs-tween/Tween.js ***!
   \***********************************/
@@ -14385,7 +14507,7 @@
 	    
 	})(function () {
 	
-	    var Easing = __webpack_require__( /*! properjs-easing */ 18 ),
+	    var Easing = __webpack_require__( /*! properjs-easing */ 17 ),
 	        defaults = {
 	            ease: Easing.linear,
 	            duration: 600,
@@ -14484,7 +14606,7 @@
 	});
 
 /***/ },
-/* 20 */
+/* 19 */
 /*!*********************************!*\
   !*** ./~/fg-loadcss/loadCSS.js ***!
   \*********************************/
@@ -14559,7 +14681,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 21 */
+/* 20 */
 /*!*******************************!*\
   !*** ./~/fg-loadjs/loadJS.js ***!
   \*******************************/
@@ -14591,7 +14713,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 22 */
+/* 21 */
 /*!*******************************!*\
   !*** ./js_src/core/config.js ***!
   \*******************************/
@@ -14605,7 +14727,7 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 	
-	var _properjsEasing = __webpack_require__(/*! properjs-easing */ 18);
+	var _properjsEasing = __webpack_require__(/*! properjs-easing */ 17);
 	
 	var _properjsEasing2 = _interopRequireDefault(_properjsEasing);
 	
@@ -14726,7 +14848,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 23 */
+/* 22 */
 /*!********************************!*\
   !*** ./js_src/core/resizes.js ***!
   \********************************/
@@ -14742,11 +14864,11 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 	
-	var _properjsThrottle = __webpack_require__(/*! properjs-throttle */ 24);
+	var _properjsThrottle = __webpack_require__(/*! properjs-throttle */ 23);
 	
 	var _properjsThrottle2 = _interopRequireDefault(_properjsThrottle);
 	
-	var _properjsDebounce = __webpack_require__(/*! properjs-debounce */ 25);
+	var _properjsDebounce = __webpack_require__(/*! properjs-debounce */ 24);
 	
 	var _properjsDebounce2 = _interopRequireDefault(_properjsDebounce);
 	
@@ -14821,7 +14943,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 24 */
+/* 23 */
 /*!*****************************************!*\
   !*** ./~/properjs-throttle/throttle.js ***!
   \*****************************************/
@@ -14880,7 +15002,7 @@
 	});
 
 /***/ },
-/* 25 */
+/* 24 */
 /*!*****************************************!*\
   !*** ./~/properjs-debounce/debounce.js ***!
   \*****************************************/
@@ -14951,7 +15073,7 @@
 	});
 
 /***/ },
-/* 26 */
+/* 25 */
 /*!********************************!*\
   !*** ./js_src/core/scrolls.js ***!
   \********************************/
@@ -15145,7 +15267,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 27 */
+/* 26 */
 /*!****************************!*\
   !*** ./js_src/core/api.js ***!
   \****************************/
@@ -15163,13 +15285,13 @@
 	
 	var _js_libsJqueryDistJquery2 = _interopRequireDefault(_js_libsJqueryDistJquery);
 	
-	var _paramalama = __webpack_require__(/*! paramalama */ 28);
+	var _paramalama = __webpack_require__(/*! paramalama */ 27);
 	
 	var _paramalama2 = _interopRequireDefault(_paramalama);
 	
 	//import config from "./config";
 	
-	var _cache = __webpack_require__(/*! ./cache */ 29);
+	var _cache = __webpack_require__(/*! ./cache */ 28);
 	
 	var _cache2 = _interopRequireDefault(_cache);
 	
@@ -15437,7 +15559,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 28 */
+/* 27 */
 /*!************************************!*\
   !*** ./~/paramalama/paramalama.js ***!
   \************************************/
@@ -15506,7 +15628,7 @@
 
 
 /***/ },
-/* 29 */
+/* 28 */
 /*!******************************!*\
   !*** ./js_src/core/cache.js ***!
   \******************************/
@@ -15520,7 +15642,7 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 	
-	var _Store = __webpack_require__(/*! ./Store */ 30);
+	var _Store = __webpack_require__(/*! ./Store */ 29);
 	
 	var _Store2 = _interopRequireDefault(_Store);
 	
@@ -15538,7 +15660,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 30 */
+/* 29 */
 /*!******************************!*\
   !*** ./js_src/core/Store.js ***!
   \******************************/
@@ -15845,7 +15967,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 31 */
+/* 30 */
 /*!**************************!*\
   !*** ./js_src/router.js ***!
   \**************************/
@@ -15865,7 +15987,7 @@
 	
 	var _js_libsJqueryDistJquery2 = _interopRequireDefault(_js_libsJqueryDistJquery);
 	
-	var _properjsPagecontroller = __webpack_require__(/*! properjs-pagecontroller */ 32);
+	var _properjsPagecontroller = __webpack_require__(/*! properjs-pagecontroller */ 31);
 	
 	var _properjsPagecontroller2 = _interopRequireDefault(_properjsPagecontroller);
 	
@@ -15873,7 +15995,7 @@
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _animate = __webpack_require__(/*! ./animate */ 37);
+	var _animate = __webpack_require__(/*! ./animate */ 36);
 	
 	var _animate2 = _interopRequireDefault(_animate);
 	
@@ -16207,7 +16329,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 32 */
+/* 31 */
 /*!*****************************************************!*\
   !*** ./~/properjs-pagecontroller/PageController.js ***!
   \*****************************************************/
@@ -16240,8 +16362,8 @@
 	})(function () {
 	
 	    // Useful stuff
-	    var Router = __webpack_require__( /*! properjs-router */ 33 ),
-	        Controller = __webpack_require__( /*! properjs-controller */ 13 ),
+	    var Router = __webpack_require__( /*! properjs-router */ 32 ),
+	        Controller = __webpack_require__( /*! properjs-controller */ 12 ),
 	
 	        _router = null,
 	        _config = [],
@@ -16744,7 +16866,7 @@
 	});
 
 /***/ },
-/* 33 */
+/* 32 */
 /*!***************************************************************!*\
   !*** ./~/properjs-pagecontroller/~/properjs-router/Router.js ***!
   \***************************************************************/
@@ -16769,9 +16891,9 @@
 	    
 	})(function () {
 	
-	    var PushState = __webpack_require__( /*! properjs-pushstate */ 34 ),
-	        MatchRoute = __webpack_require__( /*! properjs-matchroute */ 35 ),
-	        matchElement = __webpack_require__( /*! properjs-matchelement */ 36 ),
+	    var PushState = __webpack_require__( /*! properjs-pushstate */ 33 ),
+	        MatchRoute = __webpack_require__( /*! properjs-matchroute */ 34 ),
+	        matchElement = __webpack_require__( /*! properjs-matchelement */ 35 ),
 	        _rSameDomain = new RegExp( document.domain ),
 	        _initDelay = 200,
 	        _triggerEl;
@@ -17219,7 +17341,7 @@
 	});
 
 /***/ },
-/* 34 */
+/* 33 */
 /*!***************************************************************************************!*\
   !*** ./~/properjs-pagecontroller/~/properjs-router/~/properjs-pushstate/PushState.js ***!
   \***************************************************************************************/
@@ -17760,7 +17882,7 @@
 	});
 
 /***/ },
-/* 35 */
+/* 34 */
 /*!*****************************************************************************************!*\
   !*** ./~/properjs-pagecontroller/~/properjs-router/~/properjs-matchroute/MatchRoute.js ***!
   \*****************************************************************************************/
@@ -17785,7 +17907,7 @@
 	    
 	})(function () {
 	
-	    var paramalama = __webpack_require__( /*! paramalama */ 28 ),
+	    var paramalama = __webpack_require__( /*! paramalama */ 27 ),
 	
 	    /**
 	     *
@@ -18119,7 +18241,7 @@
 	});
 
 /***/ },
-/* 36 */
+/* 35 */
 /*!*************************************************!*\
   !*** ./~/properjs-matchelement/matchElement.js ***!
   \*************************************************/
@@ -18181,7 +18303,7 @@
 	});
 
 /***/ },
-/* 37 */
+/* 36 */
 /*!***************************!*\
   !*** ./js_src/animate.js ***!
   \***************************/
@@ -18344,7 +18466,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 38 */
+/* 37 */
 /*!***************************!*\
   !*** ./js_src/overlay.js ***!
   \***************************/
@@ -18427,7 +18549,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 39 */
+/* 38 */
 /*!***************************!*\
   !*** ./js_src/Project.js ***!
   \***************************/
@@ -18455,11 +18577,11 @@
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _router = __webpack_require__(/*! ./router */ 31);
+	var _router = __webpack_require__(/*! ./router */ 30);
 	
 	var _router2 = _interopRequireDefault(_router);
 	
-	var _overlay = __webpack_require__(/*! ./overlay */ 38);
+	var _overlay = __webpack_require__(/*! ./overlay */ 37);
 	
 	var _overlay2 = _interopRequireDefault(_overlay);
 	
