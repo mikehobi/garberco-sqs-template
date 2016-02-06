@@ -16,7 +16,9 @@
     <body class="is-clipped">
         <header class="header js-header -text--center">
             <h1 class="h3">
-                <a href="/" class="js-logo js-router--ignore">{website.siteTitle}</a>
+                <a href="/" class="js-logo js-router--ignore">
+                    <img class="logo" src="/assets/svgs/GarberCo.svg" />
+                </a>
             </h1>
         </header>
 

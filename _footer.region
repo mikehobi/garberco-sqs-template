@@ -2,7 +2,7 @@
         </main>
 
 
-        <squarespace:script src="app.js" combo="true" />
+        <squarespace:script src="app.js" combo="{.if authenticatedAccount}false{.or}true{.end}" />
 
 
         {squarespace-footers}

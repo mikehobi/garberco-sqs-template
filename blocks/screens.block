@@ -9,7 +9,9 @@
 
 
 <section class='project js-project screen {.section collection}{.equal? typeName "custom-photo"}is-active{.end}{.end}'>
-    {.repeated section items}
-        {@|apply photos.block}
-    {.end}
+    <div class="project__node js-project-node">
+        {.repeated section items}
+            {@|apply photos.block}
+        {.end}
+    </div>
 </section>

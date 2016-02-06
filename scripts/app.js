@@ -65,15 +65,15 @@
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _router = __webpack_require__(/*! ./router */ 30);
+	var _router = __webpack_require__(/*! ./router */ 32);
 	
 	var _router2 = _interopRequireDefault(_router);
 	
-	var _overlay = __webpack_require__(/*! ./overlay */ 37);
+	var _overlay = __webpack_require__(/*! ./overlay */ 39);
 	
 	var _overlay2 = _interopRequireDefault(_overlay);
 	
-	var _Project = __webpack_require__(/*! ./Project */ 38);
+	var _Project = __webpack_require__(/*! ./Project */ 40);
 	
 	var _Project2 = _interopRequireDefault(_Project);
 	
@@ -103,10 +103,11 @@
 	        this.core = core;
 	        this.router = _router2["default"];
 	        this.overlay = _overlay2["default"];
+	        this.analytics = new core.Analytics();
 	
+	        this.bindEvents();
 	        this.initModules();
 	        this.initProject();
-	        this.bindEvents();
 	
 	        core.log("App", this);
 	
@@ -120,7 +121,6 @@
 	    _createClass(App, [{
 	        key: "destroy",
 	        value: function destroy() {
-	            this.core.dom.page.off("click", this._onPageClick);
 	            this.core.dom.body.off("click", this._onTileClick);
 	            this.core.dom.page.off("mouseenter", this._onMouseEnter);
 	            this.core.dom.page.off("mouseleave", this._onMouseLeave);
@@ -129,7 +129,7 @@
 	        key: "initProject",
 	        value: function initProject() {
 	            if (this.loadType !== "collection") {
-	                this.core.dom.project.detach();
+	                this.core.dom.project.element.detach();
 	            } else {
 	                this.project = new _Project2["default"](this, {
 	                    url: window.location.pathname,
@@ -157,15 +157,15 @@
 	    }, {
 	        key: "bindEvents",
 	        value: function bindEvents() {
-	            this._onPageClick = this.onPageClick.bind(this);
 	            this._onTileClick = this.onTileClick.bind(this);
 	            this._onPreloadDone = this.onPreloadDone.bind(this);
 	            this._onMouseEnter = this.onMouseEnter.bind(this);
 	            this._onMouseLeave = this.onMouseLeave.bind(this);
 	            this._onLogoClick = this.onLogoClick.bind(this);
+	            this._onProjectEnded = this.onProjectEnded.bind(this);
 	
+	            this.core.util.emitter.on("app--project-ended", this._onProjectEnded);
 	            this.core.util.emitter.on("app--preload-done", this._onPreloadDone);
-	            this.core.dom.page.on("click", this._onPageClick);
 	            this.core.dom.body.on("click", ".js-project-tile", this._onTileClick);
 	            this.core.dom.page.on("mouseenter", ".js-project-tile", this._onMouseEnter);
 	            this.core.dom.page.on("mouseleave", ".js-project-tile", this._onMouseLeave);
@@ -234,10 +234,8 @@
 	            }
 	        }
 	    }, {
-	        key: "onLogoClick",
-	        value: function onLogoClick(e) {
-	            e.preventDefault();
-	
+	        key: "onProjectEnded",
+	        value: function onProjectEnded() {
 	            this.router.push("/", function () {});
 	
 	            if (this.project) {
@@ -245,13 +243,13 @@
 	            }
 	        }
 	    }, {
-	        key: "onPageClick",
-	        value: function onPageClick(e) {
+	        key: "onLogoClick",
+	        value: function onLogoClick(e) {
 	            e.preventDefault();
 	
-	            if (!(0, _js_libsJqueryDistJquery2["default"])(e.target).closest(".js-project-tile").length) {
-	                this.router.push("/", function () {});
+	            this.router.push("/", function () {});
 	
+	            if (this.project) {
 	                this.destroyProject();
 	            }
 	        }
@@ -8009,45 +8007,49 @@
 	
 	var _dom2 = _interopRequireDefault(_dom);
 	
-	var _preload = __webpack_require__(/*! ./preload */ 9);
+	var _images = __webpack_require__(/*! ./images */ 21);
 	
-	var _preload2 = _interopRequireDefault(_preload);
+	var _images2 = _interopRequireDefault(_images);
 	
-	var _resizes = __webpack_require__(/*! ./resizes */ 22);
+	var _resizes = __webpack_require__(/*! ./resizes */ 23);
 	
 	var _resizes2 = _interopRequireDefault(_resizes);
 	
-	var _scrolls = __webpack_require__(/*! ./scrolls */ 25);
+	var _scrolls = __webpack_require__(/*! ./scrolls */ 26);
 	
 	var _scrolls2 = _interopRequireDefault(_scrolls);
 	
-	var _util = __webpack_require__(/*! ./util */ 10);
+	var _util = __webpack_require__(/*! ./util */ 7);
 	
 	var util = _interopRequireWildcard(_util);
 	
-	var _config = __webpack_require__(/*! ./config */ 21);
+	var _config = __webpack_require__(/*! ./config */ 18);
 	
 	var _config2 = _interopRequireDefault(_config);
 	
-	var _env = __webpack_require__(/*! ./env */ 8);
+	var _env = __webpack_require__(/*! ./env */ 20);
 	
 	var _env2 = _interopRequireDefault(_env);
 	
-	var _log = __webpack_require__(/*! ./log */ 7);
+	var _log = __webpack_require__(/*! ./log */ 19);
 	
 	var _log2 = _interopRequireDefault(_log);
 	
-	var _api = __webpack_require__(/*! ./api */ 26);
+	var _api = __webpack_require__(/*! ./api */ 27);
 	
 	var _api2 = _interopRequireDefault(_api);
 	
-	var _cache = __webpack_require__(/*! ./cache */ 28);
+	var _cache = __webpack_require__(/*! ./cache */ 29);
 	
 	var _cache2 = _interopRequireDefault(_cache);
 	
+	var _Analytics = __webpack_require__(/*! ./Analytics */ 31);
+	
+	var _Analytics2 = _interopRequireDefault(_Analytics);
+	
 	exports.detect = _detect2["default"];
 	exports.dom = _dom2["default"];
-	exports.preload = _preload2["default"];
+	exports.images = _images2["default"];
 	exports.resizes = _resizes2["default"];
 	exports.scrolls = _scrolls2["default"];
 	exports.util = util;
@@ -8056,6 +8058,7 @@
 	exports.log = _log2["default"];
 	exports.api = _api2["default"];
 	exports.cache = _cache2["default"];
+	exports.Analytics = _Analytics2["default"];
 
 /***/ },
 /* 5 */
@@ -8076,7 +8079,7 @@
 	
 	var _dom2 = _interopRequireDefault(_dom);
 	
-	var _log = __webpack_require__(/*! ./log */ 7);
+	var _log = __webpack_require__(/*! ./log */ 19);
 	
 	var _log2 = _interopRequireDefault(_log);
 	
@@ -8182,14 +8185,20 @@
 	  value: true
 	});
 	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 	
 	var _js_libsJqueryDistJquery = __webpack_require__(/*! js_libs/jquery/dist/jquery */ 1);
 	
 	var _js_libsJqueryDistJquery2 = _interopRequireDefault(_js_libsJqueryDistJquery);
 	
-	var $_jsHeader = (0, _js_libsJqueryDistJquery2["default"])(".js-header");
+	var _util = __webpack_require__(/*! ./util */ 7);
+	
+	var util = _interopRequireWildcard(_util);
+	
 	var $_jsOverlay = (0, _js_libsJqueryDistJquery2["default"])(".js-overlay");
+	var $_jsProject = (0, _js_libsJqueryDistJquery2["default"])(".js-project");
 	
 	/**
 	 *
@@ -8257,7 +8266,11 @@
 	   * @description The project view node.
 	   *
 	   */
-	  project: (0, _js_libsJqueryDistJquery2["default"])(".js-project"),
+	  project: {
+	    element: $_jsProject,
+	    elementNode: $_jsProject.find(".js-project-node"),
+	    elementTransitionDuration: util.getTransitionDuration($_jsProject[0])
+	  },
 	
 	  /**
 	   *
@@ -8287,7 +8300,7 @@
 	   * @description The cached header node.
 	   *
 	   */
-	  header: $_jsHeader.data("$util", $_jsHeader.find(".js-header-util")),
+	  header: (0, _js_libsJqueryDistJquery2["default"])(".js-header"),
 	
 	  /**
 	   *
@@ -8311,283 +8324,6 @@
 
 /***/ },
 /* 7 */
-/*!****************************!*\
-  !*** ./js_src/core/log.js ***!
-  \****************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-	
-	var _env = __webpack_require__(/*! ./env */ 8);
-	
-	var _env2 = _interopRequireDefault(_env);
-	
-	/**
-	 *
-	 * @public
-	 * @method log
-	 * @description Normalized app console logger.
-	 *
-	 */
-	var log = function log() {
-	  if (_env2["default"].get() === _env2["default"].DEV) {
-	    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-	      args[_key] = arguments[_key];
-	    }
-	
-	    console.log(args);
-	  }
-	};
-	
-	/******************************************************************************
-	 * Export
-	*******************************************************************************/
-	exports["default"] = log;
-	module.exports = exports["default"];
-
-/***/ },
-/* 8 */
-/*!****************************!*\
-  !*** ./js_src/core/env.js ***!
-  \****************************/
-/***/ function(module, exports) {
-
-	/**
-	 *
-	 * @public
-	 * @module env
-	 * @description Set the app environment.
-	 *
-	 */
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	var env = {
-	  /**
-	   *
-	   * @member DEV
-	   * @memberof env
-	   * @description The `production` development ref.
-	   *
-	   */
-	  DEV: "development",
-	
-	  /**
-	   *
-	   * @member PROD
-	   * @memberof env
-	   * @description The `production` environment ref.
-	   *
-	   */
-	  PROD: "production",
-	
-	  /**
-	   *
-	   * @method get
-	   * @memberof env
-	   * @description Returns the active code `environment`.
-	   * @returns {boolean}
-	   *
-	   */
-	  get: function get() {
-	    return (/localhost|squarespace/g.test(document.domain) ? this.DEV : this.PROD
-	    );
-	  },
-	
-	  /**
-	   *
-	   * @method isConfig
-	   * @memberof env
-	   * @description Determine whether we are in Squarespace /config land or not.
-	   * @returns {boolean}
-	   *
-	   */
-	  isConfig: function isConfig() {
-	    return window.parent.location.pathname.indexOf("/config") !== -1;
-	  }
-	};
-	
-	/******************************************************************************
-	 * Export
-	*******************************************************************************/
-	exports["default"] = env;
-	module.exports = exports["default"];
-
-/***/ },
-/* 9 */
-/*!********************************!*\
-  !*** ./js_src/core/preload.js ***!
-  \********************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-	
-	var _dom = __webpack_require__(/*! ./dom */ 6);
-	
-	var _dom2 = _interopRequireDefault(_dom);
-	
-	var _util = __webpack_require__(/*! ./util */ 10);
-	
-	var util = _interopRequireWildcard(_util);
-	
-	var _log = __webpack_require__(/*! ./log */ 7);
-	
-	var _log2 = _interopRequireDefault(_log);
-	
-	var _config = __webpack_require__(/*! ./config */ 21);
-	
-	var _config2 = _interopRequireDefault(_config);
-	
-	var _properjsImageloader = __webpack_require__(/*! properjs-imageloader */ 15);
-	
-	var _properjsImageloader2 = _interopRequireDefault(_properjsImageloader);
-	
-	var $_images = null;
-	var $_visible = null;
-	var _imgLoader = null;
-	
-	/**
-	 *
-	 * @public
-	 * @module preload
-	 * @description Handles separation of image pre-loading and image lazy-loading.
-	 *
-	 */
-	var preload = {
-	    /**
-	     *
-	     * @public
-	     * @method init
-	     * @memberof preload
-	     * @description Method runs once when window loads.
-	     *
-	     */
-	    init: function init() {
-	        (0, _log2["default"])("preload initialized");
-	    },
-	
-	    /**
-	     *
-	     * @public
-	     * @method isActive
-	     * @memberof preload
-	     * @description Method informs PageController of active status.
-	     * @returns {boolean}
-	     *
-	     */
-	    isActive: util.noop,
-	
-	    /**
-	     *
-	     * @public
-	     * @method onload
-	     * @memberof preload
-	     * @description Method performs onloading actions for this module.
-	     *
-	     */
-	    onload: function onload() {
-	        this.doPreload();
-	    },
-	
-	    /**
-	     *
-	     * @public
-	     * @method unload
-	     * @memberof preload
-	     * @description Method performs unloading actions for this module.
-	     *
-	     */
-	    unload: function unload() {
-	        $_images = null;
-	        $_visible = null;
-	
-	        _properjsImageloader2["default"].killInstances();
-	
-	        _imgLoader = null;
-	    },
-	
-	    /**
-	     *
-	     * @public
-	     * @method doPreload
-	     * @memberof preload
-	     * @param {object} $images Optionally, the image collection to load
-	     * @param {function} callback Optionally, a callback to fire when loading is done
-	     * @description Method handles separation of pre-load and lazy-load.
-	     *
-	     */
-	    doPreload: function doPreload($images, callback) {
-	        $_images = $images || _dom2["default"].page.find(_config2["default"].lazyImageSelector);
-	        $_visible = util.getElementsInView($_images);
-	
-	        if (!$_visible.length) {
-	            delayedLoad(callback);
-	        } else {
-	            (0, _log2["default"])("preload will load", $_visible.length, "out of", $_images.length, "images");
-	
-	            _imgLoader = util.loadImages($_visible, function () {
-	                return util.noop;
-	            });
-	            _imgLoader.on("done", function () {
-	                (0, _log2["default"])("preloaded", $_visible.length, "images");
-	
-	                delayedLoad(callback);
-	            });
-	        }
-	    }
-	};
-	
-	/**
-	 *
-	 * @private
-	 * @method delayedLoad
-	 * @memberof preload
-	 * @param {function} callback Optionally, a callback to fire when loading is done
-	 * @description Method performs the delayed, or lazy-load, loading sequence.
-	 *
-	 */
-	var delayedLoad = function delayedLoad(callback) {
-	    var $notVisible = $_images.not($_visible);
-	
-	    if ($notVisible.length) {
-	        _imgLoader = null;
-	        _imgLoader = util.loadImages($notVisible, util.isElementLoadable);
-	        _imgLoader.on("done", function () {
-	            return (0, _log2["default"])("lazyloaded", $notVisible.length, "images");
-	        });
-	    }
-	
-	    util.emitter.fire("app--preload-done");
-	
-	    if (typeof callback === "function") {
-	        callback();
-	    }
-	};
-	
-	/******************************************************************************
-	 * Export
-	*******************************************************************************/
-	exports["default"] = preload;
-	module.exports = exports["default"];
-
-/***/ },
-/* 10 */
 /*!*****************************!*\
   !*** ./js_src/core/util.js ***!
   \*****************************/
@@ -8613,35 +8349,35 @@
 	
 	var _js_libsJqueryDistJquery2 = _interopRequireDefault(_js_libsJqueryDistJquery);
 	
-	var _hammerjs = __webpack_require__(/*! hammerjs */ 11);
+	var _hammerjs = __webpack_require__(/*! hammerjs */ 8);
 	
 	var _hammerjs2 = _interopRequireDefault(_hammerjs);
 	
-	var _properjsController = __webpack_require__(/*! properjs-controller */ 12);
+	var _properjsController = __webpack_require__(/*! properjs-controller */ 9);
 	
 	var _properjsController2 = _interopRequireDefault(_properjsController);
 	
-	var _properjsScrollcontroller = __webpack_require__(/*! properjs-scrollcontroller */ 13);
+	var _properjsScrollcontroller = __webpack_require__(/*! properjs-scrollcontroller */ 10);
 	
 	var _properjsScrollcontroller2 = _interopRequireDefault(_properjsScrollcontroller);
 	
-	var _properjsResizecontroller = __webpack_require__(/*! properjs-resizecontroller */ 14);
+	var _properjsResizecontroller = __webpack_require__(/*! properjs-resizecontroller */ 11);
 	
 	var _properjsResizecontroller2 = _interopRequireDefault(_properjsResizecontroller);
 	
-	var _properjsImageloader = __webpack_require__(/*! properjs-imageloader */ 15);
+	var _properjsImageloader = __webpack_require__(/*! properjs-imageloader */ 12);
 	
 	var _properjsImageloader2 = _interopRequireDefault(_properjsImageloader);
 	
-	var _properjsMediabox = __webpack_require__(/*! properjs-mediabox */ 16);
+	var _properjsMediabox = __webpack_require__(/*! properjs-mediabox */ 13);
 	
 	var _properjsMediabox2 = _interopRequireDefault(_properjsMediabox);
 	
-	var _fgLoadcss = __webpack_require__(/*! fg-loadcss */ 19);
+	var _fgLoadcss = __webpack_require__(/*! fg-loadcss */ 16);
 	
 	var _fgLoadcss2 = _interopRequireDefault(_fgLoadcss);
 	
-	var _fgLoadjs = __webpack_require__(/*! fg-loadjs */ 20);
+	var _fgLoadjs = __webpack_require__(/*! fg-loadjs */ 17);
 	
 	var _fgLoadjs2 = _interopRequireDefault(_fgLoadjs);
 	
@@ -8649,7 +8385,7 @@
 	
 	var _dom2 = _interopRequireDefault(_dom);
 	
-	var _config = __webpack_require__(/*! ./config */ 21);
+	var _config = __webpack_require__(/*! ./config */ 18);
 	
 	var _config2 = _interopRequireDefault(_config);
 	
@@ -9087,6 +8823,10 @@
 	    };
 	};
 	
+	var getPageKey = function getPageKey() {
+	    return "" + window.location.pathname + window.location.search;
+	};
+	
 	/******************************************************************************
 	 * Export
 	*******************************************************************************/
@@ -9117,12 +8857,13 @@
 	    translate3d: translate3d,
 	    getTransitionDuration: getTransitionDuration,
 	    safePreventDefault: safePreventDefault,
-	    getDefaultHammerOptions: getDefaultHammerOptions
+	    getDefaultHammerOptions: getDefaultHammerOptions,
+	    getPageKey: getPageKey
 	};
 	module.exports = exports["default"];
 
 /***/ },
-/* 11 */
+/* 8 */
 /*!******************************!*\
   !*** ./~/hammerjs/hammer.js ***!
   \******************************/
@@ -11699,7 +11440,7 @@
 
 
 /***/ },
-/* 12 */
+/* 9 */
 /*!*********************************************!*\
   !*** ./~/properjs-controller/Controller.js ***!
   \*********************************************/
@@ -12007,7 +11748,7 @@
 	});
 
 /***/ },
-/* 13 */
+/* 10 */
 /*!*********************************************************!*\
   !*** ./~/properjs-scrollcontroller/ScrollController.js ***!
   \*********************************************************/
@@ -12033,7 +11774,7 @@
 	    
 	})(function () {
 	
-	    var Controller = __webpack_require__( /*! properjs-controller */ 12 ),
+	    var Controller = __webpack_require__( /*! properjs-controller */ 9 ),
 	        
 	        // Current scroll position
 	        _currentY = null,
@@ -12185,7 +11926,7 @@
 	});
 
 /***/ },
-/* 14 */
+/* 11 */
 /*!*********************************************************!*\
   !*** ./~/properjs-resizecontroller/ResizeController.js ***!
   \*********************************************************/
@@ -12211,7 +11952,7 @@
 	    
 	})(function () {
 	
-	    var Controller = __webpack_require__( /*! properjs-controller */ 12 ),
+	    var Controller = __webpack_require__( /*! properjs-controller */ 9 ),
 	
 	        // Orientation?
 	        _hasOrientation = ("orientation" in window),
@@ -12394,7 +12135,7 @@
 	});
 
 /***/ },
-/* 15 */
+/* 12 */
 /*!***********************************************!*\
   !*** ./~/properjs-imageloader/ImageLoader.js ***!
   \***********************************************/
@@ -12959,7 +12700,7 @@
 	});
 
 /***/ },
-/* 16 */
+/* 13 */
 /*!*****************************************!*\
   !*** ./~/properjs-mediabox/MediaBox.js ***!
   \*****************************************/
@@ -12993,8 +12734,8 @@
 	})(function () {
 	
 	
-	    var Easing = __webpack_require__( /*! properjs-easing */ 17 ),
-	        Tween = __webpack_require__( /*! properjs-tween */ 18 ),
+	    var Easing = __webpack_require__( /*! properjs-easing */ 14 ),
+	        Tween = __webpack_require__( /*! properjs-tween */ 15 ),
 	        raf = window.requestAnimationFrame,
 	        caf = window.cancelAnimationFrame,
 	
@@ -14285,7 +14026,7 @@
 	});
 
 /***/ },
-/* 17 */
+/* 14 */
 /*!*************************************!*\
   !*** ./~/properjs-easing/Easing.js ***!
   \*************************************/
@@ -14482,7 +14223,7 @@
 	});
 
 /***/ },
-/* 18 */
+/* 15 */
 /*!***********************************!*\
   !*** ./~/properjs-tween/Tween.js ***!
   \***********************************/
@@ -14507,7 +14248,7 @@
 	    
 	})(function () {
 	
-	    var Easing = __webpack_require__( /*! properjs-easing */ 17 ),
+	    var Easing = __webpack_require__( /*! properjs-easing */ 14 ),
 	        defaults = {
 	            ease: Easing.linear,
 	            duration: 600,
@@ -14606,7 +14347,7 @@
 	});
 
 /***/ },
-/* 19 */
+/* 16 */
 /*!*********************************!*\
   !*** ./~/fg-loadcss/loadCSS.js ***!
   \*********************************/
@@ -14681,7 +14422,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 20 */
+/* 17 */
 /*!*******************************!*\
   !*** ./~/fg-loadjs/loadJS.js ***!
   \*******************************/
@@ -14713,7 +14454,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 21 */
+/* 18 */
 /*!*******************************!*\
   !*** ./js_src/core/config.js ***!
   \*******************************/
@@ -14727,7 +14468,7 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 	
-	var _properjsEasing = __webpack_require__(/*! properjs-easing */ 17);
+	var _properjsEasing = __webpack_require__(/*! properjs-easing */ 14);
 	
 	var _properjsEasing2 = _interopRequireDefault(_properjsEasing);
 	
@@ -14848,7 +14589,393 @@
 	module.exports = exports["default"];
 
 /***/ },
+/* 19 */
+/*!****************************!*\
+  !*** ./js_src/core/log.js ***!
+  \****************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+	
+	var _env = __webpack_require__(/*! ./env */ 20);
+	
+	var _env2 = _interopRequireDefault(_env);
+	
+	/**
+	 *
+	 * @public
+	 * @method log
+	 * @description Normalized app console logger.
+	 *
+	 */
+	var log = function log() {
+	  if (_env2["default"].get() === _env2["default"].DEV) {
+	    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+	      args[_key] = arguments[_key];
+	    }
+	
+	    console.log(args);
+	  }
+	};
+	
+	/******************************************************************************
+	 * Export
+	*******************************************************************************/
+	exports["default"] = log;
+	module.exports = exports["default"];
+
+/***/ },
+/* 20 */
+/*!****************************!*\
+  !*** ./js_src/core/env.js ***!
+  \****************************/
+/***/ function(module, exports) {
+
+	/**
+	 *
+	 * @public
+	 * @module env
+	 * @description Set the app environment.
+	 *
+	 */
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	var env = {
+	  /**
+	   *
+	   * @member DEV
+	   * @memberof env
+	   * @description The `production` development ref.
+	   *
+	   */
+	  DEV: "development",
+	
+	  /**
+	   *
+	   * @member PROD
+	   * @memberof env
+	   * @description The `production` environment ref.
+	   *
+	   */
+	  PROD: "production",
+	
+	  /**
+	   *
+	   * @method get
+	   * @memberof env
+	   * @description Returns the active code `environment`.
+	   * @returns {boolean}
+	   *
+	   */
+	  get: function get() {
+	    return (/localhost|squarespace/g.test(document.domain) ? this.DEV : this.PROD
+	    );
+	  },
+	
+	  /**
+	   *
+	   * @method isConfig
+	   * @memberof env
+	   * @description Determine whether we are in Squarespace /config land or not.
+	   * @returns {boolean}
+	   *
+	   */
+	  isConfig: function isConfig() {
+	    return window.parent.location.pathname.indexOf("/config") !== -1;
+	  }
+	};
+	
+	/******************************************************************************
+	 * Export
+	*******************************************************************************/
+	exports["default"] = env;
+	module.exports = exports["default"];
+
+/***/ },
+/* 21 */
+/*!*******************************!*\
+  !*** ./js_src/core/images.js ***!
+  \*******************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+	
+	var _dom = __webpack_require__(/*! ./dom */ 6);
+	
+	var _dom2 = _interopRequireDefault(_dom);
+	
+	var _util = __webpack_require__(/*! ./util */ 7);
+	
+	var util = _interopRequireWildcard(_util);
+	
+	var _log = __webpack_require__(/*! ./log */ 19);
+	
+	var _log2 = _interopRequireDefault(_log);
+	
+	var _config = __webpack_require__(/*! ./config */ 18);
+	
+	var _config2 = _interopRequireDefault(_config);
+	
+	var _properjsImageloader = __webpack_require__(/*! properjs-imageloader */ 12);
+	
+	var _properjsImageloader2 = _interopRequireDefault(_properjsImageloader);
+	
+	var _ImageController = __webpack_require__(/*! ./ImageController */ 22);
+	
+	var _ImageController2 = _interopRequireDefault(_ImageController);
+	
+	/**
+	 *
+	 * @public
+	 * @namespace images
+	 * @memberof core
+	 * @description Handles separation of image pre-loading and image lazy-loading.
+	 *
+	 */
+	var images = {
+	    /**
+	     *
+	     * @public
+	     * @method init
+	     * @memberof core.images
+	     * @description Method runs once when window loads.
+	     *
+	     */
+	    init: function init() {
+	        (0, _log2["default"])("preload initialized");
+	    },
+	
+	    /**
+	     *
+	     * @public
+	     * @method isActive
+	     * @memberof core.images
+	     * @description Method informs PageController of active status.
+	     * @returns {boolean}
+	     *
+	     */
+	    isActive: util.noop,
+	
+	    /**
+	     *
+	     * @public
+	     * @method onload
+	     * @memberof core.images
+	     * @description Method performs onloading actions for this module.
+	     *
+	     */
+	    onload: function onload() {
+	        this.handleImages();
+	    },
+	
+	    /**
+	     *
+	     * @public
+	     * @method unload
+	     * @memberof core.images
+	     * @description Method performs unloading actions for this module.
+	     *
+	     */
+	    unload: function unload() {
+	        _properjsImageloader2["default"].killInstances();
+	    },
+	
+	    /**
+	     *
+	     * @public
+	     * @method handlePreload
+	     * @memberof core.images
+	     * @param {function} callback The passed callback from `handleImages`
+	     * @description Method handles the `done` preloading event cycle.
+	     *
+	     */
+	    handlePreload: function handlePreload(callback) {
+	        if (typeof callback === "function") {
+	            callback();
+	        }
+	
+	        util.emitter.fire("app--preload-done");
+	    },
+	
+	    /**
+	     *
+	     * @public
+	     * @method handleImages
+	     * @memberof core.images
+	     * @param {object} $images Optionally, the image collection to load
+	     * @param {function} callback Optionally, a callback to fire when loading is done
+	     * @description Method handles separation of pre-load and lazy-load.
+	     *
+	     */
+	    handleImages: function handleImages($images, callback) {
+	        $images = $images || _dom2["default"].page.find(_config2["default"].lazyImageSelector);
+	
+	        if ($images.length) {
+	            var imageController = new _ImageController2["default"]($images);
+	
+	            imageController.on("preload", this.handlePreload.bind(this, callback));
+	
+	            imageController.on("lazyload", function () {
+	                util.emitter.fire("app--lazyload-done");
+	            });
+	        } else {
+	            this.handlePreload(callback);
+	        }
+	    }
+	};
+	
+	/******************************************************************************
+	 * Export
+	*******************************************************************************/
+	exports["default"] = images;
+	module.exports = exports["default"];
+
+/***/ },
 /* 22 */
+/*!****************************************!*\
+  !*** ./js_src/core/ImageController.js ***!
+  \****************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var _util = __webpack_require__(/*! ./util */ 7);
+	
+	var util = _interopRequireWildcard(_util);
+	
+	var _log = __webpack_require__(/*! ./log */ 19);
+	
+	var _log2 = _interopRequireDefault(_log);
+	
+	var _properjsController = __webpack_require__(/*! properjs-controller */ 9);
+	
+	var _properjsController2 = _interopRequireDefault(_properjsController);
+	
+	/**
+	 *
+	 * @public
+	 * @class ImageController
+	 * @param {jQuery} $images The image collection to load
+	 * @classdesc Handles breaking out the preload vs lazyload batches
+	 * @memberof core
+	 *
+	 */
+	
+	var ImageController = (function (_Controller) {
+	    _inherits(ImageController, _Controller);
+	
+	    function ImageController($images) {
+	        _classCallCheck(this, ImageController);
+	
+	        _get(Object.getPrototypeOf(ImageController.prototype), "constructor", this).call(this);
+	
+	        this.$preload = util.getElementsInView($images);
+	        this.$lazyload = $images.not(this.$preload);
+	
+	        if (this.$preload.length) {
+	            this.handlePreload();
+	        } else {
+	            this.fire("preload");
+	        }
+	
+	        if (this.$lazyload.length) {
+	            this.handleLazyload();
+	        }
+	    }
+	
+	    /******************************************************************************
+	     * Export
+	    *******************************************************************************/
+	
+	    /**
+	     *
+	     * @public
+	     * @method handlePreload
+	     * @memberof core.ImageController
+	     * @description ImageLoader instance for preload batch.
+	     *
+	     */
+	
+	    _createClass(ImageController, [{
+	        key: "handlePreload",
+	        value: function handlePreload() {
+	            var _this = this;
+	
+	            (0, _log2["default"])("ImageController preload queue:", this.$preload.length);
+	
+	            this.preLoader = util.loadImages(this.$preload, util.noop);
+	            this.preLoader.on("done", function () {
+	                (0, _log2["default"])("ImageController preloaded:", _this.$preload.length);
+	
+	                _this.fire("preload");
+	            });
+	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @method handleLazyload
+	         * @memberof core.ImageController
+	         * @description ImageLoader instance for lazyload batch.
+	         *
+	         */
+	    }, {
+	        key: "handleLazyload",
+	        value: function handleLazyload() {
+	            var _this2 = this;
+	
+	            (0, _log2["default"])("ImageController lazyload queue:", this.$lazyload.length);
+	
+	            this.lazyLoader = util.loadImages(this.$lazyload, util.isElementLoadable);
+	            this.lazyLoader.on("done", function () {
+	                (0, _log2["default"])("ImageController lazyloaded:", _this2.$lazyload.length);
+	
+	                _this2.fire("lazyload");
+	            });
+	        }
+	    }]);
+	
+	    return ImageController;
+	})(_properjsController2["default"]);
+	
+	exports["default"] = ImageController;
+	module.exports = exports["default"];
+
+/***/ },
+/* 23 */
 /*!********************************!*\
   !*** ./js_src/core/resizes.js ***!
   \********************************/
@@ -14864,19 +14991,19 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 	
-	var _properjsThrottle = __webpack_require__(/*! properjs-throttle */ 23);
+	var _properjsThrottle = __webpack_require__(/*! properjs-throttle */ 24);
 	
 	var _properjsThrottle2 = _interopRequireDefault(_properjsThrottle);
 	
-	var _properjsDebounce = __webpack_require__(/*! properjs-debounce */ 24);
+	var _properjsDebounce = __webpack_require__(/*! properjs-debounce */ 25);
 	
 	var _properjsDebounce2 = _interopRequireDefault(_properjsDebounce);
 	
-	var _util = __webpack_require__(/*! ./util */ 10);
+	var _util = __webpack_require__(/*! ./util */ 7);
 	
 	var util = _interopRequireWildcard(_util);
 	
-	var _log = __webpack_require__(/*! ./log */ 7);
+	var _log = __webpack_require__(/*! ./log */ 19);
 	
 	var _log2 = _interopRequireDefault(_log);
 	
@@ -14943,7 +15070,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 23 */
+/* 24 */
 /*!*****************************************!*\
   !*** ./~/properjs-throttle/throttle.js ***!
   \*****************************************/
@@ -15002,7 +15129,7 @@
 	});
 
 /***/ },
-/* 24 */
+/* 25 */
 /*!*****************************************!*\
   !*** ./~/properjs-debounce/debounce.js ***!
   \*****************************************/
@@ -15073,7 +15200,7 @@
 	});
 
 /***/ },
-/* 25 */
+/* 26 */
 /*!********************************!*\
   !*** ./js_src/core/scrolls.js ***!
   \********************************/
@@ -15097,11 +15224,11 @@
 	
 	var _detect2 = _interopRequireDefault(_detect);
 	
-	var _util = __webpack_require__(/*! ./util */ 10);
+	var _util = __webpack_require__(/*! ./util */ 7);
 	
 	var util = _interopRequireWildcard(_util);
 	
-	var _log = __webpack_require__(/*! ./log */ 7);
+	var _log = __webpack_require__(/*! ./log */ 19);
 	
 	var _log2 = _interopRequireDefault(_log);
 	
@@ -15267,7 +15394,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 26 */
+/* 27 */
 /*!****************************!*\
   !*** ./js_src/core/api.js ***!
   \****************************/
@@ -15285,13 +15412,13 @@
 	
 	var _js_libsJqueryDistJquery2 = _interopRequireDefault(_js_libsJqueryDistJquery);
 	
-	var _paramalama = __webpack_require__(/*! paramalama */ 27);
+	var _paramalama = __webpack_require__(/*! paramalama */ 28);
 	
 	var _paramalama2 = _interopRequireDefault(_paramalama);
 	
 	//import config from "./config";
 	
-	var _cache = __webpack_require__(/*! ./cache */ 28);
+	var _cache = __webpack_require__(/*! ./cache */ 29);
 	
 	var _cache2 = _interopRequireDefault(_cache);
 	
@@ -15559,7 +15686,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 27 */
+/* 28 */
 /*!************************************!*\
   !*** ./~/paramalama/paramalama.js ***!
   \************************************/
@@ -15628,7 +15755,7 @@
 
 
 /***/ },
-/* 28 */
+/* 29 */
 /*!******************************!*\
   !*** ./js_src/core/cache.js ***!
   \******************************/
@@ -15642,7 +15769,7 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 	
-	var _Store = __webpack_require__(/*! ./Store */ 29);
+	var _Store = __webpack_require__(/*! ./Store */ 30);
 	
 	var _Store2 = _interopRequireDefault(_Store);
 	
@@ -15660,7 +15787,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 29 */
+/* 30 */
 /*!******************************!*\
   !*** ./js_src/core/Store.js ***!
   \******************************/
@@ -15682,7 +15809,7 @@
 	
 	var _js_libsJqueryDistJquery2 = _interopRequireDefault(_js_libsJqueryDistJquery);
 	
-	var _log = __webpack_require__(/*! ./log */ 7);
+	var _log = __webpack_require__(/*! ./log */ 19);
 	
 	var _log2 = _interopRequireDefault(_log);
 	
@@ -15690,17 +15817,10 @@
 	var _instance = null;
 	var _initialized = false;
 	
-	// In-Memory {object} cache
+	// Session Storage
 	var _cache = {};
-	var _timestamp = null;
-	var _cacheAccess = "instrument-cache";
-	var _timeAccess = "instrument-timestamp";
-	
-	// 1 Week in milliseconds
-	var _duration = 604800000;
-	
-	// (1024 * 1024 * 5) - 5MB
-	var _allocated = 5242880;
+	var _access = "garberco-cache";
+	var _session = window.sessionStorage;
 	
 	/**
 	 *
@@ -15708,21 +15828,6 @@
 	 * @class Store
 	 * @param {object} options The Store settings
 	 * @classdesc Handles how data / content is cached and stored for webapp.
-	 *
-	 *            Local Storage is synchronous - so we don't want to set
-	 *            every time cache is modified. Ideally we can use an app event
-	 *            hook to set the cache to device when we have a free moment.
-	 *            Ideally, we're just looking at NOT BLOCKING REQUESTS just to
-	 *            set some data to the device storage.
-	 *
-	 *            There are 2 places where XHR requests happen in `OUR` app:
-	 *            The api module and PageController.
-	 *            This excludes media content requests - audio and video.
-	 *            But that's fine I think.
-	 *
-	 *            Some stuff I was reading:
-	 *            http://www.sitepoint.com/html5-local-storage-revisited/
-	 *            http://www.html5rocks.com/en/tutorials/offline/quota-research/
 	 *
 	 */
 	
@@ -15740,13 +15845,19 @@
 	        return _instance;
 	    }
 	
-	    /******************************************************************************
-	     * Export
-	    *******************************************************************************/
-	
 	    /**
 	     *
 	     * @public
+	     * @static
+	     * @member isStorageSupported
+	     * @memberof Store
+	     * @description Boolean to test local/session storage support
+	     *
+	     */
+	
+	    /**
+	     *
+	     * @private
 	     * @instance
 	     * @method _init
 	     * @memberof Store
@@ -15763,64 +15874,9 @@
 	
 	            _initialized = true;
 	
-	            if (this._opts.enableStorage) {
-	                this.tryFlush();
-	            } else {
-	                this.tryClean();
-	            }
+	            this.flush();
 	
 	            (0, _log2["default"])("Singleton Store initialized", this);
-	        }
-	
-	        /**
-	         *
-	         * @public
-	         * @instance
-	         * @method tryClean
-	         * @memberof Store
-	         * @description If initialized with storage disabled, attempt to remove old storage if it exists
-	         *
-	         */
-	    }, {
-	        key: "tryClean",
-	        value: function tryClean() {
-	            window.localStorage.removeItem(_timeAccess);
-	            window.localStorage.removeItem(_cacheAccess);
-	        }
-	
-	        /**
-	         *
-	         * @public
-	         * @instance
-	         * @method tryFlush
-	         * @memberof Store
-	         * @description Flush the cache if necessary
-	         *
-	         */
-	    }, {
-	        key: "tryFlush",
-	        value: function tryFlush() {
-	            _cache = window.localStorage.getItem(_cacheAccess);
-	            _timestamp = window.localStorage.getItem(_timeAccess);
-	
-	            // Store exists - Timestamp exists
-	            if (_cache && _timestamp) {
-	                _cache = JSON.parse(_cache);
-	                _timestamp = parseInt(_timestamp, 10);
-	
-	                // Neither exist - setup the cache and timestamp
-	                // Timestamp remains null for this case
-	            } else {
-	                    _cache = {};
-	                    _timestamp = Date.now();
-	                }
-	
-	            // Timestamp so check how long data has been stored
-	            // This condition establishes a 1 week duration before data flush
-	            // This condition also checks the size stored vs what is allocated - 5MB
-	            if (Date.now() - _timestamp >= _duration || _allocated - JSON.stringify(window.localStorage).length <= 0) {
-	                this.flush();
-	            }
 	        }
 	
 	        /**
@@ -15838,9 +15894,6 @@
 	            // New empty cache
 	            _cache = {};
 	
-	            // New Timestamp for NOW
-	            _timestamp = Date.now();
-	
 	            // Store the new cache object
 	            this.save();
 	        }
@@ -15857,13 +15910,12 @@
 	    }, {
 	        key: "save",
 	        value: function save() {
-	            if (!this._opts.enableStorage) {
-	                (0, _log2["default"])("Cache Storage disabled - Not writing to LocalStorage");
+	            if (!this._opts.enableStorage || !Store.isStorageSupported) {
+	                (0, _log2["default"])("Cache Storage disabled - Not writing to SessionStorage");
 	                return;
 	            }
 	
-	            window.localStorage.setItem(_timeAccess, _timestamp);
-	            window.localStorage.setItem(_cacheAccess, JSON.stringify(_cache));
+	            _session.setItem(_access, JSON.stringify(_cache));
 	        }
 	
 	        /**
@@ -15963,11 +16015,241 @@
 	    return Store;
 	})();
 	
+	Store.isStorageSupported = (function () {
+	    var ret = true;
+	
+	    try {
+	        _session.setItem("garberco-test", 1);
+	        _session.removeItem("garberco-test");
+	    } catch (err) {
+	        ret = false;
+	    }
+	
+	    return ret;
+	})();
+	
+	/******************************************************************************
+	 * Export
+	*******************************************************************************/
 	exports["default"] = Store;
 	module.exports = exports["default"];
 
 /***/ },
-/* 30 */
+/* 31 */
+/*!**********************************!*\
+  !*** ./js_src/core/Analytics.js ***!
+  \**********************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var _js_libsJqueryDistJquery = __webpack_require__(/*! js_libs/jquery/dist/jquery */ 1);
+	
+	var _js_libsJqueryDistJquery2 = _interopRequireDefault(_js_libsJqueryDistJquery);
+	
+	var _log = __webpack_require__(/*! ./log */ 19);
+	
+	var _log2 = _interopRequireDefault(_log);
+	
+	var _util = __webpack_require__(/*! ./util */ 7);
+	
+	var util = _interopRequireWildcard(_util);
+	
+	var _cache = __webpack_require__(/*! ./cache */ 29);
+	
+	var _cache2 = _interopRequireDefault(_cache);
+	
+	// Singleton
+	var _instance = null;
+	
+	/**
+	 *
+	 * @public
+	 * @class Analytics
+	 * @classdesc Handles Squarespace Metrics and Google Analytics.
+	 *            @see {@link https://developers.google.com/analytics/devguides/collection/analyticsjs/}
+	 * @memberof core
+	 *
+	 */
+	
+	var Analytics = (function () {
+	    function Analytics() {
+	        _classCallCheck(this, Analytics);
+	
+	        if (!_instance) {
+	            this.initSQSMetrics();
+	
+	            util.emitter.on("app--analytics-push", this.pushTrack.bind(this));
+	
+	            (0, _log2["default"])("Analytics initialized", this);
+	
+	            _instance = this;
+	        }
+	
+	        return _instance;
+	    }
+	
+	    /******************************************************************************
+	     * Export
+	    *******************************************************************************/
+	
+	    /**
+	     *
+	     * @public
+	     * @method initSQSMetrics
+	     * @memberof core.Analytics
+	     * @description Cache the initial static context object.
+	     *
+	     */
+	
+	    _createClass(Analytics, [{
+	        key: "initSQSMetrics",
+	        value: function initSQSMetrics() {
+	            if (_instance) {
+	                return;
+	            }
+	
+	            this.cacheStaticContext(window.Static.SQUARESPACE_CONTEXT);
+	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @method track
+	         * @param {string} type The object type, item or collection
+	         * @param {object} data The data context to track with
+	         * @memberof core.Analytics
+	         * @description Track Squarespace Metrics since we are ajax-routing.
+	         *
+	         */
+	    }, {
+	        key: "track",
+	        value: function track(type, data) {
+	            (0, _log2["default"])("Analytics track", type, data);
+	
+	            // Squarespace Metrics
+	            window.Y.Squarespace.Analytics.view(type, data);
+	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @method pushTrack
+	         * @param {string} html The full responseText from an XHR request
+	         * @param {jQuery} $doc Optional document node to receive and work with
+	         * @memberof core.Analytics
+	         * @description Parse static context from responseText and track it.
+	         *
+	         */
+	    }, {
+	        key: "pushTrack",
+	        value: function pushTrack(html, $doc) {
+	            var ctx = null;
+	
+	            $doc = $doc || (0, _js_libsJqueryDistJquery2["default"])(html);
+	
+	            ctx = this.getStaticContext(html);
+	
+	            if (ctx) {
+	                this.track(ctx.item ? "item" : "collection", ctx.item || ctx.collection);
+	            }
+	
+	            this.setDocumentTitle($doc.filter("title").text());
+	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @method setDocumentTitle
+	         * @param {string} title The new title for the document
+	         * @memberof core.Analytics
+	         * @description Update the documents title.
+	         *
+	         */
+	    }, {
+	        key: "setDocumentTitle",
+	        value: function setDocumentTitle(title) {
+	            document.title = title;
+	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @method getStaticContext
+	         * @param {string} resHTML The responseText HTML string from router
+	         * @memberof core.Analytics
+	         * @description Attempt to parse the Squarespace data context from responseText.
+	         * @returns {object}
+	         *
+	         */
+	    }, {
+	        key: "getStaticContext",
+	        value: function getStaticContext(resHTML) {
+	            // Match the { data } in Static.SQUARESPACE_CONTEXT
+	            var ctx = _cache2["default"].get(util.getPageKey() + "-context");
+	
+	            if (!ctx) {
+	                ctx = resHTML.match(/Static\.SQUARESPACE_CONTEXT\s=\s(.*?)\};/);
+	
+	                if (ctx && ctx[1]) {
+	                    ctx = ctx[1];
+	
+	                    // Put the ending {object} bracket back in there :-(
+	                    ctx = ctx + "}";
+	
+	                    // Parse the string as a valid piece of JSON content
+	                    try {
+	                        ctx = JSON.parse(ctx);
+	                    } catch (error) {
+	                        (0, _log2["default"])("warn", "Analytics JSON.parse Error", error);
+	                    }
+	
+	                    // Cache context locally
+	                    this.cacheStaticContext(ctx);
+	                } else {
+	                    ctx = false;
+	                }
+	            }
+	
+	            return ctx;
+	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @method cacheStaticContext
+	         * @param {object} json The Static.SQUARESPACE_CONTEXT ref
+	         * @memberof core.Analytics
+	         * @description Cache the sqs context once its been parsed out.
+	         *
+	         */
+	    }, {
+	        key: "cacheStaticContext",
+	        value: function cacheStaticContext(json) {
+	            _cache2["default"].set(util.getPageKey() + "-context", json);
+	        }
+	    }]);
+	
+	    return Analytics;
+	})();
+	
+	exports["default"] = Analytics;
+	module.exports = exports["default"];
+
+/***/ },
+/* 32 */
 /*!**************************!*\
   !*** ./js_src/router.js ***!
   \**************************/
@@ -15987,7 +16269,7 @@
 	
 	var _js_libsJqueryDistJquery2 = _interopRequireDefault(_js_libsJqueryDistJquery);
 	
-	var _properjsPagecontroller = __webpack_require__(/*! properjs-pagecontroller */ 31);
+	var _properjsPagecontroller = __webpack_require__(/*! properjs-pagecontroller */ 33);
 	
 	var _properjsPagecontroller2 = _interopRequireDefault(_properjsPagecontroller);
 	
@@ -15995,7 +16277,7 @@
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _animate = __webpack_require__(/*! ./animate */ 36);
+	var _animate = __webpack_require__(/*! ./animate */ 38);
 	
 	var _animate2 = _interopRequireDefault(_animate);
 	
@@ -16043,14 +16325,13 @@
 	
 	        this.controller.setConfig(["*"]);
 	
-	        this.controller.setModules([core.preload, _animate2["default"]]);
+	        this.controller.setModules([core.images, _animate2["default"]]);
 	
 	        this.controller.on("page-controller-router-transition-out", this.changePageOut.bind(this));
 	        this.controller.on("page-controller-router-refresh-document", this.changeContent.bind(this));
 	        this.controller.on("page-controller-router-transition-in", this.changePageIn.bind(this));
 	        this.controller.on("page-controller-initialized-page", function (html) {
 	            _this.cachePage(core.dom.html, (0, _js_libsJqueryDistJquery2["default"])(html).filter(".js-page")[0].innerHTML);
-	            _this.cacheStaticContext(window.Static.SQUARESPACE_CONTEXT);
 	        });
 	
 	        this.controller.initPage();
@@ -16071,32 +16352,6 @@
 	            $object: $object,
 	            response: response
 	        });
-	    },
-	
-	    /**
-	     *
-	     * @public
-	     * @method cacheStaticContext
-	     * @param {object} json The Static.SQUARESPACE_CONTEXT ref
-	     * @memberof router
-	     * @description Cache the sqs context once its been parsed out.
-	     *
-	     */
-	    cacheStaticContext: function cacheStaticContext(json) {
-	        core.cache.set(this.getPageKey() + "-context", json);
-	    },
-	
-	    /**
-	     *
-	     * @public
-	     * @method getPageKey
-	     * @memberof router
-	     * @description Determine the key for local page cache storage.
-	     * @returns {string}
-	     *
-	     */
-	    getPageKey: function getPageKey() {
-	        return "" + window.location.pathname + window.location.search;
 	    },
 	
 	    /**
@@ -16143,46 +16398,6 @@
 	    /**
 	     *
 	     * @public
-	     * @method track
-	     * @param {string} type The object type, item or collection
-	     * @param {object} data The data context to track with
-	     * @memberof router
-	     * @description Track Squarespace Metrics since we are ajax-routing.
-	     *
-	     */
-	    track: function track(type, data) {
-	        core.log("router:track:View", type, data);
-	
-	        Y.Squarespace.Analytics.view(type, data);
-	    },
-	
-	    /**
-	     *
-	     * @public
-	     * @method pushTrack
-	     * @param {string} html The full responseText from an XHR request
-	     * @param {jQuery} $doc Optional document node to receive and work with
-	     * @memberof router
-	     * @description Parse static context from responseText and track it.
-	     *
-	     */
-	    pushTrack: function pushTrack(html, $doc) {
-	        var ctx = null;
-	
-	        $doc = $doc || (0, _js_libsJqueryDistJquery2["default"])(html);
-	
-	        ctx = this.getStaticContext(html);
-	
-	        if (ctx) {
-	            this.track(ctx.item ? "item" : "collection", ctx.item || ctx.collection);
-	        }
-	
-	        this.setDocumentTitle($doc.filter("title").text());
-	    },
-	
-	    /**
-	     *
-	     * @public
 	     * @method onPreloadDone
 	     * @memberof router
 	     * @description Finish routing sequence when image pre-loading is done.
@@ -16203,46 +16418,6 @@
 	        }, _pageDuration);
 	
 	        core.util.emitter.off("app--preload-done", this.onPreloadDone);
-	    },
-	
-	    /**
-	     *
-	     * @public
-	     * @method getStaticContext
-	     * @param {string} resHTML The responseText HTML string from router
-	     * @memberof router
-	     * @description Attempt to parse the Squarespace data context from responseText.
-	     * @returns {object}
-	     *
-	     */
-	    getStaticContext: function getStaticContext(resHTML) {
-	        // Match the { data } in Static.SQUARESPACE_CONTEXT
-	        var ctx = core.cache.get(this.getPageKey() + "-context");
-	
-	        if (!ctx) {
-	            ctx = resHTML.match(/Static\.SQUARESPACE_CONTEXT\s=\s(.*?)\};/);
-	
-	            if (ctx && ctx[1]) {
-	                ctx = ctx[1];
-	
-	                // Put the ending {object} bracket back in there :-(
-	                ctx = ctx + "}";
-	
-	                // Parse the string as a valid piece of JSON content
-	                try {
-	                    ctx = JSON.parse(ctx);
-	                } catch (error) {
-	                    throw error;
-	                }
-	
-	                // Cache context locally
-	                this.cacheStaticContext(ctx);
-	            } else {
-	                ctx = false;
-	            }
-	        }
-	
-	        return ctx;
 	    },
 	
 	    /**
@@ -16290,7 +16465,7 @@
 	
 	        core.dom.page[0].innerHTML = response;
 	
-	        this.pushTrack(html, $object);
+	        core.util.emitter.fire("app--analytics-push", html, $object);
 	
 	        core.util.emitter.fire("app--cleanup");
 	    },
@@ -16306,19 +16481,6 @@
 	     */
 	    changePageIn: function changePageIn() /* data */{
 	        core.dom.page.addClass("is-reactive");
-	    },
-	
-	    /**
-	     *
-	     * @public
-	     * @method setDocumentTitle
-	     * @param {string} title The new title for the document
-	     * @memberof router
-	     * @description Update the documents title.
-	     *
-	     */
-	    setDocumentTitle: function setDocumentTitle(title) {
-	        document.title = title;
 	    }
 	};
 	
@@ -16329,7 +16491,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 31 */
+/* 33 */
 /*!*****************************************************!*\
   !*** ./~/properjs-pagecontroller/PageController.js ***!
   \*****************************************************/
@@ -16362,8 +16524,8 @@
 	})(function () {
 	
 	    // Useful stuff
-	    var Router = __webpack_require__( /*! properjs-router */ 32 ),
-	        Controller = __webpack_require__( /*! properjs-controller */ 12 ),
+	    var Router = __webpack_require__( /*! properjs-router */ 34 ),
+	        Controller = __webpack_require__( /*! properjs-controller */ 9 ),
 	
 	        _router = null,
 	        _config = [],
@@ -16866,7 +17028,7 @@
 	});
 
 /***/ },
-/* 32 */
+/* 34 */
 /*!***************************************************************!*\
   !*** ./~/properjs-pagecontroller/~/properjs-router/Router.js ***!
   \***************************************************************/
@@ -16891,9 +17053,9 @@
 	    
 	})(function () {
 	
-	    var PushState = __webpack_require__( /*! properjs-pushstate */ 33 ),
-	        MatchRoute = __webpack_require__( /*! properjs-matchroute */ 34 ),
-	        matchElement = __webpack_require__( /*! properjs-matchelement */ 35 ),
+	    var PushState = __webpack_require__( /*! properjs-pushstate */ 35 ),
+	        MatchRoute = __webpack_require__( /*! properjs-matchroute */ 36 ),
+	        matchElement = __webpack_require__( /*! properjs-matchelement */ 37 ),
 	        _rSameDomain = new RegExp( document.domain ),
 	        _initDelay = 200,
 	        _triggerEl;
@@ -17341,7 +17503,7 @@
 	});
 
 /***/ },
-/* 33 */
+/* 35 */
 /*!***************************************************************************************!*\
   !*** ./~/properjs-pagecontroller/~/properjs-router/~/properjs-pushstate/PushState.js ***!
   \***************************************************************************************/
@@ -17882,7 +18044,7 @@
 	});
 
 /***/ },
-/* 34 */
+/* 36 */
 /*!*****************************************************************************************!*\
   !*** ./~/properjs-pagecontroller/~/properjs-router/~/properjs-matchroute/MatchRoute.js ***!
   \*****************************************************************************************/
@@ -17907,7 +18069,7 @@
 	    
 	})(function () {
 	
-	    var paramalama = __webpack_require__( /*! paramalama */ 27 ),
+	    var paramalama = __webpack_require__( /*! paramalama */ 28 ),
 	
 	    /**
 	     *
@@ -18241,7 +18403,7 @@
 	});
 
 /***/ },
-/* 35 */
+/* 37 */
 /*!*************************************************!*\
   !*** ./~/properjs-matchelement/matchElement.js ***!
   \*************************************************/
@@ -18303,7 +18465,7 @@
 	});
 
 /***/ },
-/* 36 */
+/* 38 */
 /*!***************************!*\
   !*** ./js_src/animate.js ***!
   \***************************/
@@ -18466,7 +18628,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 37 */
+/* 39 */
 /*!***************************!*\
   !*** ./js_src/overlay.js ***!
   \***************************/
@@ -18549,7 +18711,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 38 */
+/* 40 */
 /*!***************************!*\
   !*** ./js_src/Project.js ***!
   \***************************/
@@ -18577,11 +18739,11 @@
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _router = __webpack_require__(/*! ./router */ 30);
+	var _router = __webpack_require__(/*! ./router */ 32);
 	
 	var _router2 = _interopRequireDefault(_router);
 	
-	var _overlay = __webpack_require__(/*! ./overlay */ 37);
+	var _overlay = __webpack_require__(/*! ./overlay */ 39);
 	
 	var _overlay2 = _interopRequireDefault(_overlay);
 	
@@ -18600,7 +18762,9 @@
 	        this.app = app;
 	        this.opts = options;
 	        this.$plates = null;
+	        this.$images = null;
 	        this.isLoaded = false;
+	        this.isEnded = false;
 	
 	        if (this.opts.onLoad) {
 	            this.loadCollection();
@@ -18630,9 +18794,8 @@
 	    }, {
 	        key: "initCollection",
 	        value: function initCollection() {
-	            this.isLoaded = true;
-	            this.$plates = core.dom.project.find(".js-project-plate");
 	            this._onUpdateEmitter = this.onUpdateEmitter.bind(this);
+	            this.$plates = core.dom.project.element.find(".js-project-plate");
 	            this.cycleAnimation();
 	        }
 	    }, {
@@ -18653,8 +18816,8 @@
 	            }
 	        }
 	    }, {
-	        key: "onUpdateEmitter",
-	        value: function onUpdateEmitter() {
+	        key: "updatePlates",
+	        value: function updatePlates() {
 	            var $plate = null;
 	            var i = this.$plates.length;
 	
@@ -18667,6 +18830,30 @@
 	                    $plate.removeClass("is-active");
 	                }
 	            }
+	        }
+	    }, {
+	        key: "updatePosition",
+	        value: function updatePosition() {
+	            var scrollMaxY = core.dom.project.element[0].scrollHeight - window.innerHeight;
+	            var scrollCurrY = core.dom.project.element[0].scrollTop;
+	
+	            if (scrollCurrY >= scrollMaxY && !this.isEnded) {
+	                core.log("Project Ended");
+	
+	                this.isEnded = true;
+	
+	                core.dom.project.element.addClass("is-inactive");
+	
+	                setTimeout(function () {
+	                    core.util.emitter.fire("app--project-ended");
+	                }, core.dom.project.elementTransitionDuration);
+	            }
+	        }
+	    }, {
+	        key: "onUpdateEmitter",
+	        value: function onUpdateEmitter() {
+	            this.updatePlates();
+	            this.updatePosition();
 	        }
 	    }, {
 	        key: "onLoadCollection",
@@ -18682,13 +18869,13 @@
 	                $project = $node.filter(".js-page").find(".js-project");
 	            }
 	
-	            this.isLoaded = true;
 	            this.$plates = $project.find(".js-project-plate");
-	            this._onUpdateEmitter = this.onUpdateEmitter.bind(this);
+	            this.$images = this.$plates.find(".js-lazy-image");
 	
-	            core.dom.project.html(this.$plates);
+	            core.dom.project.elementNode.html(this.$plates);
 	
-	            core.util.loadImages(this.$plates.find(".js-lazy-image"), core.util.noop).on("done", function () {
+	            //core.util.loadImages( this.$images, core.util.noop ).on( "done", () => {
+	            core.images.handleImages(this.$images, function () {
 	                if (_overlay2["default"].isActive()) {
 	                    _overlay2["default"].close();
 	                }
@@ -18697,6 +18884,7 @@
 	                    _this.opts.onLoad();
 	                }
 	
+	                _this._onUpdateEmitter = _this.onUpdateEmitter.bind(_this);
 	                _this.cycleAnimation();
 	            });
 	
@@ -18706,28 +18894,25 @@
 	        key: "open",
 	        value: function open() {
 	            core.dom.html.addClass("is-neverflow is-project-active");
-	            core.dom.page.append(core.dom.project);
+	            core.dom.page.append(core.dom.project.element);
 	
 	            setTimeout(function () {
-	                return core.dom.project.addClass("is-active");
-	            }, 10);
+	                return core.dom.project.element.addClass("is-active");
+	            }, 100);
 	        }
 	    }, {
 	        key: "close",
 	        value: function close() {
-	            var _this2 = this;
-	
 	            core.util.emitter.stop();
 	
-	            core.dom.project.removeClass("is-active");
+	            core.dom.project.element.removeClass("is-active is-inactive");
 	            core.dom.html.removeClass("is-neverflow");
 	
 	            setTimeout(function () {
-	                _this2.$plates = null;
-	
 	                core.dom.html.removeClass("is-project-active");
-	                core.dom.project.detach().empty();
-	            }, core.util.getTransitionDuration(core.dom.project[0]));
+	                core.dom.project.element.detach();
+	                core.dom.project.elementNode.empty();
+	            }, core.dom.project.elementTransitionDuration);
 	        }
 	    }]);
 	
