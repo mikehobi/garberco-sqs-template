@@ -18860,14 +18860,18 @@
 	        value: function onLoadCollection(response) {
 	            var _this = this;
 	
-	            var $node = (0, _js_libsJqueryDistJquery2["default"])(response);
+	            var html = "";
 	            var $project = null;
 	
 	            if (typeof response === "object") {
+	                html = response.response;
 	                $project = (0, _js_libsJqueryDistJquery2["default"])(response.response);
 	            } else {
-	                $project = $node.filter(".js-page").find(".js-project");
+	                html = response;
+	                $project = (0, _js_libsJqueryDistJquery2["default"])(response).filter(".js-page").find(".js-project");
 	            }
+	
+	            core.util.emitter.fire("app--analytics-push", html);
 	
 	            this.$plates = $project.find(".js-project-plate");
 	            this.$images = this.$plates.find(".js-lazy-image");
