@@ -1,4 +1,4 @@
-<section class="homepage js-homepage expander">
+<section class="appentry js-appentry expander">
     <div class="grid js-grid">
         {.section collection}
             {.repeated section collections}

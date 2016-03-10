@@ -65,19 +65,17 @@
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _router = __webpack_require__(/*! ./router */ 32);
+	var _router = __webpack_require__(/*! ./router */ 28);
 	
 	var _router2 = _interopRequireDefault(_router);
 	
-	var _overlay = __webpack_require__(/*! ./overlay */ 39);
+	var _overlay = __webpack_require__(/*! ./overlay */ 35);
 	
 	var _overlay2 = _interopRequireDefault(_overlay);
 	
-	var _Project = __webpack_require__(/*! ./Project */ 40);
+	var _Project = __webpack_require__(/*! ./Project */ 36);
 	
 	var _Project2 = _interopRequireDefault(_Project);
-	
-	var _app = null;
 	
 	/**
 	 *
@@ -91,15 +89,12 @@
 	    function App() {
 	        _classCallCheck(this, App);
 	
-	        if (!_app) {
-	            _app = this;
-	        }
-	
-	        this.loadType = core.dom.page.data("pageLoadType");
+	        this.navData = core.dom.nav.data();
+	        this.pageData = core.dom.page.data();
+	        this.appEntry = null;
 	        this.project = null;
-	        this.isProjectTileClicked = false;
 	        this.timeoutId = null;
-	        this.timeoutDelay = 300;
+	        this.timeoutDelay = core.util.getTransitionDuration(core.dom.overlay.element[0]);
 	        this.core = core;
 	        this.router = _router2["default"];
 	        this.overlay = _overlay2["default"];
@@ -107,11 +102,9 @@
 	
 	        this.bindEvents();
 	        this.initModules();
-	        this.initProject();
+	        this.initAppEntry();
 	
 	        core.log("App", this);
-	
-	        return _app;
 	    }
 	
 	    /******************************************************************************
@@ -126,16 +119,37 @@
 	            this.core.dom.page.off("mouseleave", this._onMouseLeave);
 	        }
 	    }, {
-	        key: "initProject",
-	        value: function initProject() {
-	            if (this.loadType !== "collection") {
-	                this.core.dom.project.element.detach();
-	            } else {
+	        key: "initAppEntry",
+	        value: function initAppEntry() {
+	            var _this = this;
+	
+	            // Index > Collection
+	            if (this.pageData.appEntryType !== this.core.config.rootEntryType) {
 	                this.project = new _Project2["default"](this, {
 	                    url: window.location.pathname,
 	                    onLoad: false
 	                });
-	            }
+	
+	                // Need to find the root index for app-entry point
+	                this.navData.appTree.forEach(function (indexItem) {
+	                    if (indexItem.items) {
+	                        indexItem.items.forEach(function (collectionItem) {
+	                            if (collectionItem.collection.fullUrl === _this.pageData.appEntry) {
+	                                _this.appEntry = indexItem.collection.fullUrl;
+	                            }
+	                        });
+	                    }
+	                });
+	
+	                // Index
+	            } else {
+	                    this.appEntry = this.pageData.appEntry;
+	
+	                    this.core.dom.project.element.detach();
+	                }
+	
+	            // Logo
+	            this.core.dom.logo[0].href = this.appEntry;
 	        }
 	    }, {
 	        key: "initModules",
@@ -147,12 +161,23 @@
 	            this.overlay.init(this);
 	        }
 	    }, {
-	        key: "loadHomepage",
-	        value: function loadHomepage() {
+	        key: "loadAppEntry",
+	        value: function loadAppEntry() {
 	            var dataType = { dataType: "html" };
 	            var format = { format: "full", nocache: true };
 	
-	            this.core.api.collection("/", format, dataType).done(this.onLoadHomepage.bind(this));
+	            this.core.api.collection(this.appEntry, format, dataType).done(this.onLoadAppEntry.bind(this));
+	        }
+	    }, {
+	        key: "pushAppEntry",
+	        value: function pushAppEntry() {
+	            var _this2 = this;
+	
+	            this.router.push(this.appEntry, function () {
+	                var cached = _this2.core.cache.get(_this2.appEntry);
+	
+	                _this2.core.util.emitter.fire("app--analytics-push", cached.$object);
+	            });
 	        }
 	    }, {
 	        key: "bindEvents",
@@ -201,24 +226,22 @@
 	            }
 	        }
 	    }, {
-	        key: "onLoadHomepage",
-	        value: function onLoadHomepage(response) {
-	            var _this = this;
+	        key: "onLoadAppEntry",
+	        value: function onLoadAppEntry(response) {
+	            var _this3 = this;
 	
-	            var $node = (0, _js_libsJqueryDistJquery2["default"])(response);
-	            var $grid = null;
+	            var cache = this.router.parseDoc(response);
+	            var $grid = cache.$object.find(".js-appentry").children();
+	            var $images = $grid.find(".js-lazy-image");
+	            var $anims = $grid.find(".js-animate");
 	
-	            if (typeof response === "object") {
-	                $grid = (0, _js_libsJqueryDistJquery2["default"])(response.response).find(".js-homepage").children();
-	            } else {
-	                $grid = $node.filter(".js-page").find(".js-homepage").children();
-	            }
+	            this.core.dom.appentry.html($grid);
 	
-	            this.core.dom.homepage.html($grid);
-	
-	            core.util.loadImages($grid.find(".js-lazy-image"), this.core.util.noop).on("done", function () {
-	                _this.core.util.emitter.fire("app--update-animate", $grid.find(".js-animate"));
+	            this.core.util.loadImages($images, this.core.util.noop).on("done", function () {
+	                _this3.core.util.emitter.fire("app--update-animate", $anims);
 	            });
+	
+	            this.core.cache.set(this.appEntry, cache);
 	        }
 	    }, {
 	        key: "onPreloadDone",
@@ -227,16 +250,16 @@
 	
 	            this.overlay.close();
 	
-	            if (this.loadType === "collection") {
-	                this.loadHomepage();
-	            } else {
+	            if (this.pageData.appEntryType === this.core.config.rootEntryType) {
 	                this.enableDocument();
+	            } else {
+	                this.loadAppEntry();
 	            }
 	        }
 	    }, {
 	        key: "onProjectEnded",
 	        value: function onProjectEnded() {
-	            this.router.push("/", function () {});
+	            this.pushAppEntry();
 	
 	            if (this.project) {
 	                this.destroyProject();
@@ -247,7 +270,7 @@
 	        value: function onLogoClick(e) {
 	            e.preventDefault();
 	
-	            this.router.push("/", function () {});
+	            this.pushAppEntry();
 	
 	            if (this.project) {
 	                this.destroyProject();
@@ -268,6 +291,10 @@
 	        value: function onMouseEnter(e) {
 	            this.clearTimeoutById(this.timeoutId);
 	
+	            if (this.project) {
+	                return;
+	            }
+	
 	            var $tile = (0, _js_libsJqueryDistJquery2["default"])(e.currentTarget);
 	
 	            this.overlay.setTitle($tile.data("title"));
@@ -279,11 +306,15 @@
 	    }, {
 	        key: "onMouseLeave",
 	        value: function onMouseLeave() {
-	            var _this2 = this;
+	            var _this4 = this;
+	
+	            if (this.project) {
+	                return;
+	            }
 	
 	            this.timeoutId = setTimeout(function () {
-	                if (!_this2.project) {
-	                    _this2.overlay.close();
+	                if (!_this4.project) {
+	                    _this4.overlay.close();
 	                }
 	            }, this.timeoutDelay);
 	        }
@@ -8007,15 +8038,15 @@
 	
 	var _dom2 = _interopRequireDefault(_dom);
 	
-	var _images = __webpack_require__(/*! ./images */ 21);
+	var _images = __webpack_require__(/*! ./images */ 17);
 	
 	var _images2 = _interopRequireDefault(_images);
 	
-	var _resizes = __webpack_require__(/*! ./resizes */ 23);
+	var _resizes = __webpack_require__(/*! ./resizes */ 19);
 	
 	var _resizes2 = _interopRequireDefault(_resizes);
 	
-	var _scrolls = __webpack_require__(/*! ./scrolls */ 26);
+	var _scrolls = __webpack_require__(/*! ./scrolls */ 22);
 	
 	var _scrolls2 = _interopRequireDefault(_scrolls);
 	
@@ -8023,27 +8054,27 @@
 	
 	var util = _interopRequireWildcard(_util);
 	
-	var _config = __webpack_require__(/*! ./config */ 18);
+	var _config = __webpack_require__(/*! ./config */ 13);
 	
 	var _config2 = _interopRequireDefault(_config);
 	
-	var _env = __webpack_require__(/*! ./env */ 20);
+	var _env = __webpack_require__(/*! ./env */ 16);
 	
 	var _env2 = _interopRequireDefault(_env);
 	
-	var _log = __webpack_require__(/*! ./log */ 19);
+	var _log = __webpack_require__(/*! ./log */ 15);
 	
 	var _log2 = _interopRequireDefault(_log);
 	
-	var _api = __webpack_require__(/*! ./api */ 27);
+	var _api = __webpack_require__(/*! ./api */ 23);
 	
 	var _api2 = _interopRequireDefault(_api);
 	
-	var _cache = __webpack_require__(/*! ./cache */ 29);
+	var _cache = __webpack_require__(/*! ./cache */ 25);
 	
 	var _cache2 = _interopRequireDefault(_cache);
 	
-	var _Analytics = __webpack_require__(/*! ./Analytics */ 31);
+	var _Analytics = __webpack_require__(/*! ./Analytics */ 27);
 	
 	var _Analytics2 = _interopRequireDefault(_Analytics);
 	
@@ -8079,7 +8110,7 @@
 	
 	var _dom2 = _interopRequireDefault(_dom);
 	
-	var _log = __webpack_require__(/*! ./log */ 19);
+	var _log = __webpack_require__(/*! ./log */ 15);
 	
 	var _log2 = _interopRequireDefault(_log);
 	
@@ -8231,6 +8262,16 @@
 	  /**
 	   *
 	   * @public
+	   * @member nav
+	   * @memberof dom
+	   * @description The cached nav node.
+	   *
+	   */
+	  nav: (0, _js_libsJqueryDistJquery2["default"])(".js-nav"),
+	
+	  /**
+	   *
+	   * @public
 	   * @member html
 	   * @memberof dom
 	   * @description The cached documentElement node.
@@ -8285,12 +8326,12 @@
 	  /**
 	   *
 	   * @public
-	   * @member homepage
+	   * @member appentry
 	   * @memberof dom
-	   * @description The homepage grid element.
+	   * @description The appentry grid element.
 	   *
 	   */
-	  homepage: (0, _js_libsJqueryDistJquery2["default"])(".js-homepage"),
+	  appentry: (0, _js_libsJqueryDistJquery2["default"])(".js-appentry"),
 	
 	  /**
 	   *
@@ -8369,42 +8410,17 @@
 	
 	var _properjsImageloader2 = _interopRequireDefault(_properjsImageloader);
 	
-	var _properjsMediabox = __webpack_require__(/*! properjs-mediabox */ 13);
-	
-	var _properjsMediabox2 = _interopRequireDefault(_properjsMediabox);
-	
-	var _fgLoadcss = __webpack_require__(/*! fg-loadcss */ 16);
-	
-	var _fgLoadcss2 = _interopRequireDefault(_fgLoadcss);
-	
-	var _fgLoadjs = __webpack_require__(/*! fg-loadjs */ 17);
-	
-	var _fgLoadjs2 = _interopRequireDefault(_fgLoadjs);
-	
 	var _dom = __webpack_require__(/*! ./dom */ 6);
 	
 	var _dom2 = _interopRequireDefault(_dom);
 	
-	var _config = __webpack_require__(/*! ./config */ 18);
+	var _config = __webpack_require__(/*! ./config */ 13);
 	
 	var _config2 = _interopRequireDefault(_config);
 	
 	var _detect = __webpack_require__(/*! ./detect */ 5);
 	
 	var _detect2 = _interopRequireDefault(_detect);
-	
-	/**
-	 *
-	 * @description Don't prevent default for <a /> nodes with Hammer...
-	 * @method safePreventDefault
-	 * @param {object} e The event object
-	 *
-	 */
-	var safePreventDefault = function safePreventDefault(e) {
-	    if (e.target.nodeName !== "A") {
-	        e.preventDefault();
-	    }
-	};
 	
 	/**
 	 *
@@ -8446,15 +8462,6 @@
 	var translate3d = function translate3d(el, x, y, z) {
 	    el.style[_hammerjs2["default"].prefixed(el.style, "transform")] = "translate3d( " + x + ", " + y + ", " + z + " )";
 	};
-	
-	/**
-	 *
-	 * @description Single app instanceof [MediaBox]{@link https://github.com/ProperJS/MediaBox} for custom audio/video
-	 * @member mediabox
-	 * @memberof util
-	 *
-	 */
-	var mediabox = new _properjsMediabox2["default"]();
 	
 	/**
 	 *
@@ -8585,6 +8592,7 @@
 	 *
 	 */
 	var loadImages = function loadImages(images, handler, useVariant) {
+	    var rQuery = /\?(.*)$/;
 	    var map = function map(vnt) {
 	        return parseInt(vnt, 10);
 	    };
@@ -8592,14 +8600,17 @@
 	    var data = null;
 	    var vars = null;
 	    var width = null;
+	    var height = null;
+	    var dimension = null;
 	    var variant = null;
+	    var source = null;
 	    var i = null;
 	
 	    // Normalize the handler
 	    handler = handler || isElementLoadable;
 	
 	    // Normalize the images
-	    images = images || (0, _js_libsJqueryDistJquery2["default"])(_config2["default"].lazyImageSelector);
+	    images = images || _dom2["default"].page.find(_config2["default"].lazyImageSelector);
 	
 	    // Normalize the `useVariant` flag
 	    if (!useVariant && useVariant !== false) {
@@ -8615,26 +8626,25 @@
 	    for (i; i--;) {
 	        $img = images.eq(i);
 	        data = $img.data();
-	        width = $img.parent()[0].clientWidth || window.innerWidth || _config2["default"].sqsMaxImgWidth;
-	
-	        data.imgSrc = data.imgSrc.replace(/\?(.*)$/, "");
+	        width = $img[0].clientWidth || $img[0].parentNode.clientWidth || window.innerWidth;
+	        height = $img[0].clientHeight || $img[0].parentNode.clientHeight || window.innerHeight;
+	        dimension = Math.max(width, height);
+	        source = data.imgSrc.replace(rQuery, "");
 	
 	        if (useVariant && data.variants) {
 	            vars = data.variants.split(",").map(map);
-	            variant = getClosestValue(vars, width);
+	            variant = getClosestValue(vars, dimension);
 	
 	            // If the pixel density is higher, use a larger image ?
 	            if (window.devicePixelRatio > 1) {
 	                // Splice off the variant that was matched
-	                vars.splice(vars.indexOf(variant, 1));
+	                vars.splice(vars.indexOf(variant), 1);
 	
 	                // Apply the new, larger variant as the format
 	                variant = getClosestValue(vars, variant);
 	            }
 	
-	            $img.attr(_config2["default"].lazyImageAttr, data.imgSrc + "?format=" + variant + "w");
-	        } else {
-	            $img.attr(_config2["default"].lazyImageAttr, data.imgSrc + "?format=original");
+	            $img[0].setAttribute(_config2["default"].lazyImageAttr, source + "?format=" + variant + "w");
 	        }
 	    }
 	
@@ -8644,43 +8654,6 @@
 	        transitionDelay: 0
 	
 	    }).on("data", handler);
-	};
-	
-	/**
-	 *
-	 * @description Load all deps for a module
-	 * @method loadDependencies
-	 * @param {object} data The dependency data
-	 * @param {function} callback Function to call when all deps are loaded
-	 * @memberof util
-	 *
-	 */
-	var loadDependencies = function loadDependencies(data, callback) {
-	    var i = 0;
-	    var total = data.sources.length;
-	    var onload = function onload() {
-	        i++;
-	
-	        if (i === total) {
-	            console.log("dependencies loaded", data);
-	
-	            if (typeof data.callback === "function") {
-	                data.callback();
-	            }
-	
-	            if (typeof callback === "function") {
-	                callback();
-	            }
-	        }
-	    };
-	
-	    data.sources.forEach(function (source) {
-	        if (source.type === "script") {
-	            (0, _fgLoadjs2["default"])(_config2["default"].asyncScriptPath + source.file, onload);
-	        } else if (source.type === "style") {
-	            (0, _fgLoadcss2["default"])(_config2["default"].asyncStylePath + source.file).onloadcssdefined(onload);
-	        }
-	    });
 	};
 	
 	/**
@@ -8755,54 +8728,6 @@
 	
 	/**
 	 *
-	 * @description Randomize array element order in-place.
-	 * Using Fisher-Yates shuffle algorithm.
-	 * @method shuffle
-	 * @param {object} arr The array to shuffle
-	 * @memberof util
-	 * @returns {array}
-	 *
-	 */
-	var shuffle = function shuffle(arr) {
-	    var i = arr.length - 1;
-	    var j = 0;
-	    var temp = arr[i];
-	
-	    for (i; i > 0; i--) {
-	        j = Math.floor(Math.random() * (i + 1));
-	        temp = arr[i];
-	
-	        arr[i] = arr[j];
-	        arr[j] = temp;
-	    }
-	
-	    return arr;
-	};
-	
-	/**
-	 *
-	 * @description Parse a floating point time value into a distinguished time representation
-	 * @method parseTime
-	 * @param {float} time The floating point time value
-	 * @memberof util
-	 * @returns {string}
-	 *
-	 */
-	var parseTime = function parseTime(time) {
-	    time *= 1000;
-	
-	    var minutes = parseInt(time / (1000 * 60), 10);
-	    var seconds = parseInt(time / 1000, 10) % 60;
-	
-	    if (seconds < 10) {
-	        seconds = "0" + seconds;
-	    }
-	
-	    return minutes + ":" + seconds;
-	};
-	
-	/**
-	 *
 	 * @method getDefaultHammerOptions
 	 * @memberof util
 	 * @description The default options for Hammer JS.
@@ -8832,14 +8757,12 @@
 	*******************************************************************************/
 	exports["default"] = {
 	    // Classes
-	    mediabox: mediabox,
 	    emitter: emitter,
 	    scroller: scroller,
 	    resizer: resizer,
 	
 	    // Loading
 	    loadImages: loadImages,
-	    loadDependencies: loadDependencies,
 	    updateImages: updateImages,
 	    isElementLoadable: isElementLoadable,
 	    isElementInViewport: isElementInViewport,
@@ -8852,11 +8775,8 @@
 	    // Random
 	    px: px,
 	    noop: noop,
-	    shuffle: shuffle,
-	    parseTime: parseTime,
 	    translate3d: translate3d,
 	    getTransitionDuration: getTransitionDuration,
-	    safePreventDefault: safePreventDefault,
 	    getDefaultHammerOptions: getDefaultHammerOptions,
 	    getPageKey: getPageKey
 	};
@@ -12701,1329 +12621,141 @@
 
 /***/ },
 /* 13 */
-/*!*****************************************!*\
-  !*** ./~/properjs-mediabox/MediaBox.js ***!
-  \*****************************************/
+/*!*******************************!*\
+  !*** ./js_src/core/config.js ***!
+  \*******************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	/*!
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+	
+	var _properjsEasing = __webpack_require__(/*! properjs-easing */ 14);
+	
+	var _properjsEasing2 = _interopRequireDefault(_properjsEasing);
+	
+	/**
 	 *
-	 * A lightweight manager for HTML5 audio and video.
-	 *
-	 * @MediaBox
-	 * @singleton
-	 * @author: kitajchuk
-	 *
-	 * @useful web pages with information on this stuffs
-	 * https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Media_events
-	 * https://developer.mozilla.org/en-US/docs/Web/API/HTMLAudioElement
-	 * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/video
-	 * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/audio
-	 * https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement
+	 * @public
+	 * @module config
+	 * @description Stores app-wide config values.
 	 *
 	 */
-	(function ( factory ) {
-	    
-	    if ( true ) {
-	        module.exports = factory();
+	var config = {
+	  homepageKey: "homepage",
+	  rootEntryType: "index",
 	
-	    } else if ( typeof window !== "undefined" ) {
-	        window.MediaBox = factory();
-	    }
-	    
-	})(function () {
+	  /**
+	   *
+	   * @public
+	   * @member sqsMaxImgWidth
+	   * @memberof config
+	   * @description The max width Squarespace allows for images.
+	   *
+	   */
+	  sqsMaxImgWidth: 2500,
 	
+	  /**
+	   *
+	   * @public
+	   * @member sqsSpecialProps
+	   * @memberof config
+	   * @description Normalize access to certain item object properties for application.
+	   *
+	   * Any of these indicate a post HAS a thumbnail image:
+	   * - systemDataId
+	   * - systemDataVariants
+	   * - systemDataSourceType
+	   * - systemDataOrigin
+	   *
+	   */
+	  sqsSpecialProps: {
+	    published: "publishOn",
+	    userUpload: "systemDataVariants",
+	    blockDataKey: "blockJson",
+	    mainContent: "main-content"
+	  },
 	
-	    var Easing = __webpack_require__( /*! properjs-easing */ 14 ),
-	        Tween = __webpack_require__( /*! properjs-tween */ 15 ),
-	        raf = window.requestAnimationFrame,
-	        caf = window.cancelAnimationFrame,
+	  /**
+	   *
+	   * @public
+	   * @member defaultEasing
+	   * @memberof config
+	   * @description The default easing function for javascript Tweens.
+	   *
+	   */
+	  defaultEasing: _properjsEasing2["default"].easeInOutCubic,
 	
-	    /******************************************************************************
-	     * @Private API
-	    *******************************************************************************/
-	    
-	    /**
-	     *
-	     * Expression match hashbang/querystring
-	     * @member rHashQuery
-	     * @private
-	     *
-	     */
-	    rHashQuery = /[#|?].*$/g,
-	    
-	    
-	    /**
-	     *
-	     * Replace "no" in canPlayType strings
-	     * @member rNos
-	     * @private
-	     *
-	     */
-	    rNos = /^no$/,
-	    
-	    
-	    /**
-	     *
-	     * Clean up all those typeof's
-	     * @method isFunction
-	     * @returns boolean
-	     * @private
-	     *
-	     */
-	    isFunction = function ( fn ) {
-	        return (typeof fn === "function");
-	    },
-	    
-	    
-	    /**
-	     *
-	     * Test that an object is an Element
-	     * @method isElement
-	     * @returns boolean
-	     * @private
-	     *
-	     */
-	    isElement = function ( el ) {
-	        return (el instanceof HTMLElement);
-	    },
-	    
-	    
-	    /**
-	     *
-	     * Borrowed(ish)
-	     * Modernizr v3.0.0-alpha.4 on master branch
-	     * https://github.com/Modernizr/Modernizr/blob/master/feature-detects/audio.js
-	     * @method getAudioSupport
-	     * @returns object
-	     * @private
-	     *
-	     */
-	    getAudioSupport = function () {
-	        var elem = document.createElement( "audio" ),
-	            ret = {};
-	    
-	        try {
-	            if ( elem.canPlayType ) {
-	                ret.ogg = elem.canPlayType( 'audio/ogg; codecs="vorbis"' ).replace( rNos, "" );
-	                ret.mp3 = elem.canPlayType( 'audio/mpeg;' ).replace( rNos, "" );
-	                ret.opus = elem.canPlayType( 'audio/ogg; codecs="opus"' ).replace( rNos, "" );
-	    
-	                // Mimetypes accepted:
-	                // developer.mozilla.org/En/Media_formats_supported_by_the_audio_and_video_elements
-	                // bit.ly/iphoneoscodecs
-	                ret.wav = elem.canPlayType( 'audio/wav; codecs="1"' ).replace( rNos, "" );
-	                ret.m4a = (elem.canPlayType( 'audio/x-m4a;' ) || elem.canPlayType( 'audio/aac;' )).replace( rNos, "" );
-	            }
-	    
-	        } catch ( e ) {}
-	    
-	        return ret;
-	    },
-	    
-	    
-	    /**
-	     *
-	     * Borrowed(ish)
-	     * Modernizr v3.0.0-alpha.4 on master branch
-	     * https://github.com/Modernizr/Modernizr/blob/master/feature-detects/video.js
-	     * @method getVideoSupport
-	     * @returns object
-	     * @private
-	     *
-	     */
-	    getVideoSupport = function () {
-	        var elem = document.createElement( "video" ),
-	            ret = {};
-	    
-	        try {
-	            if ( elem.canPlayType ) {
-	                ret.ogg = elem.canPlayType( 'video/ogg; codecs="theora"' ).replace( rNos, "" );
-	    
-	                // Without QuickTime, this value will be `undefined`. github.com/Modernizr/Modernizr/issues/546
-	                ret.h264 = elem.canPlayType( 'video/mp4; codecs="avc1.42E01E"' ).replace( rNos, "" );
-	                ret.webm = elem.canPlayType( 'video/webm; codecs="vp8, vorbis"' ).replace( rNos, "" );
-	                ret.vp9 = elem.canPlayType( 'video/webm; codecs="vp9"' ).replace( rNos, "" );
-	                ret.hls = elem.canPlayType( 'application/x-mpegURL; codecs="avc1.42E01E"' ).replace( rNos, "" );
-	            }
-	    
-	        } catch ( e ) {}
-	    
-	        return ret;
-	    },
-	    
-	    
-	    /**
-	     *
-	     * Get mimetype string from media source
-	     * @method getMimeForMedia
-	     * @param {string} src media file source
-	     * @private
-	     *
-	     */
-	    getMimeForMedia = function ( type, src ) {
-	        var ext = src.split( "." ).pop().toLowerCase().replace( rHashQuery, "" ),
-	            ret;
-	    
-	        if ( type === "video" ) {
-	            switch ( ext ) {
-	                case "webm":
-	                    ret = "video/webm";
-	                    break;
-	                case "mp4":
-	                case "m4v":
-	                    ret = "video/mp4";
-	                    break;
-	                case "ogv":
-	                    ret = "video/ogg";
-	                    break;
-	            }
-	    
-	        } else {
-	            switch ( ext ) {
-	                case "aac":
-	                    ret = "audio/aac";
-	                    break;
-	                case "m4a":
-	                    ret = "audio/x-m4a";
-	                    break;
-	                case "mp4":
-	                    ret = "audio/mp4";
-	                    break;
-	                case "mp1":
-	                case "mp2":
-	                case "mp3":
-	                case "mpg":
-	                case "mpeg":
-	                    ret = "audio/mpeg";
-	                    break;
-	                case "oga":
-	                case "ogg":
-	                    ret = "audio/ogg";
-	                    break;
-	                case "wav":
-	                    ret = "audio/wav";
-	                    break;
-	            }
-	        }
-	    
-	        return ret;
-	    },
-	    
-	    
-	    /**
-	     *
-	     * Get the audio source that should be used
-	     * @method getCanPlaySource
-	     * @param {string} media the media type to check
-	     * @param {array} sources Array of media sources
-	     * @returns object
-	     * @private
-	     *
-	     */
-	    getCanPlaySource = function ( media, sources ) {
-	        var source, canPlay;
-	    
-	        for ( var i = 0, len = sources.length; i < len; i++ ) {
-	            var src = sources[ i ].split( "." ).pop().toLowerCase().replace( rHashQuery, "" );
-	    
-	            if ( MediaBox.support[ media ][ src ] === "probably" || MediaBox.support[ media ][ src ] === "maybe" ) {
-	                source = sources[ i ];
-	                canPlay = MediaBox.support[ media ][ src ];
-	                break;
-	            }
-	    
-	            if ( (src === "ogv" || src === "oga") && (MediaBox.support[ media ].ogg === "probably" || MediaBox.support[ media ].ogg === "maybe") ) {
-	                source = sources[ i ];
-	                canPlay = MediaBox.support[ media ].ogg;
-	                break;
-	            }
-	    
-	            if ( (src === "mp4" || src === "m4v") && (MediaBox.support[ media ].h264 === "probably" || MediaBox.support[ media ].h264 === "maybe") ) {
-	                source = sources[ i ];
-	                canPlay = MediaBox.support[ media ].h264;
-	                break;
-	            }
-	    
-	            if ( src === "aac" && (MediaBox.support[ media ].m4a === "probably" || MediaBox.support[ media ].m4a === "maybe") ) {
-	                source = sources[ i ];
-	                canPlay = MediaBox.support[ media ].m4a;
-	                break;
-	            }
-	    
-	            if ( (src === "mp1" || src === "mp2" || src === "mpg" || src === "mpeg") && (MediaBox.support[ media ].mp3 === "probably" || MediaBox.support[ media ].mp3 === "maybe") ) {
-	                source = sources[ i ];
-	                canPlay = MediaBox.support[ media ].mp3;
-	                break;
-	            }
-	    
-	            if ( source ) {
-	                break;
-	            }
-	        }
-	    
-	        return {
-	            source: source,
-	            canPlay: canPlay
-	        };
-	    },
-	    
-	    
-	    /**
-	     *
-	     * MediaBox clear a timeupdate interval for audio/video tracks
-	     * @method clearPlaybackUpdate
-	     * @param {object} track The media object
-	     *
-	     */
-	    clearPlaybackUpdate = function ( track ) {
-	        if ( track._updateId ) {
-	            caf( track._updateId );
-	    
-	            track._updateId = null;
-	            track._updateFn = null;
-	        }
-	    },
-	    
-	    
-	    /**
-	     *
-	     * MediaBox crossbrowser create audio context
-	     * @method createAudioContext
-	     * @returns instance of audio context
-	     *
-	     */
-	    createAudioContext = function () {
-	        var AudioContext;
-	    
-	        if ( window.AudioContext ) {
-	            AudioContext = window.AudioContext;
-	    
-	        } else if ( window.webkitAudioContext ) {
-	            AudioContext = window.webkitAudioContext;
-	        }
-	    
-	        return ( AudioContext ) ? new AudioContext() : AudioContext;
-	    },
-	    
-	    
-	    /**
-	     *
-	     * MediaBox Open a new XMLHttpRequest
-	     * @method createRequest
-	     * @returns instance of audio context
-	     *
-	     */
-	    createRequest = function ( url, config, callback ) {
-	        var xhr = new XMLHttpRequest();
-	    
-	        xhr.open( "GET", url, true );
-	    
-	        if ( config ) {
-	            for ( var i in config ) {
-	                xhr[ i ] = config[ i ];
-	            }
-	        }
-	    
-	        xhr.onreadystatechange = function ( e ) {
-	            if ( this.readyState === 4 ) {
-	                if ( this.status === 200 ) {
-	                    try {
-	                        if ( !config.responseType ) {
-	                            this.responseJSON = JSON.parse( this.responseText );
-	                        }
-	    
-	                        if ( isFunction( callback ) ) {
-	                            callback( this );
-	                        }
-	    
-	                    } catch ( error ) {
-	                        throw new Error([
-	                            error.name,
-	                            error.message
-	    
-	                        ].join( " : " ));
-	                    }
-	                }
-	            }
-	        };
-	    
-	        xhr.send();
-	    
-	        return xhr;
-	    },
-	    
-	    
-	    /**
-	     *
-	     * MediaBox init constructor for singleton
-	     * @method init
-	     * @private
-	     *
-	     */
-	    init = function () {
-	        _instance = this;
-	    },
-	    
-	    
-	    /**
-	     *
-	     * MediaBox default volume setting
-	     * @member _volume
-	     * @private
-	     *
-	     */
-	    _volume = 1,
-	    
-	    
-	    /**
-	     *
-	     * MediaBox information for each channel.
-	     * These are default channels you can use.
-	     * <ul>
-	     * <li>bgm - background music channel</li>
-	     * <li>sfx - sound effects channel</li>
-	     * <li>vid - video channel</li>
-	     * </ul>
-	     * @member _channels
-	     * @private
-	     *
-	     */
-	    _channels = {
-	        bgm: {
-	            volume: _volume,
-	            _builtIn: true
-	        },
-	        sfx: {
-	            volume: _volume,
-	            _builtIn: true
-	        },
-	        vid: {
-	            volume: _volume,
-	            _builtIn: true
-	        }
-	    },
-	    
-	    /**
-	     *
-	     * MediaBox holds all audio tracks
-	     * @member _audio
-	     * @private
-	     *
-	     */
-	    _audio = {},
-	    
-	    /**
-	     *
-	     * MediaBox holds all video tracks
-	     * @member _video
-	     * @private
-	     *
-	     */
-	    _video = {},
-	    
-	    
-	    /**
-	     *
-	     * The singleton instance for MediaBox
-	     * @member _instance
-	     * @private
-	     *
-	     */
-	    _instance = null,
-	    
-	    
-	    /**
-	     *
-	     * Master audio context instance
-	     * @member _context
-	     * @private
-	     *
-	     */
-	    _context = createAudioContext(),
-	    
-	    
-	    /******************************************************************************
-	     * @Public API
-	    *******************************************************************************/
-	    
-	    /**
-	     *
-	     * A complete management tool for html5 video and audio context
-	     * @constructor MediaBox
-	     * @requires Tween
-	     * @memberof! <global>
-	     *
-	     */
-	    MediaBox = function () {
-	        return (_instance || init.apply( this, arguments ));
-	    };
-	    
-	    
-	    /**
-	     *
-	     * MediaBox types object
-	     * @memberof MediaBox
-	     * @member types
-	     *
-	     */
-	    MediaBox.types = {
-	        AUDIO: "audio",
-	        VIDEO: "video"
-	    };
-	    
-	    
-	    /**
-	     *
-	     * MediaBox support object
-	     * @memberof MediaBox
-	     * @member support
-	     *
-	     */
-	    MediaBox.support = {
-	        audio: getAudioSupport(),
-	        video: getVideoSupport()
-	    };
-	    
-	    
-	    /**
-	     *
-	     * MediaBox stopped state constant
-	     * @memberof MediaBox
-	     * @member STATE_STOPPED
-	     *
-	     */
-	    MediaBox.STATE_STOPPED = 0;
-	    
-	    
-	    /**
-	     *
-	     * MediaBox stopping state constant
-	     * @memberof MediaBox
-	     * @member STATE_STOPPING
-	     *
-	     */
-	    MediaBox.STATE_STOPPING = 1;
-	    
-	    
-	    /**
-	     *
-	     * MediaBox paused state constant
-	     * @memberof MediaBox
-	     * @member STATE_PAUSED
-	     *
-	     */
-	    MediaBox.STATE_PAUSED = 2;
-	    
-	    
-	    /**
-	     *
-	     * MediaBox playing state constant
-	     * @memberof MediaBox
-	     * @member STATE_PLAYING
-	     *
-	     */
-	    MediaBox.STATE_PLAYING = 3;
-	    
-	    
-	    /**
-	     *
-	     * MediaBox prototype
-	     *
-	     */
-	    MediaBox.prototype = {
-	        constructor: MediaBox,
-	    
-	        /**
-	         *
-	         * MediaBox check if media is loaded via ajax
-	         * @memberof MediaBox
-	         * @method isLoaded
-	         * @param {string} id reference id for media
-	         * @returns boolean
-	         *
-	         */
-	        isLoaded: function ( id ) {
-	            var obj = this.getMedia( id );
-	    
-	            return (obj.loaded === true);
-	        },
-	    
-	        /**
-	         *
-	         * MediaBox check stopped/paused status for audio/video
-	         * @memberof MediaBox
-	         * @method isStopped
-	         * @param {string} id reference id for media
-	         * @returns boolean
-	         *
-	         */
-	        isStopped: function ( id ) {
-	            var obj = this.getMedia( id );
-	    
-	            return (obj.state === MediaBox.STATE_STOPPED);
-	        },
-	    
-	        /**
-	         *
-	         * MediaBox check stopped/paused status for audio/video
-	         * @memberof MediaBox
-	         * @method isPaused
-	         * @param {string} id reference id for media
-	         * @returns boolean
-	         *
-	         */
-	        isPaused: function ( id ) {
-	            var obj = this.getMedia( id );
-	    
-	            return (obj.state === MediaBox.STATE_PAUSED);
-	        },
-	    
-	        /**
-	         *
-	         * MediaBox check playing status for audio/video
-	         * @memberof MediaBox
-	         * @method isPlaying
-	         * @param {string} id reference id for media
-	         * @returns boolean
-	         *
-	         */
-	        isPlaying: function ( id ) {
-	            var obj = this.getMedia( id );
-	    
-	            return (obj.state === MediaBox.STATE_PLAYING || obj.state === MediaBox.STATE_STOPPING);
-	        },
-	    
-	        /**
-	         *
-	         * MediaBox set volume for audio OR video
-	         * @memberof MediaBox
-	         * @method setVolume
-	         * @param {string} id reference id for media
-	         * @param {number} volume the volume to set to
-	         *
-	         */
-	        setVolume: function ( id, volume ) {
-	            var obj = this.getMedia( id );
-	    
-	            obj._node.volume = volume;
-	    
-	            return _instance;
-	        },
-	    
-	        /**
-	         *
-	         * MediaBox set volume for audio OR video
-	         * @memberof MediaBox
-	         * @method getVolume
-	         * @param {string} id reference id for media
-	         * @returns number
-	         *
-	         */
-	        getVolume: function ( id ) {
-	            var obj = this.getMedia( id );
-	    
-	            return obj._node.volume;
-	        },
-	    
-	        /**
-	         *
-	         * MediaBox get an audio nodes property
-	         * @memberof MediaBox
-	         * @method getAudioProp
-	         * @param {string} id Audio id
-	         * @param {string} prop The property to access
-	         *
-	         */
-	        getMediaProp: function ( id, prop ) {
-	            var obj = this.getMedia( id );
-	    
-	            if ( obj ) {
-	                return obj._node[ prop ];
-	            }
-	        },
-	    
-	        /**
-	         *
-	         * MediaBox set an audio nodes property/attribute
-	         * @memberof MediaBox
-	         * @method setAudioProp
-	         * @param {string} id Audio id
-	         * @param {string} prop The property to set
-	         * @param {mixed} value The value to assign
-	         *
-	         */
-	        setMediaProp: function ( id, prop, value ) {
-	            var obj = this.getMedia( id );
-	    
-	            if ( obj ) {
-	                obj._node[ prop ] = value;
-	            }
-	    
-	            return _instance;
-	        },
-	    
-	        /**
-	         *
-	         * MediaBox get an audio nodes attribute
-	         * @memberof MediaBox
-	         * @method getAudioAttr
-	         * @param {string} id Audio id
-	         * @param {string} prop The property to access
-	         *
-	         */
-	        getMediaAttr: function ( id, prop ) {
-	            var obj = this.getMedia( id );
-	    
-	            if ( obj ) {
-	                return obj._node.getAttribute( prop );
-	            }
-	        },
-	    
-	        /**
-	         *
-	         * MediaBox set an audio nodes attribute
-	         * @memberof MediaBox
-	         * @method setAudioAttr
-	         * @param {string} id Audio id
-	         * @param {string} prop The property to set
-	         * @param {mixed} value The value to assign
-	         *
-	         */
-	        setMediaAttr: function ( id, prop, value ) {
-	            var obj = this.getMedia( id );
-	    
-	            if ( obj ) {
-	                obj._node.setAttribute( prop, value );
-	            }
-	    
-	            return _instance;
-	        },
-	    
-	        /**
-	         *
-	         * MediaBox add an audio nodes event listener
-	         * @memberof MediaBox
-	         * @method addAudioEvent
-	         * @param {string} id Audio id to add event for
-	         * @param {string} event Event to add
-	         * @param {function} callback The event handler to call
-	         *
-	         */
-	        addMediaEvent: function ( id, event, callback ) {
-	            var obj = this.getMedia( id );
-	    
-	            if ( obj ) {
-	                // Capture timeupdate to run at 60fps instead
-	                if ( event === "timeupdate" ) {
-	                    obj._events.timeupdate = callback;
-	    
-	                    return _instance;
-	                }
-	    
-	                obj._events[ event ] = function () {
-	                    if ( isFunction( callback ) ) {
-	                        callback.apply( this, arguments );
-	                    }
-	                };
-	    
-	                obj._node.addEventListener( event, obj._events[ event ], false );
-	            }
-	    
-	            return _instance;
-	        },
-	    
-	        /**
-	         *
-	         * MediaBox remove an audio nodes event listener
-	         * @memberof MediaBox
-	         * @method removeAudioEvent
-	         * @param {string} id Audio id to remove event for
-	         * @param {string} event Event to remove
-	         *
-	         */
-	        removeMediaEvent: function ( id, event ) {
-	            var obj = this.getMedia( id );
-	    
-	            if ( obj ) {
-	                // Capture timeupdate to run at 60fps instead
-	                if ( event === "timeupdate" ) {
-	                    clearPlaybackUpdate( obj );
-	                }
-	    
-	                obj._node.removeEventListener( event, obj._events[ event ], false );
-	    
-	                obj._events[ event ] = null;
-	            }
-	    
-	            return _instance;
-	        },
-	    
-	        /**
-	         *
-	         * MediaBox play audio node by id
-	         * @memberof MediaBox
-	         * @method playAudio
-	         * @param {string} id reference id for media
-	         *
-	         */
-	        playMedia: function ( id ) {
-	            var obj = this.getMedia( id );
-	    
-	            if ( obj && this.isLoaded( id ) && (this.isStopped( id ) || this.isPaused( id )) ) {
-	                obj._node.volume = _channels[ obj.channel ].volume;
-	                obj._node.play();
-	                obj.state = MediaBox.STATE_PLAYING;
-	    
-	                if ( !obj._updateId && isFunction( obj._events.timeupdate ) ) {
-	                    obj._updateFn = function () {
-	                        obj._events.timeupdate.call( obj._node, null );
-	                        
-	                        obj._updateId = raf( obj._updateFn );
-	                    };
-	                    
-	                    obj._updateId = raf( obj._updateFn );
-	                }
-	            }
-	    
-	            return _instance;
-	        },
-	    
-	        /**
-	         *
-	         * MediaBox stop audio node by id with a paused state
-	         * @memberof MediaBox
-	         * @method pauseAudio
-	         * @param {string} id reference id for media
-	         *
-	         */
-	        pauseMedia: function ( id ) {
-	            var obj = this.getMedia( id );
-	    
-	            if ( obj && this.isLoaded( id ) && this.isPlaying( id ) ) {
-	                obj._node.pause();
-	                obj.state = MediaBox.STATE_PAUSED;
-	    
-	                clearPlaybackUpdate( obj );
-	            }
-	    
-	            return _instance;
-	        },
-	    
-	        /**
-	         *
-	         * MediaBox stop audio node by id with a stopped state
-	         * @memberof MediaBox
-	         * @method stopAudio
-	         * @param {string} id reference id for media
-	         *
-	         */
-	        stopMedia: function ( id ) {
-	            var obj = this.getMedia( id );
-	    
-	            if ( obj && this.isLoaded( id ) && this.isPlaying( id ) ) {
-	                obj._node.pause();
-	                obj.state = MediaBox.STATE_STOPPED;
-	    
-	                clearPlaybackUpdate( obj );
-	            }
-	    
-	            return _instance;
-	        },
-	    
-	        /**
-	         *
-	         * MediaBox get audio object by id
-	         * @memberof getMedia
-	         * @method getAudio
-	         * @param {string} id reference id for media
-	         * @returns object
-	         *
-	         */
-	        getMedia: function ( id ) {
-	            return _video[ id ] ? _video[ id ] : _audio[ id ];
-	        },
-	    
-	        /**
-	         *
-	         * MediaBox get all audio objects
-	         * @memberof MediaBox
-	         * @method getAudios
-	         * @returns object
-	         *
-	         */
-	        getAudios: function () {
-	            return _audio;
-	        },
-	    
-	        /**
-	         *
-	         * MediaBox get all video objects
-	         * @memberof MediaBox
-	         * @method getVideos
-	         * @returns object
-	         *
-	         */
-	        getVideos: function () {
-	            return _video;
-	        },
-	    
-	        /**
-	         *
-	         * MediaBox kill a media object abstractly
-	         * @memberof MediaBox
-	         * @method destroyMedia
-	         * @param {string} id reference id for media
-	         *
-	         */
-	        destroyMedia: function ( id ) {
-	            var obj = this.getMedia( id );
-	    
-	            this.stopMedia( id );
-	    
-	            if ( obj.type === MediaBox.types.AUDIO ) {
-	                delete _audio[ id ];
-	    
-	            } else {
-	                delete _video[ id ];
-	            }
-	    
-	            return _instance;
-	        },
-	    
-	        /**
-	         *
-	         * MediaBox load media config JSON formatted in a json bundle
-	         * @memberof MediaBox
-	         * @method loadMedia
-	         * @param {string} url The url to the JSON config
-	         * @param {function} callback The function to fire when done loading
-	         *
-	         */
-	        loadMedia: function ( url, callback ) {
-	            var self = this;
-	    
-	            createRequest( url, null, function ( xhr ) {
-	                self.addMedia( xhr.responseJSON );
-	    
-	                if ( isFunction( callback ) ) {
-	                    callback();
-	                }
-	            });
-	    
-	            return _instance;
-	        },
-	    
-	        /**
-	         *
-	         * MediaBox add media from bundle json
-	         * @memberof MediaBox
-	         * @method addMedia
-	         * @param {object} bundle Formatted media bundle JSON
-	         *
-	         */
-	        addMedia: function ( bundle ) {
-	            for ( var m in bundle ) {
-	                for ( var i = bundle[ m ].length; i--; ) {
-	                    // this.addVideo() / this.addAudio()
-	                    if ( isFunction( this[ m ] ) ) {
-	                        this[ m ]( bundle[ m ][ i ] );
-	                    }
-	                }
-	            }
-	    
-	            return _instance;
-	        },
-	    
-	        /**
-	         *
-	         * MediaBox add a video element
-	         * @memberof MediaBox
-	         * @method addVideo
-	         * @param {object} obj Formatted media bundle
-	         *
-	         */
-	        addVideo: function ( obj ) {
-	            var id = obj.id,
-	                src = obj.src,
-	                props = {
-	                    element: obj.element,
-	                    channel: obj.channel
-	                };
-	    
-	            // Disallow overrides / Require id and src props
-	            if ( _video[ id ] || !id || !src ) {
-	                return _instance;
-	            }
-	    
-	            // Allow new channels to exist
-	            if ( !_channels[ props.channel ] ) {
-	                _channels[ props.channel ] = {
-	                    volume: _volume
-	                };
-	            }
-	    
-	            // Create video object
-	            _video[ id ] = {};
-	            _video[ id ].type = MediaBox.types.VIDEO;
-	            _video[ id ].state = MediaBox.STATE_STOPPED;
-	            _video[ id ].loaded = true;
-	            _video[ id ].channel = props.channel;
-	            _video[ id ].sources = src;
-	            _video[ id ]._source = getCanPlaySource( MediaBox.types.VIDEO, src );
-	            _video[ id ]._events = {};
-	            _video[ id ]._updateId = null;
-	            _video[ id ]._updateFn = null;
-	            _video[ id ]._node = (props.element || document.createElement( "video" ));
-	            _video[ id ]._nodeSource = document.createElement( "source" );
-	            _video[ id ]._nodeSource.src = _video[ id ]._source.source;
-	            _video[ id ]._nodeSource.type = getMimeForMedia( MediaBox.types.VIDEO, _video[ id ]._source.source );
-	            _video[ id ]._node.appendChild( _video[ id ]._nodeSource );
-	    
-	            return _instance;
-	        },
-	    
-	        /**
-	         *
-	         * MediaBox add an audio context
-	         * @memberof MediaBox
-	         * @method addAudio
-	         * @param {object} obj Formatted media bundle
-	         *
-	         */
-	        addAudio: function ( obj ) {
-	            var id = obj.id,
-	                src = obj.src,
-	                props = {
-	                    channel: obj.channel,
-	                    CORS: (obj.CORS || false)
-	                };
-	    
-	            // Disallow overrides / Require id and src props
-	            if ( _audio[ id ] || !id || !src ) {
-	                return _instance;
-	            }
-	            
-	            // Allow new channels to exist
-	            if ( !_channels[ props.channel ] ) {
-	                _channels[ props.channel ] = {
-	                    volume: _volume
-	                };
-	            }
-	    
-	            // Create audio object
-	            _audio[ id ] = {};
-	            _audio[ id ].type = MediaBox.types.AUDIO;
-	            _audio[ id ].state = MediaBox.STATE_STOPPED;
-	            _audio[ id ].loaded = true;
-	            _audio[ id ].channel = props.channel;
-	            _audio[ id ].sources = src;
-	            _audio[ id ]._source = getCanPlaySource( MediaBox.types.AUDIO, src );
-	            _audio[ id ]._events = {};
-	            _audio[ id ]._updateId = null;
-	            _audio[ id ]._updateFn = null;
-	            _audio[ id ]._node = new Audio( _audio[ id ]._source.source );
-	    
-	            // Get the media as a buffer
-	            if ( isFunction( obj.onloaded ) && !props.CORS ) {
-	                createRequest( _audio[ id ]._source.source, {responseType: "arraybuffer"}, function ( xhr ) {
-	                    _context.decodeAudioData( xhr.response, obj.onloaded );
-	                });
-	            }
-	    
-	            return _instance;
-	        },
-	    
-	        /**
-	         *
-	         * MediaBox fade in audio/video volume
-	         * @memberof MediaBox
-	         * @method fadeMediaIn
-	         * @param {string} id string reference id for audio
-	         * @param {number} duration tween time in ms
-	         * @param {function} easing optional easing to use
-	         *
-	         */
-	        fadeMediaIn: function ( id, duration, easing ) {
-	            var obj = this.getMedia( id ),
-	                self = this,
-	                volume;
-	    
-	            if ( obj && obj.state === MediaBox.STATE_PLAYING ) {
-	                return _instance;
-	            }
-	    
-	            if ( obj ) {
-	                volume = _channels[ obj.channel ].volume;
-	    
-	                // Only reset volume and play if object is stopped
-	                // Object state could be STATE_STOPPING at this point
-	                if ( obj.state === MediaBox.STATE_STOPPED ) {
-	                    this.playMedia( id );
-	                    this.setVolume( id, 0 );
-	    
-	                } else if ( obj.state === MediaBox.STATE_STOPPING ) {
-	                    obj.state = MediaBox.STATE_PLAYING;
-	                }
-	    
-	                new Tween({
-	                    to: volume,
-	                    from: 0,
-	                    ease: ( isFunction( easing ) ) ? easing : Easing.linear,
-	                    duration: (duration || 1000),
-	                    update: function ( v ) {
-	                        self.setVolume( id, (v > volume) ? volume : v );
-	                    },
-	                    complete: function () {
-	                        self.setVolume( id, volume );
-	                    }
-	                });
-	            }
-	    
-	            return _instance;
-	        },
-	    
-	        /**
-	         *
-	         * MediaBox fade out audio/video volume
-	         * @memberof MediaBox
-	         * @method fadeMediaOut
-	         * @param {string} id string reference id for audio
-	         * @param {number} duration tween time in ms
-	         * @param {function} easing optional easing to use
-	         *
-	         */
-	        fadeMediaOut: function ( id, duration, easing ) {
-	            var obj = this.getMedia( id );
-	    
-	            if ( obj && obj.state === MediaBox.STATE_STOPPING ) {
-	                return _instance;
-	            }
-	    
-	            var self = this,
-	                handler = function ( v ) {
-	                    // Check audio state on fadeout in case it is started again
-	                    // before the duration of the fadeout is complete.
-	                    if ( obj.state === MediaBox.STATE_STOPPING ) {
-	                        self.setVolume( id, (v < 0) ? 0 : v );
-	    
-	                        if ( self.getVolume( id ) === 0 ) {
-	                            self.stopMedia( id );
-	                        }
-	                    }
-	                };
-	    
-	            if ( obj ) {
-	                obj.state = MediaBox.STATE_STOPPING;
-	    
-	                new Tween({
-	                    to: 0,
-	                    from: self.getVolume( id ),
-	                    ease: ( isFunction( easing ) ) ? easing : Easing.linear,
-	                    duration: (duration || 1000),
-	                    update: handler,
-	                    complete: handler
-	                });
-	            }
-	    
-	            return _instance;
-	        },
-	    
-	        /**
-	         *
-	         * MediaBox pause all playing audio for a given channel id
-	         * @memberof MediaBox
-	         * @method stopChannel
-	         * @param {string} channel string reference id for channel
-	         *
-	         */
-	        stopChannel: function ( channel ) {
-	            var id;
-	    
-	            // Look at video index
-	            for ( id in _video ) {
-	                if ( _video[ id ].channel === channel && _video[ id ].state === MediaBox.STATE_PLAYING ) {
-	                    this.pauseMedia( id );
-	                }
-	            }
-	    
-	            // Look at audio index
-	            for ( id in _audio ) {
-	                if ( _audio[ id ].channel === channel && _audio[ id ].state === MediaBox.STATE_PLAYING ) {
-	                    this.pauseMedia( id );
-	                }
-	            }
-	    
-	            return _instance;
-	        },
-	    
-	        /**
-	         *
-	         * MediaBox resume all playing audio for a given channel id
-	         * @memberof MediaBox
-	         * @method playChannel
-	         * @param {string} channel string reference id for channel
-	         *
-	         */
-	        playChannel: function ( channel ) {
-	            var id;
-	    
-	            // Look at video index
-	            for ( id in _video ) {
-	                if ( _video[ id ].channel === channel && _video[ id ].state === MediaBox.STATE_PAUSED ) {
-	                    this.playMedia( id );
-	                }
-	            }
-	    
-	            // Look at audio index
-	            for ( id in _audio ) {
-	                if ( _audio[ id ].channel === channel && _audio[ id ].state === MediaBox.STATE_PAUSED ) {
-	                    this.playMedia( id );
-	                }
-	            }
-	    
-	            return _instance;
-	        },
-	    
-	        /**
-	         *
-	         * MediaBox fade out all playing audio/video for a given channel id
-	         * @memberof MediaBox
-	         * @method fadeChannelOut
-	         * @param {string} channel string reference id for channel
-	         * @param {number} duration tween time in ms
-	         *
-	         */
-	        fadeChannelOut: function ( channel, duration ) {
-	            var id;
-	    
-	            // Look at video index
-	            for ( id in _video ) {
-	                if ( _video[ id ].channel === channel && _video[ id ].state === MediaBox.STATE_PLAYING ) {
-	                    this.fadeMediaOut( id, duration );
-	                }
-	            }
-	    
-	            // Look at audio index
-	            for ( id in _audio ) {
-	                if ( _audio[ id ].channel === channel && _audio[ id ].state === MediaBox.STATE_PLAYING ) {
-	                    this.fadeMediaOut( id, duration );
-	                }
-	            }
-	    
-	            return _instance;
-	        },
-	    
-	        /**
-	         *
-	         * MediaBox fade in all playing audio/video for a given channel id
-	         * @memberof MediaBox
-	         * @method fadeChannelIn
-	         * @param {string} channel string reference id for channel
-	         * @param {number} duration tween time in ms
-	         *
-	         */
-	        fadeChannelIn: function ( channel, duration ) {
-	            var id;
-	    
-	            // Look at video index
-	            for ( id in _video ) {
-	                if ( _video[ id ].channel === channel && _video[ id ].state === MediaBox.STATE_STOPPED ) {
-	                    this.fadeMediaIn( id, duration );
-	                }
-	            }
-	    
-	            // Look at audio index
-	            for ( id in _audio ) {
-	                if ( _audio[ id ].channel === channel && _audio[ id ].state === MediaBox.STATE_STOPPED ) {
-	                    this.fadeMediaIn( id, duration );
-	                }
-	            }
-	    
-	            return _instance;
-	        },
-	    
-	        /**
-	         *
-	         * MediaBox crossfade volume between multiple channels
-	         * @memberof MediaBox
-	         * @method crossFadeChannel
-	         * @param {string} channel string reference id for channel
-	         * @param {string} objId string reference id for object to fade in
-	         * @param {number} duration tween time in ms
-	         *
-	         */
-	        crossFadeChannel: function ( channel, objId, duration ) {
-	            var id;
-	            
-	            // Look at video index
-	            for ( id in _video ) {
-	                if ( _video[ id ].channel === channel && _video[ id ].state === MediaBox.STATE_PLAYING ) {
-	                    this.fadeMediaOut( id, duration );
-	                }
-	            }
-	    
-	            // Look at audio index
-	            for ( id in _audio ) {
-	                if ( _audio[ id ].channel === channel && _audio[ id ].state === MediaBox.STATE_PLAYING ) {
-	                    this.fadeMediaOut( id, duration );
-	                }
-	            }
-	    
-	            return this.fadeMediaIn( objId, duration );
-	        },
-	    
-	        /**
-	         *
-	         * MediaBox set the property for a channel
-	         * @memberof MediaBox
-	         * @method setChannelProp
-	         * @param {string} id string id reference to channel
-	         * @param {string} key string prop key
-	         * @param {string} val prop val
-	         *
-	         */
-	        setChannelProp: function ( id, key, val ) {
-	            if ( _channels[ id ] ) {
-	                _channels[ id ][ key ] = val;
-	            }
-	    
-	            return _instance;
-	        },
-	    
-	        /**
-	         *
-	         * MediaBox get the property for a channel
-	         * @memberof MediaBox
-	         * @method getChannelProp
-	         * @param {string} id string id reference to channel
-	         * @param {string} key string prop key
-	         *
-	         */
-	        getChannelProp: function ( id, key ) {
-	            if ( _channels[ id ] ) {
-	                return _channels[ id ][ key ];
-	            }
-	        },
-	        
-	        
-	        /**
-	         *
-	         * MediaBox get the channels config
-	         * @memberof MediaBox
-	         * @method _channels
-	         *
-	         */
-	        getChannels: function () {
-	            return _channels;
-	        }
-	    };
-	    
-	    
-	    return MediaBox;
+	  /**
+	   *
+	   * @public
+	   * @member defaultDuration
+	   * @memberof config
+	   * @description The default duration for javascript Tweens.
+	   *
+	   */
+	  defaultDuration: 300,
 	
+	  /**
+	   *
+	   * @public
+	   * @member lazyImageSelector
+	   * @memberof config
+	   * @description The string selector used for images deemed lazy-loadable.
+	   *
+	   */
+	  lazyImageSelector: ".js-lazy-image",
 	
-	});
+	  /**
+	   *
+	   * @public
+	   * @member lazyImageAttr
+	   * @memberof config
+	   * @description The string attribute for lazy image source URLs.
+	   *
+	   */
+	  lazyImageAttr: "data-img-src",
+	
+	  /**
+	   *
+	   * @public
+	   * @member imageLoaderAttr
+	   * @memberof config
+	   * @description The string attribute ImageLoader gives loaded images.
+	   *
+	   */
+	  imageLoaderAttr: "data-imageloader",
+	
+	  /**
+	   *
+	   * @public
+	   * @member asyncScriptPath
+	   * @memberof config
+	   * @description The string path where async scripts are kept.
+	   *
+	   */
+	  asyncScriptPath: "/assets/async/scripts/",
+	
+	  /**
+	   *
+	   * @public
+	   * @member asyncStylePath
+	   * @memberof config
+	   * @description The string path where async styles are kept.
+	   *
+	   */
+	  asyncStylePath: "/assets/async/styles/"
+	};
+	
+	/******************************************************************************
+	 * Export
+	*******************************************************************************/
+	exports["default"] = config;
+	module.exports = exports["default"];
 
 /***/ },
 /* 14 */
@@ -14224,372 +12956,6 @@
 
 /***/ },
 /* 15 */
-/*!***********************************!*\
-  !*** ./~/properjs-tween/Tween.js ***!
-  \***********************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	/*!
-	 *
-	 * A simple tween class using requestAnimationFrame
-	 *
-	 * @Tween
-	 * @author: kitajchuk
-	 *
-	 */
-	(function ( factory ) {
-	    
-	    if ( true ) {
-	        module.exports = factory();
-	
-	    } else if ( typeof window !== "undefined" ) {
-	        window.Tween = factory();
-	    }
-	    
-	})(function () {
-	
-	    var Easing = __webpack_require__( /*! properjs-easing */ 14 ),
-	        defaults = {
-	            ease: Easing.linear,
-	            duration: 600,
-	            from: 0,
-	            to: 0,
-	            delay: 0,
-	            update: function () {},
-	            complete: function () {}
-	        };
-	    
-	    
-	    /**
-	     *
-	     * Tween function
-	     * @constructor Tween
-	     * @requires raf
-	     * @requires Easing
-	     * @param {object} options Tween animation settings
-	     * <ul>
-	     * <li>duration - How long the tween will last</li>
-	     * <li>from - Where to start the tween</li>
-	     * <li>to - When to end the tween</li>
-	     * <li>update - The callback on each iteration</li>
-	     * <li>complete - The callback on end of animation</li>
-	     * <li>ease - The easing function to use</li>
-	     * <li>delay - How long to wait before animation</li>
-	     * </ul>
-	     * @memberof! <global>
-	     *
-	     */
-	    var Tween = function ( options ) {
-	        // Normalize options
-	        options = (options || {});
-	    
-	        // Normalize options
-	        for ( var i in defaults ) {
-	            if ( options[ i ] === undefined ) {
-	                options[ i ] = defaults[ i ];
-	            }
-	        }
-	    
-	        var tweenDiff = (options.to - options.from),
-	            startTime = null,
-	            rafTimer = null,
-	            isStopped = false;
-	    
-	        function animate( rafTimeStamp ) {
-	            if ( isStopped ) {
-	                return;
-	            }
-	    
-	            if ( startTime === null ) {
-	                startTime = rafTimeStamp;
-	            }
-	    
-	            var animDiff = (rafTimeStamp - startTime),
-	                tweenTo = (tweenDiff * options.ease( animDiff / options.duration )) + options.from;
-	    
-	            if ( typeof options.update === "function" ) {
-	                options.update( tweenTo );
-	            }
-	    
-	            if ( animDiff > options.duration ) {
-	                if ( typeof options.complete === "function" ) {
-	                    options.complete( options.to );
-	                }
-	    
-	                cancelAnimationFrame( rafTimer );
-	    
-	                rafTimer = null;
-	    
-	                return false;
-	            }
-	    
-	            rafTimer = requestAnimationFrame( animate );
-	        }
-	    
-	        setTimeout(function () {
-	            rafTimer = requestAnimationFrame( animate );
-	    
-	        }, options.delay );
-	    
-	        this.stop = function () {
-	            isStopped = true;
-	    
-	            cancelAnimationFrame( rafTimer );
-	    
-	            rafTimer = null;
-	        };
-	    };
-	    
-	    
-	    return Tween;
-	
-	
-	});
-
-/***/ },
-/* 16 */
-/*!*********************************!*\
-  !*** ./~/fg-loadcss/loadCSS.js ***!
-  \*********************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function(global) {/*!
-	loadCSS: load a CSS file asynchronously.
-	[c]2015 @scottjehl, Filament Group, Inc.
-	Licensed MIT
-	*/
-	(function(w){
-		"use strict";
-		/* exported loadCSS */
-		var loadCSS = function( href, before, media ){
-			// Arguments explained:
-			// `href` [REQUIRED] is the URL for your CSS file.
-			// `before` [OPTIONAL] is the element the script should use as a reference for injecting our stylesheet <link> before
-				// By default, loadCSS attempts to inject the link after the last stylesheet or script in the DOM. However, you might desire a more specific location in your document.
-			// `media` [OPTIONAL] is the media type or query of the stylesheet. By default it will be 'all'
-			var doc = w.document;
-			var ss = doc.createElement( "link" );
-			var ref;
-			if( before ){
-				ref = before;
-			}
-			else {
-				var refs = ( doc.body || doc.getElementsByTagName( "head" )[ 0 ] ).childNodes;
-				ref = refs[ refs.length - 1];
-			}
-	
-			var sheets = doc.styleSheets;
-			ss.rel = "stylesheet";
-			ss.href = href;
-			// temporarily set media to something inapplicable to ensure it'll fetch without blocking render
-			ss.media = "only x";
-	
-			// Inject link
-				// Note: the ternary preserves the existing behavior of "before" argument, but we could choose to change the argument to "after" in a later release and standardize on ref.nextSibling for all refs
-				// Note: `insertBefore` is used instead of `appendChild`, for safety re: http://www.paulirish.com/2011/surefire-dom-element-insertion/
-			ref.parentNode.insertBefore( ss, ( before ? ref : ref.nextSibling ) );
-			// A method (exposed on return object for external use) that mimics onload by polling until document.styleSheets until it includes the new sheet.
-			var onloadcssdefined = function( cb ){
-				var resolvedHref = ss.href;
-				var i = sheets.length;
-				while( i-- ){
-					if( sheets[ i ].href === resolvedHref ){
-						return cb();
-					}
-				}
-				setTimeout(function() {
-					onloadcssdefined( cb );
-				});
-			};
-	
-			// once loaded, set link's media back to `all` so that the stylesheet applies once it loads
-			ss.onloadcssdefined = onloadcssdefined;
-			onloadcssdefined(function() {
-				ss.media = media || "all";
-			});
-			return ss;
-		};
-		// commonjs
-		if( true ){
-			module.exports = loadCSS;
-		}
-		else {
-			w.loadCSS = loadCSS;
-		}
-	}( typeof global !== "undefined" ? global : this ));
-	
-	
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
-
-/***/ },
-/* 17 */
-/*!*******************************!*\
-  !*** ./~/fg-loadjs/loadJS.js ***!
-  \*******************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function(global) {/*! loadJS: load a JS file asynchronously. [c]2014 @scottjehl, Filament Group, Inc. (Based on http://goo.gl/REQGQ by Paul Irish). Licensed MIT */
-	(function( w ){
-		var loadJS = function( src, cb ){
-			"use strict";
-			var ref = w.document.getElementsByTagName( "script" )[ 0 ];
-			var script = w.document.createElement( "script" );
-			script.src = src;
-			script.async = true;
-			ref.parentNode.insertBefore( script, ref );
-			if (cb && typeof(cb) === "function") {
-				script.onload = cb;
-			}
-			return script;
-		};
-		// commonjs
-		if( true ){
-			module.exports = loadJS;
-		}
-		else {
-			w.loadJS = loadJS;
-		}
-	}( typeof global !== "undefined" ? global : this ));
-	
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
-
-/***/ },
-/* 18 */
-/*!*******************************!*\
-  !*** ./js_src/core/config.js ***!
-  \*******************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-	
-	var _properjsEasing = __webpack_require__(/*! properjs-easing */ 14);
-	
-	var _properjsEasing2 = _interopRequireDefault(_properjsEasing);
-	
-	/**
-	 *
-	 * @public
-	 * @module config
-	 * @description Stores app-wide config values.
-	 *
-	 */
-	var config = {
-	  /**
-	   *
-	   * @public
-	   * @member sqsMaxImgWidth
-	   * @memberof config
-	   * @description The max width Squarespace allows for images.
-	   *
-	   */
-	  sqsMaxImgWidth: 2500,
-	
-	  /**
-	   *
-	   * @public
-	   * @member sqsSpecialProps
-	   * @memberof config
-	   * @description Normalize access to certain item object properties for application.
-	   *
-	   * Any of these indicate a post HAS a thumbnail image:
-	   * - systemDataId
-	   * - systemDataVariants
-	   * - systemDataSourceType
-	   * - systemDataOrigin
-	   *
-	   */
-	  sqsSpecialProps: {
-	    published: "publishOn",
-	    userUpload: "systemDataVariants",
-	    blockDataKey: "blockJson",
-	    mainContent: "main-content"
-	  },
-	
-	  /**
-	   *
-	   * @public
-	   * @member defaultEasing
-	   * @memberof config
-	   * @description The default easing function for javascript Tweens.
-	   *
-	   */
-	  defaultEasing: _properjsEasing2["default"].easeInOutCubic,
-	
-	  /**
-	   *
-	   * @public
-	   * @member defaultDuration
-	   * @memberof config
-	   * @description The default duration for javascript Tweens.
-	   *
-	   */
-	  defaultDuration: 300,
-	
-	  /**
-	   *
-	   * @public
-	   * @member lazyImageSelector
-	   * @memberof config
-	   * @description The string selector used for images deemed lazy-loadable.
-	   *
-	   */
-	  lazyImageSelector: ".js-lazy-image",
-	
-	  /**
-	   *
-	   * @public
-	   * @member lazyImageAttr
-	   * @memberof config
-	   * @description The string attribute for lazy image source URLs.
-	   *
-	   */
-	  lazyImageAttr: "data-img-src",
-	
-	  /**
-	   *
-	   * @public
-	   * @member imageLoaderAttr
-	   * @memberof config
-	   * @description The string attribute ImageLoader gives loaded images.
-	   *
-	   */
-	  imageLoaderAttr: "data-imageloader",
-	
-	  /**
-	   *
-	   * @public
-	   * @member asyncScriptPath
-	   * @memberof config
-	   * @description The string path where async scripts are kept.
-	   *
-	   */
-	  asyncScriptPath: "/assets/async/scripts/",
-	
-	  /**
-	   *
-	   * @public
-	   * @member asyncStylePath
-	   * @memberof config
-	   * @description The string path where async styles are kept.
-	   *
-	   */
-	  asyncStylePath: "/assets/async/styles/"
-	};
-	
-	/******************************************************************************
-	 * Export
-	*******************************************************************************/
-	exports["default"] = config;
-	module.exports = exports["default"];
-
-/***/ },
-/* 19 */
 /*!****************************!*\
   !*** ./js_src/core/log.js ***!
   \****************************/
@@ -14603,7 +12969,7 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 	
-	var _env = __webpack_require__(/*! ./env */ 20);
+	var _env = __webpack_require__(/*! ./env */ 16);
 	
 	var _env2 = _interopRequireDefault(_env);
 	
@@ -14631,7 +12997,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 20 */
+/* 16 */
 /*!****************************!*\
   !*** ./js_src/core/env.js ***!
   \****************************/
@@ -14701,7 +13067,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 21 */
+/* 17 */
 /*!*******************************!*\
   !*** ./js_src/core/images.js ***!
   \*******************************/
@@ -14725,11 +13091,11 @@
 	
 	var util = _interopRequireWildcard(_util);
 	
-	var _log = __webpack_require__(/*! ./log */ 19);
+	var _log = __webpack_require__(/*! ./log */ 15);
 	
 	var _log2 = _interopRequireDefault(_log);
 	
-	var _config = __webpack_require__(/*! ./config */ 18);
+	var _config = __webpack_require__(/*! ./config */ 13);
 	
 	var _config2 = _interopRequireDefault(_config);
 	
@@ -14737,7 +13103,7 @@
 	
 	var _properjsImageloader2 = _interopRequireDefault(_properjsImageloader);
 	
-	var _ImageController = __webpack_require__(/*! ./ImageController */ 22);
+	var _ImageController = __webpack_require__(/*! ./ImageController */ 18);
 	
 	var _ImageController2 = _interopRequireDefault(_ImageController);
 	
@@ -14848,7 +13214,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 22 */
+/* 18 */
 /*!****************************************!*\
   !*** ./js_src/core/ImageController.js ***!
   \****************************************/
@@ -14876,7 +13242,7 @@
 	
 	var util = _interopRequireWildcard(_util);
 	
-	var _log = __webpack_require__(/*! ./log */ 19);
+	var _log = __webpack_require__(/*! ./log */ 15);
 	
 	var _log2 = _interopRequireDefault(_log);
 	
@@ -14975,7 +13341,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 23 */
+/* 19 */
 /*!********************************!*\
   !*** ./js_src/core/resizes.js ***!
   \********************************/
@@ -14991,11 +13357,11 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 	
-	var _properjsThrottle = __webpack_require__(/*! properjs-throttle */ 24);
+	var _properjsThrottle = __webpack_require__(/*! properjs-throttle */ 20);
 	
 	var _properjsThrottle2 = _interopRequireDefault(_properjsThrottle);
 	
-	var _properjsDebounce = __webpack_require__(/*! properjs-debounce */ 25);
+	var _properjsDebounce = __webpack_require__(/*! properjs-debounce */ 21);
 	
 	var _properjsDebounce2 = _interopRequireDefault(_properjsDebounce);
 	
@@ -15003,7 +13369,7 @@
 	
 	var util = _interopRequireWildcard(_util);
 	
-	var _log = __webpack_require__(/*! ./log */ 19);
+	var _log = __webpack_require__(/*! ./log */ 15);
 	
 	var _log2 = _interopRequireDefault(_log);
 	
@@ -15070,7 +13436,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 24 */
+/* 20 */
 /*!*****************************************!*\
   !*** ./~/properjs-throttle/throttle.js ***!
   \*****************************************/
@@ -15129,7 +13495,7 @@
 	});
 
 /***/ },
-/* 25 */
+/* 21 */
 /*!*****************************************!*\
   !*** ./~/properjs-debounce/debounce.js ***!
   \*****************************************/
@@ -15200,7 +13566,7 @@
 	});
 
 /***/ },
-/* 26 */
+/* 22 */
 /*!********************************!*\
   !*** ./js_src/core/scrolls.js ***!
   \********************************/
@@ -15228,7 +13594,7 @@
 	
 	var util = _interopRequireWildcard(_util);
 	
-	var _log = __webpack_require__(/*! ./log */ 19);
+	var _log = __webpack_require__(/*! ./log */ 15);
 	
 	var _log2 = _interopRequireDefault(_log);
 	
@@ -15394,7 +13760,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 27 */
+/* 23 */
 /*!****************************!*\
   !*** ./js_src/core/api.js ***!
   \****************************/
@@ -15412,13 +13778,13 @@
 	
 	var _js_libsJqueryDistJquery2 = _interopRequireDefault(_js_libsJqueryDistJquery);
 	
-	var _paramalama = __webpack_require__(/*! paramalama */ 28);
+	var _paramalama = __webpack_require__(/*! paramalama */ 24);
 	
 	var _paramalama2 = _interopRequireDefault(_paramalama);
 	
 	//import config from "./config";
 	
-	var _cache = __webpack_require__(/*! ./cache */ 29);
+	var _cache = __webpack_require__(/*! ./cache */ 25);
 	
 	var _cache2 = _interopRequireDefault(_cache);
 	
@@ -15686,7 +14052,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 28 */
+/* 24 */
 /*!************************************!*\
   !*** ./~/paramalama/paramalama.js ***!
   \************************************/
@@ -15755,7 +14121,7 @@
 
 
 /***/ },
-/* 29 */
+/* 25 */
 /*!******************************!*\
   !*** ./js_src/core/cache.js ***!
   \******************************/
@@ -15769,7 +14135,7 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 	
-	var _Store = __webpack_require__(/*! ./Store */ 30);
+	var _Store = __webpack_require__(/*! ./Store */ 26);
 	
 	var _Store2 = _interopRequireDefault(_Store);
 	
@@ -15787,7 +14153,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 30 */
+/* 26 */
 /*!******************************!*\
   !*** ./js_src/core/Store.js ***!
   \******************************/
@@ -15809,9 +14175,13 @@
 	
 	var _js_libsJqueryDistJquery2 = _interopRequireDefault(_js_libsJqueryDistJquery);
 	
-	var _log = __webpack_require__(/*! ./log */ 19);
+	var _log = __webpack_require__(/*! ./log */ 15);
 	
 	var _log2 = _interopRequireDefault(_log);
+	
+	var _config = __webpack_require__(/*! ./config */ 13);
+	
+	var _config2 = _interopRequireDefault(_config);
 	
 	// Singleton
 	var _instance = null;
@@ -15933,7 +14303,7 @@
 	        key: "slug",
 	        value: function slug(uri) {
 	            uri = uri.replace(/^\/|\/$/g, "").replace(/\/|\?|\&|=|\s/g, "-").toLowerCase();
-	            uri = uri === "" ? "homepage" : uri;
+	            uri = uri === "" ? _config2["default"].homepageKey : uri;
 	
 	            return uri;
 	        }
@@ -16035,12 +14405,13 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 31 */
+/* 27 */
 /*!**********************************!*\
   !*** ./js_src/core/Analytics.js ***!
   \**********************************/
 /***/ function(module, exports, __webpack_require__) {
 
+	//import $ from "js_libs/jquery/dist/jquery";
 	"use strict";
 	
 	Object.defineProperty(exports, "__esModule", {
@@ -16055,11 +14426,7 @@
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	var _js_libsJqueryDistJquery = __webpack_require__(/*! js_libs/jquery/dist/jquery */ 1);
-	
-	var _js_libsJqueryDistJquery2 = _interopRequireDefault(_js_libsJqueryDistJquery);
-	
-	var _log = __webpack_require__(/*! ./log */ 19);
+	var _log = __webpack_require__(/*! ./log */ 15);
 	
 	var _log2 = _interopRequireDefault(_log);
 	
@@ -16067,7 +14434,7 @@
 	
 	var util = _interopRequireWildcard(_util);
 	
-	var _cache = __webpack_require__(/*! ./cache */ 29);
+	var _cache = __webpack_require__(/*! ./cache */ 25);
 	
 	var _cache2 = _interopRequireDefault(_cache);
 	
@@ -16093,7 +14460,7 @@
 	
 	            util.emitter.on("app--analytics-push", this.pushTrack.bind(this));
 	
-	            (0, _log2["default"])("Analytics initialized", this);
+	            (0, _log2["default"])("Analytics initialized");
 	
 	            _instance = this;
 	        }
@@ -16147,26 +14514,22 @@
 	         *
 	         * @public
 	         * @method pushTrack
-	         * @param {string} html The full responseText from an XHR request
-	         * @param {jQuery} $doc Optional document node to receive and work with
+	         * @param {Hobo} $doc <html> node to receive and work with
 	         * @memberof core.Analytics
 	         * @description Parse static context from responseText and track it.
 	         *
 	         */
 	    }, {
 	        key: "pushTrack",
-	        value: function pushTrack(html, $doc) {
-	            var ctx = null;
-	
-	            $doc = $doc || (0, _js_libsJqueryDistJquery2["default"])(html);
-	
-	            ctx = this.getStaticContext(html);
+	        value: function pushTrack($doc) {
+	            var $title = $doc.find("title");
+	            var ctx = this.getStaticContext($doc.find("head")[0].innerHTML);
 	
 	            if (ctx) {
 	                this.track(ctx.item ? "item" : "collection", ctx.item || ctx.collection);
 	            }
 	
-	            this.setDocumentTitle($doc.filter("title").text());
+	            this.setDocumentTitle($title[0].innerText);
 	        }
 	
 	        /**
@@ -16249,7 +14612,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 32 */
+/* 28 */
 /*!**************************!*\
   !*** ./js_src/router.js ***!
   \**************************/
@@ -16269,7 +14632,7 @@
 	
 	var _js_libsJqueryDistJquery2 = _interopRequireDefault(_js_libsJqueryDistJquery);
 	
-	var _properjsPagecontroller = __webpack_require__(/*! properjs-pagecontroller */ 33);
+	var _properjsPagecontroller = __webpack_require__(/*! properjs-pagecontroller */ 29);
 	
 	var _properjsPagecontroller2 = _interopRequireDefault(_properjsPagecontroller);
 	
@@ -16277,16 +14640,14 @@
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _animate = __webpack_require__(/*! ./animate */ 38);
+	var _animate = __webpack_require__(/*! ./animate */ 34);
 	
 	var _animate2 = _interopRequireDefault(_animate);
-	
-	var _pageDuration = core.util.getTransitionDuration(core.dom.page[0]);
 	
 	/**
 	 *
 	 * @public
-	 * @module router
+	 * @namespace router
 	 * @description Handles async web app routing for nice transitions.
 	 *
 	 */
@@ -16295,15 +14656,15 @@
 	     *
 	     * @public
 	     * @method init
-	     * @param {App} app Instance of the main application
 	     * @memberof router
 	     * @description Initialize the router module.
 	     *
 	     */
-	    init: function init(app) {
-	        this.app = app;
-	        this.bindCaptureLinks();
-	        this.initPageController();
+	    init: function init() {
+	        this.state = {};
+	        this.pageDuration = core.util.getTransitionDuration(core.dom.page[0]);
+	        this.bindEmptyHashLinks();
+	        this.createPageController();
 	
 	        core.log("router initialized");
 	    },
@@ -16311,61 +14672,70 @@
 	    /**
 	     *
 	     * @public
-	     * @method initPageController
+	     * @method setState
 	     * @memberof router
-	     * @description Create the PageController instance.
+	     * @param {string} name The access key
+	     * @param {mixed} value The storage value
+	     * @description Non-persistent state.
+	     *              This state object will persist for one router cycle.
+	     *              The next router cycle will delete this state object.
 	     *
 	     */
-	    initPageController: function initPageController() {
-	        var _this = this;
-	
-	        this.controller = new _properjsPagecontroller2["default"]({
-	            transitionTime: _pageDuration
-	        });
-	
-	        this.controller.setConfig(["*"]);
-	
-	        this.controller.setModules([core.images, _animate2["default"]]);
-	
-	        this.controller.on("page-controller-router-transition-out", this.changePageOut.bind(this));
-	        this.controller.on("page-controller-router-refresh-document", this.changeContent.bind(this));
-	        this.controller.on("page-controller-router-transition-in", this.changePageIn.bind(this));
-	        this.controller.on("page-controller-initialized-page", function (html) {
-	            _this.cachePage(core.dom.html, (0, _js_libsJqueryDistJquery2["default"])(html).filter(".js-page")[0].innerHTML);
-	        });
-	
-	        this.controller.initPage();
+	    setState: function setState(name, value) {
+	        this.state[name] = {
+	            checked: false,
+	            name: name,
+	            value: value
+	        };
 	    },
 	
 	    /**
 	     *
 	     * @public
-	     * @method cachePage
-	     * @param {jQuery} $object The node for use
-	     * @param {string} response The XHR responseText
+	     * @method getState
 	     * @memberof router
-	     * @description Cache the DOM content for a page once its parsed out.
+	     * @param {string} name The access key
+	     * @description Access a state object ref by its name.
+	     * @returns {mixed}
 	     *
 	     */
-	    cachePage: function cachePage($object, response) {
-	        core.cache.set(this.getPageKey(), {
-	            $object: $object,
-	            response: response
-	        });
+	    getState: function getState(name) {
+	        var id = null;
+	        var ret = null;
+	
+	        for (id in this.state) {
+	            if (this.state.hasOwnProperty(id)) {
+	                if (this.state[id].name === name) {
+	                    ret = this.state[id].value;
+	                    break;
+	                }
+	            }
+	        }
+	
+	        return ret;
 	    },
 	
 	    /**
 	     *
 	     * @public
-	     * @method bindCaptureLinks
+	     * @method checkState
 	     * @memberof router
-	     * @description Suppress #hash links.
+	     * @description Process state objects.
+	     *              Objects that have already been `checked` are deleted.
 	     *
 	     */
-	    bindCaptureLinks: function bindCaptureLinks() {
-	        core.dom.body.on("click", "[href^='#']", function (e) {
-	            return e.preventDefault();
-	        });
+	    checkState: function checkState() {
+	        var id = null;
+	
+	        for (id in this.state) {
+	            if (this.state.hasOwnProperty(id)) {
+	                if (this.state[id].checked) {
+	                    delete this.state[id];
+	                } else {
+	                    this.state[id].checked = true;
+	                }
+	            }
+	        }
 	    },
 	
 	    /**
@@ -16393,6 +14763,102 @@
 	     */
 	    push: function push(path, cb) {
 	        this.controller.routeSilently(path, cb || core.util.noop);
+	        this.checkState();
+	    },
+	
+	    /**
+	     *
+	     * @public
+	     * @method createPageController
+	     * @memberof router
+	     * @description Create the PageController instance.
+	     *
+	     */
+	    createPageController: function createPageController() {
+	        this.controller = new _properjsPagecontroller2["default"]({
+	            transitionTime: this.pageDuration
+	        });
+	
+	        this.controller.setConfig(["*"]);
+	
+	        this.controller.setModules([core.images, _animate2["default"]]);
+	
+	        //this.controller.on( "page-controller-router-samepage", () => {} );
+	        this.controller.on("page-controller-router-transition-out", this.changePageOut.bind(this));
+	        this.controller.on("page-controller-router-refresh-document", this.changeContent.bind(this));
+	        this.controller.on("page-controller-router-transition-in", this.changePageIn.bind(this));
+	        this.controller.on("page-controller-initialized-page", this.initPage.bind(this));
+	
+	        this.controller.initPage();
+	    },
+	
+	    /**
+	     *
+	     * @public
+	     * @method initPage
+	     * @param {string} html The responseText to parse out
+	     * @memberof router
+	     * @description Cache the initial page load.
+	     *
+	     */
+	    initPage: function initPage(html) {
+	        var cache = this.parseDoc(html);
+	
+	        this.cachePage(cache.$object, cache.response);
+	    },
+	
+	    /**
+	     *
+	     * @public
+	     * @method parseDoc
+	     * @param {string} html The responseText to parse out
+	     * @memberof router
+	     * @description Get the DOM information to cache for a request.
+	     * @returns {object}
+	     *
+	     */
+	    parseDoc: function parseDoc(html) {
+	        var doc = document.createElement("html");
+	
+	        doc.innerHTML = html;
+	
+	        doc = (0, _js_libsJqueryDistJquery2["default"])(doc);
+	
+	        return {
+	            $object: doc,
+	            response: doc.find(".js-page")[0].innerHTML
+	        };
+	    },
+	
+	    /**
+	     *
+	     * @public
+	     * @method cachePage
+	     * @param {Hobo} $object The node for use
+	     * @param {string} response The XHR responseText
+	     * @memberof router
+	     * @description Cache the DOM content for a page once its parsed out.
+	     *
+	     */
+	    cachePage: function cachePage($object, response) {
+	        core.cache.set(core.util.getPageKey(), {
+	            $object: $object,
+	            response: response
+	        });
+	    },
+	
+	    /**
+	     *
+	     * @public
+	     * @method bindEmptyHashLinks
+	     * @memberof router
+	     * @description Suppress #hash links.
+	     *
+	     */
+	    bindEmptyHashLinks: function bindEmptyHashLinks() {
+	        core.dom.body.on("click", "[href^='#']", function (e) {
+	            return e.preventDefault();
+	        });
 	    },
 	
 	    /**
@@ -16408,14 +14874,14 @@
 	        core.util.disableTouchMove(false);
 	
 	        core.dom.html.removeClass("is-routing");
-	        core.dom.page.removeClass("is-reactive is-inactive");
+	        core.dom.page.removeClass("is-inactive");
 	
 	        core.scrolls.topout(0);
 	        core.scrolls.clearStates();
 	
 	        setTimeout(function () {
 	            core.util.emitter.fire("app--intro-art");
-	        }, _pageDuration);
+	        }, this.pageDuration);
 	
 	        core.util.emitter.off("app--preload-done", this.onPreloadDone);
 	    },
@@ -16424,17 +14890,16 @@
 	     *
 	     * @public
 	     * @method changePageOut
-	     * @param {object} data The data object supplied by PageController from PushState
 	     * @memberof router
 	     * @description Trigger transition-out animation.
 	     *
 	     */
-	    changePageOut: function changePageOut() /* data */{
+	    changePageOut: function changePageOut() {
 	        core.util.disableMouseWheel(true);
 	        core.util.disableTouchMove(true);
 	
 	        core.dom.html.addClass("is-routing");
-	        core.dom.page.removeClass("is-reactive").addClass("is-inactive");
+	        core.dom.page.addClass("is-inactive");
 	
 	        core.util.emitter.on("app--preload-done", this.onPreloadDone);
 	    },
@@ -16449,25 +14914,20 @@
 	     *
 	     */
 	    changeContent: function changeContent(html) {
-	        var $object = null;
-	        var response = null;
-	        var cached = core.cache.get(this.getPageKey());
+	        var cached = core.cache.get(core.util.getPageKey());
 	
-	        if (cached) {
-	            $object = cached.$object;
-	            response = cached.response;
-	        } else {
-	            $object = (0, _js_libsJqueryDistJquery2["default"])(html).filter("title, div, main, section, header, footer, span");
-	            response = $object.filter(".js-page")[0].innerHTML;
+	        if (!cached) {
+	            cached = this.parseDoc(html);
 	
-	            this.cachePage($object, response);
+	            this.cachePage(cached.$object, cached.response);
 	        }
 	
-	        core.dom.page[0].innerHTML = response;
+	        core.dom.page[0].innerHTML = cached.response;
 	
-	        core.util.emitter.fire("app--analytics-push", html, $object);
+	        core.util.emitter.fire("app--analytics-push", cached.$object);
 	
-	        core.util.emitter.fire("app--cleanup");
+	        // Check state before cycle finishes so `checked` state can be deleted
+	        this.checkState();
 	    },
 	
 	    /**
@@ -16479,9 +14939,7 @@
 	     * @description Trigger transition-in animation.
 	     *
 	     */
-	    changePageIn: function changePageIn() /* data */{
-	        core.dom.page.addClass("is-reactive");
-	    }
+	    changePageIn: function changePageIn() /* data */{}
 	};
 	
 	/******************************************************************************
@@ -16491,7 +14949,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 33 */
+/* 29 */
 /*!*****************************************************!*\
   !*** ./~/properjs-pagecontroller/PageController.js ***!
   \*****************************************************/
@@ -16524,7 +14982,7 @@
 	})(function () {
 	
 	    // Useful stuff
-	    var Router = __webpack_require__( /*! properjs-router */ 34 ),
+	    var Router = __webpack_require__( /*! properjs-router */ 30 ),
 	        Controller = __webpack_require__( /*! properjs-controller */ 9 ),
 	
 	        _router = null,
@@ -17028,7 +15486,7 @@
 	});
 
 /***/ },
-/* 34 */
+/* 30 */
 /*!***************************************************************!*\
   !*** ./~/properjs-pagecontroller/~/properjs-router/Router.js ***!
   \***************************************************************/
@@ -17053,9 +15511,9 @@
 	    
 	})(function () {
 	
-	    var PushState = __webpack_require__( /*! properjs-pushstate */ 35 ),
-	        MatchRoute = __webpack_require__( /*! properjs-matchroute */ 36 ),
-	        matchElement = __webpack_require__( /*! properjs-matchelement */ 37 ),
+	    var PushState = __webpack_require__( /*! properjs-pushstate */ 31 ),
+	        MatchRoute = __webpack_require__( /*! properjs-matchroute */ 32 ),
+	        matchElement = __webpack_require__( /*! properjs-matchelement */ 33 ),
 	        _rSameDomain = new RegExp( document.domain ),
 	        _initDelay = 200,
 	        _triggerEl;
@@ -17503,7 +15961,7 @@
 	});
 
 /***/ },
-/* 35 */
+/* 31 */
 /*!***************************************************************************************!*\
   !*** ./~/properjs-pagecontroller/~/properjs-router/~/properjs-pushstate/PushState.js ***!
   \***************************************************************************************/
@@ -18044,7 +16502,7 @@
 	});
 
 /***/ },
-/* 36 */
+/* 32 */
 /*!*****************************************************************************************!*\
   !*** ./~/properjs-pagecontroller/~/properjs-router/~/properjs-matchroute/MatchRoute.js ***!
   \*****************************************************************************************/
@@ -18069,7 +16527,7 @@
 	    
 	})(function () {
 	
-	    var paramalama = __webpack_require__( /*! paramalama */ 28 ),
+	    var paramalama = __webpack_require__( /*! paramalama */ 24 ),
 	
 	    /**
 	     *
@@ -18403,7 +16861,7 @@
 	});
 
 /***/ },
-/* 37 */
+/* 33 */
 /*!*************************************************!*\
   !*** ./~/properjs-matchelement/matchElement.js ***!
   \*************************************************/
@@ -18465,7 +16923,7 @@
 	});
 
 /***/ },
-/* 38 */
+/* 34 */
 /*!***************************!*\
   !*** ./js_src/animate.js ***!
   \***************************/
@@ -18628,7 +17086,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 39 */
+/* 35 */
 /*!***************************!*\
   !*** ./js_src/overlay.js ***!
   \***************************/
@@ -18691,7 +17149,7 @@
 	            _isActive = false;
 	
 	            core.dom.html.removeClass("is-overlay-active");
-	            core.dom.overlay.element.detach();
+	            core.dom.overlay.element.detach().removeClass("is-intro");
 	        }, _transTime);
 	    },
 	
@@ -18711,12 +17169,13 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 40 */
+/* 36 */
 /*!***************************!*\
   !*** ./js_src/Project.js ***!
   \***************************/
 /***/ function(module, exports, __webpack_require__) {
 
+	//import $ from "js_libs/jquery/dist/jquery";
 	"use strict";
 	
 	Object.defineProperty(exports, "__esModule", {
@@ -18725,25 +17184,21 @@
 	
 	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 	
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
-	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
+	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	var _js_libsJqueryDistJquery = __webpack_require__(/*! js_libs/jquery/dist/jquery */ 1);
-	
-	var _js_libsJqueryDistJquery2 = _interopRequireDefault(_js_libsJqueryDistJquery);
 	
 	var _core = __webpack_require__(/*! ./core */ 4);
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _router = __webpack_require__(/*! ./router */ 32);
+	var _router = __webpack_require__(/*! ./router */ 28);
 	
 	var _router2 = _interopRequireDefault(_router);
 	
-	var _overlay = __webpack_require__(/*! ./overlay */ 39);
+	var _overlay = __webpack_require__(/*! ./overlay */ 35);
 	
 	var _overlay2 = _interopRequireDefault(_overlay);
 	
@@ -18752,6 +17207,7 @@
 	 * @public
 	 * @class Project
 	 * @classdesc Load the Project collection into its container
+	 *            options { url, onLoad? }
 	 *
 	 */
 	
@@ -18803,17 +17259,44 @@
 	        value: function loadCollection() {
 	            var dataType = { dataType: "html" };
 	            var format = { format: "full", nocache: true };
-	            var cached = core.cache.get("project-" + this.opts.url);
+	            var cached = core.cache.get(this.opts.url);
 	
 	            this.open();
 	
 	            _router2["default"].push(this.opts.url, function () {});
 	
 	            if (cached) {
-	                this.onLoadCollection(cached);
+	                this.handleCollection(cached);
 	            } else {
 	                core.api.collection(this.opts.url, format, dataType).done(this.onLoadCollection.bind(this));
 	            }
+	        }
+	
+	        // You are mutating your cache references here.
+	    }, {
+	        key: "handleCollection",
+	        value: function handleCollection(cache) {
+	            var _this = this;
+	
+	            var $project = cache.$object.find(".js-project");
+	
+	            this.$plates = $project.find(".js-project-plate");
+	            this.$images = this.$plates.find(".js-lazy-image");
+	
+	            core.dom.project.elementNode.html(this.$plates);
+	
+	            core.images.handleImages(this.$images, function () {
+	                if (_overlay2["default"].isActive()) {
+	                    _overlay2["default"].close();
+	                }
+	
+	                if (typeof _this.opts.onLoad === "function") {
+	                    _this.opts.onLoad();
+	                }
+	
+	                _this._onUpdateEmitter = _this.onUpdateEmitter.bind(_this);
+	                _this.cycleAnimation();
+	            });
 	        }
 	    }, {
 	        key: "updatePlates",
@@ -18836,8 +17319,11 @@
 	        value: function updatePosition() {
 	            var scrollMaxY = core.dom.project.element[0].scrollHeight - window.innerHeight;
 	            var scrollCurrY = core.dom.project.element[0].scrollTop;
+	            var calcBuffer = 10;
 	
-	            if (scrollCurrY >= scrollMaxY && !this.isEnded) {
+	            //console.log( scrollMaxY, scrollCurrY );
+	
+	            if (scrollCurrY >= scrollMaxY - calcBuffer && !this.isEnded) {
 	                core.log("Project Ended");
 	
 	                this.isEnded = true;
@@ -18858,41 +17344,16 @@
 	    }, {
 	        key: "onLoadCollection",
 	        value: function onLoadCollection(response) {
-	            var _this = this;
+	            var cache = this.app.router.parseDoc(response);
 	
-	            var html = "";
-	            var $project = null;
+	            this.handleCollection(cache);
 	
-	            if (typeof response === "object") {
-	                html = response.response;
-	                $project = (0, _js_libsJqueryDistJquery2["default"])(response.response);
-	            } else {
-	                html = response;
-	                $project = (0, _js_libsJqueryDistJquery2["default"])(response).filter(".js-page").find(".js-project");
-	            }
+	            // @todo:
+	            // Disable cache on Projects for now
+	            // You should circle back to this one later...
+	            // core.cache.set( this.opts.url, cache );
 	
-	            core.util.emitter.fire("app--analytics-push", html);
-	
-	            this.$plates = $project.find(".js-project-plate");
-	            this.$images = this.$plates.find(".js-lazy-image");
-	
-	            core.dom.project.elementNode.html(this.$plates);
-	
-	            //core.util.loadImages( this.$images, core.util.noop ).on( "done", () => {
-	            core.images.handleImages(this.$images, function () {
-	                if (_overlay2["default"].isActive()) {
-	                    _overlay2["default"].close();
-	                }
-	
-	                if (typeof _this.opts.onLoad === "function") {
-	                    _this.opts.onLoad();
-	                }
-	
-	                _this._onUpdateEmitter = _this.onUpdateEmitter.bind(_this);
-	                _this.cycleAnimation();
-	            });
-	
-	            core.cache.set("project-" + this.opts.url, response);
+	            core.util.emitter.fire("app--analytics-push", cache.$object);
 	        }
 	    }, {
 	        key: "open",

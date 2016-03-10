@@ -16,7 +16,7 @@
     <body class="is-clipped">
         <header class="header js-header -text--center">
             <h1 class="h3">
-                <a href="/" class="js-logo js-router--ignore">
+                <a href="#" class="js-logo js-router--ignore">
                     <img class="logo" src="/assets/svgs/GarberCo.svg" />
                 </a>
             </h1>
@@ -26,4 +26,4 @@
         <squarespace:navigation navigationId="nav" template="nav" />
 
 
-        <main class="page js-page" {.section collection}data-page-load-type='{.equal? typeName "index"}index{.or}collection{.end}'{.end}>
+        <main class="page js-page" data-app-entry="{collection.fullUrl}" data-app-entry-type="{collection.typeName}">

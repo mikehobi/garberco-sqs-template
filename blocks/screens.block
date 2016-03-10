@@ -1,7 +1,12 @@
-<section class="overlay js-overlay screen -text--center is-active">
+<section class="overlay js-overlay screen -text--center is-active is-intro">
     <div class="valigner">
         <div class="valigner__cell">
-            <h1 class="h1 js-overlay-title">{collection.title}</h1>
+            <h1 class="h1 js-overlay-title">
+                {.if collection.homepage}
+                {.or}
+                    {collection.title}
+                {.end}
+            </h1>
         </div>
     </div>
 </section>
