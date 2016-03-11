@@ -14337,7 +14337,7 @@
 	    initPage: function initPage() {
 	        var _this2 = this;
 	
-	        this.root = window.location.pathname;
+	        this.root = this.pageData.type === "menu" ? "/" : window.location.pathname;
 	
 	        core.dom.nav.detach();
 	        core.dom.page.detach();
