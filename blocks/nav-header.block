@@ -10,7 +10,7 @@
         {.end}
     {.end}
 </nav>
-<main class="main js-main" id="{.repeated section items}{.if folderActive}is-main--{collection.urlId}{.end}{.end}">
+<main class="main js-main" id="{.repeated section items}{.if folderActive || active}is-main--{collection.urlId}{.end}{.end}">
     {.repeated section items}
         {.section externalLink}
             <section class="main__panel main__panel--{title|slugify} js-main--{title|slugify}"></section>
