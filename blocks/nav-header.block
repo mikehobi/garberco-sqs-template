@@ -1,0 +1,22 @@
+<nav class="nav nav--header header js-header -text--center">
+    {.repeated section items}
+        {.section externalLink}
+            <a class="header__nav header__nav--{title|slugify} js-root h4 -column" href="{url}">
+                <img class="logo js-controller js-controller--{title|slugify}" src="/assets/svgs/GarberCo.svg" />
+            </a>
+        {.end}
+        {.section collection}
+            <a class="header__nav header__nav--{urlId} js-controller js-controller--{urlId} h4 -column" href="{fullUrl}" data-target="{urlId}">{navigationTitle}</a>
+        {.end}
+    {.end}
+</nav>
+<main class="main js-main" id="{.repeated section items}{.if folderActive}is-main--{collection.urlId}{.end}{.end}">
+    {.repeated section items}
+        {.section externalLink}
+            <section class="main__panel main__panel--{title|slugify} js-main--{title|slugify}"></section>
+        {.end}
+        {.section collection}
+            <section class="main__panel main__panel--{urlId} js-main--{urlId}"></section>
+        {.end}
+    {.end}
+</main>

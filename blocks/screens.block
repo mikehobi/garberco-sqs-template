@@ -1,22 +1,14 @@
-<section class="overlay js-overlay screen -text--center is-active is-intro">
-    <div class="valigner">
-        <div class="valigner__cell">
-            <h1 class="h1 js-overlay-title">
-                {.if collection.homepage}
-                {.or}
-                    {collection.title}
-                {.end}
-            </h1>
-        </div>
+<div class="project-view js-project-view screen {.equal? collection.typeName "custom-photo"}is-active{.end}"></div>
+
+
+
+<div class='overlay js-overlay screen -text--center ghost {.equal? collection.typeName "custom-photo"}is-active is-intro{.end}'>
+    <div class="ghost__child">
+        <h1 class="h1 js-overlay-title">
+            {.if collection.homepage}
+            {.or}
+                {collection.title}
+            {.end}
+        </h1>
     </div>
-</section>
-
-
-
-<section class='project js-project screen {.section collection}{.equal? typeName "custom-photo"}is-active{.end}{.end}'>
-    <div class="project__node js-project-node">
-        {.repeated section items}
-            {@|apply photos.block}
-        {.end}
-    </div>
-</section>
+</div>

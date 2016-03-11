@@ -1,9 +1,9 @@
-<section class="appentry js-appentry expander">
-    <div class="grid js-grid">
+<div class="page js-page" data-type="index" data-id="{collection.id}">
+    <section class="index js-index grid" data-target="garberco" data-id="{collection.id}">
         {.section collection}
             {.repeated section collections}
                 <div class="grid__item expander-bottom">
-                    <a href="{fullUrl}" class="grid__photo js-project-tile animate js-animate js-router--ignore" data-title="{title}">
+                    <a href="{fullUrl}" class="grid__photo js-index-tile animate js-animate" data-title="{title}">
                         {.section mainImage}
                             {@|apply image.block}
                         {.end}
@@ -11,5 +11,5 @@
                 </div>
             {.end}
         {.end}
-    </div>
-</section>
+    </section>
+</div>

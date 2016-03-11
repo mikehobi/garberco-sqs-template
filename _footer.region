@@ -1,5 +1,4 @@
-            {@|apply screens.block}
-        </main>
+        </div>
 
 
         <squarespace:script src="app.js" combo="{.if authenticatedAccount}false{.or}true{.end}" />

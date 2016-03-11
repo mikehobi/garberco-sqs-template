@@ -1,1 +1,7 @@
-<section class="appentry js-appentry grid js-grid"></section>
+<div class="page js-page" data-type="project" data-id="{collection.id}">
+    <div class="project js-project" data-target="project" data-id="{collection.id}">
+        {.repeated section items}
+            {@|apply photos.block}
+        {.end}
+    </div>
+</div>

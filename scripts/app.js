@@ -65,17 +65,13 @@
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _router = __webpack_require__(/*! ./router */ 28);
+	var _router = __webpack_require__(/*! ./router */ 27);
 	
 	var _router2 = _interopRequireDefault(_router);
 	
-	var _overlay = __webpack_require__(/*! ./overlay */ 35);
+	var _overlay = __webpack_require__(/*! ./overlay */ 38);
 	
 	var _overlay2 = _interopRequireDefault(_overlay);
-	
-	var _Project = __webpack_require__(/*! ./Project */ 36);
-	
-	var _Project2 = _interopRequireDefault(_Project);
 	
 	/**
 	 *
@@ -89,20 +85,13 @@
 	    function App() {
 	        _classCallCheck(this, App);
 	
-	        this.navData = core.dom.nav.data();
-	        this.pageData = core.dom.page.data();
-	        this.appEntry = null;
-	        this.project = null;
-	        this.timeoutId = null;
-	        this.timeoutDelay = core.util.getTransitionDuration(core.dom.overlay.element[0]);
 	        this.core = core;
 	        this.router = _router2["default"];
 	        this.overlay = _overlay2["default"];
 	        this.analytics = new core.Analytics();
 	
-	        this.bindEvents();
 	        this.initModules();
-	        this.initAppEntry();
+	        this.bindEvents();
 	
 	        core.log("App", this);
 	    }
@@ -112,46 +101,6 @@
 	    *******************************************************************************/
 	
 	    _createClass(App, [{
-	        key: "destroy",
-	        value: function destroy() {
-	            this.core.dom.body.off("click", this._onTileClick);
-	            this.core.dom.page.off("mouseenter", this._onMouseEnter);
-	            this.core.dom.page.off("mouseleave", this._onMouseLeave);
-	        }
-	    }, {
-	        key: "initAppEntry",
-	        value: function initAppEntry() {
-	            var _this = this;
-	
-	            // Index > Collection
-	            if (this.pageData.appEntryType !== this.core.config.rootEntryType) {
-	                this.project = new _Project2["default"](this, {
-	                    url: window.location.pathname,
-	                    onLoad: false
-	                });
-	
-	                // Need to find the root index for app-entry point
-	                this.navData.appTree.forEach(function (indexItem) {
-	                    if (indexItem.items) {
-	                        indexItem.items.forEach(function (collectionItem) {
-	                            if (collectionItem.collection.fullUrl === _this.pageData.appEntry) {
-	                                _this.appEntry = indexItem.collection.fullUrl;
-	                            }
-	                        });
-	                    }
-	                });
-	
-	                // Index
-	            } else {
-	                    this.appEntry = this.pageData.appEntry;
-	
-	                    this.core.dom.project.element.detach();
-	                }
-	
-	            // Logo
-	            this.core.dom.logo[0].href = this.appEntry;
-	        }
-	    }, {
 	        key: "initModules",
 	        value: function initModules() {
 	            this.core.detect.init(this);
@@ -161,162 +110,20 @@
 	            this.overlay.init(this);
 	        }
 	    }, {
-	        key: "loadAppEntry",
-	        value: function loadAppEntry() {
-	            var dataType = { dataType: "html" };
-	            var format = { format: "full", nocache: true };
-	
-	            this.core.api.collection(this.appEntry, format, dataType).done(this.onLoadAppEntry.bind(this));
-	        }
-	    }, {
-	        key: "pushAppEntry",
-	        value: function pushAppEntry() {
-	            var _this2 = this;
-	
-	            this.router.push(this.appEntry, function () {
-	                var cached = _this2.core.cache.get(_this2.appEntry);
-	
-	                _this2.core.util.emitter.fire("app--analytics-push", cached.$object);
-	            });
-	        }
-	    }, {
 	        key: "bindEvents",
 	        value: function bindEvents() {
-	            this._onTileClick = this.onTileClick.bind(this);
-	            this._onPreloadDone = this.onPreloadDone.bind(this);
-	            this._onMouseEnter = this.onMouseEnter.bind(this);
-	            this._onMouseLeave = this.onMouseLeave.bind(this);
-	            this._onLogoClick = this.onLogoClick.bind(this);
-	            this._onProjectEnded = this.onProjectEnded.bind(this);
+	            var _this = this;
 	
-	            this.core.util.emitter.on("app--project-ended", this._onProjectEnded);
-	            this.core.util.emitter.on("app--preload-done", this._onPreloadDone);
-	            this.core.dom.body.on("click", ".js-project-tile", this._onTileClick);
-	            this.core.dom.page.on("mouseenter", ".js-project-tile", this._onMouseEnter);
-	            this.core.dom.page.on("mouseleave", ".js-project-tile", this._onMouseLeave);
-	            this.core.dom.logo.on("click", this._onLogoClick);
-	        }
-	    }, {
-	        key: "enableDocument",
-	        value: function enableDocument() {
-	            this.core.dom.html.removeClass("is-clipped");
-	            this.core.dom.body.removeClass("is-clipped");
-	        }
-	    }, {
-	        key: "isProjectActive",
-	        value: function isProjectActive() {
-	            return this.project !== null;
-	        }
-	    }, {
-	        key: "destroyProject",
-	        value: function destroyProject() {
-	            if (this.project) {
-	                this.enableDocument();
-	                this.project.destroy();
-	                this.project = null;
-	            }
-	        }
-	    }, {
-	        key: "clearTimeoutById",
-	        value: function clearTimeoutById(timeoutId) {
-	            try {
-	                clearTimeout(timeoutId);
-	            } catch (error) {
-	                throw error;
-	            }
-	        }
-	    }, {
-	        key: "onLoadAppEntry",
-	        value: function onLoadAppEntry(response) {
-	            var _this3 = this;
+	            this.core.dom.header.on("click", ".js-controller", function (e) {
+	                e.preventDefault();
 	
-	            var cache = this.router.parseDoc(response);
-	            var $grid = cache.$object.find(".js-appentry").children();
-	            var $images = $grid.find(".js-lazy-image");
-	            var $anims = $grid.find(".js-animate");
+	                var $target = (0, _js_libsJqueryDistJquery2["default"])(e.target);
+	                var data = $target.data();
 	
-	            this.core.dom.appentry.html($grid);
+	                _this.core.dom.main[0].id = data.target ? "is-main--" + data.target : "";
 	
-	            this.core.util.loadImages($images, this.core.util.noop).on("done", function () {
-	                _this3.core.util.emitter.fire("app--update-animate", $anims);
+	                core.log("controller", data.target);
 	            });
-	
-	            this.core.cache.set(this.appEntry, cache);
-	        }
-	    }, {
-	        key: "onPreloadDone",
-	        value: function onPreloadDone() {
-	            this.core.util.emitter.off("app--preload-done", this._onPreloadDone);
-	
-	            this.overlay.close();
-	
-	            if (this.pageData.appEntryType === this.core.config.rootEntryType) {
-	                this.enableDocument();
-	            } else {
-	                this.loadAppEntry();
-	            }
-	        }
-	    }, {
-	        key: "onProjectEnded",
-	        value: function onProjectEnded() {
-	            this.pushAppEntry();
-	
-	            if (this.project) {
-	                this.destroyProject();
-	            }
-	        }
-	    }, {
-	        key: "onLogoClick",
-	        value: function onLogoClick(e) {
-	            e.preventDefault();
-	
-	            this.pushAppEntry();
-	
-	            if (this.project) {
-	                this.destroyProject();
-	            }
-	        }
-	    }, {
-	        key: "onTileClick",
-	        value: function onTileClick(e) {
-	            e.preventDefault();
-	
-	            this.project = new _Project2["default"](this, {
-	                url: e.currentTarget.pathname,
-	                onLoad: function onLoad() {}
-	            });
-	        }
-	    }, {
-	        key: "onMouseEnter",
-	        value: function onMouseEnter(e) {
-	            this.clearTimeoutById(this.timeoutId);
-	
-	            if (this.project) {
-	                return;
-	            }
-	
-	            var $tile = (0, _js_libsJqueryDistJquery2["default"])(e.currentTarget);
-	
-	            this.overlay.setTitle($tile.data("title"));
-	
-	            if (!this.overlay.isActive()) {
-	                this.overlay.open();
-	            }
-	        }
-	    }, {
-	        key: "onMouseLeave",
-	        value: function onMouseLeave() {
-	            var _this4 = this;
-	
-	            if (this.project) {
-	                return;
-	            }
-	
-	            this.timeoutId = setTimeout(function () {
-	                if (!_this4.project) {
-	                    _this4.overlay.close();
-	                }
-	            }, this.timeoutDelay);
 	        }
 	    }]);
 	
@@ -8038,15 +7845,15 @@
 	
 	var _dom2 = _interopRequireDefault(_dom);
 	
-	var _images = __webpack_require__(/*! ./images */ 17);
+	var _images = __webpack_require__(/*! ./images */ 16);
 	
 	var _images2 = _interopRequireDefault(_images);
 	
-	var _resizes = __webpack_require__(/*! ./resizes */ 19);
+	var _resizes = __webpack_require__(/*! ./resizes */ 18);
 	
 	var _resizes2 = _interopRequireDefault(_resizes);
 	
-	var _scrolls = __webpack_require__(/*! ./scrolls */ 22);
+	var _scrolls = __webpack_require__(/*! ./scrolls */ 21);
 	
 	var _scrolls2 = _interopRequireDefault(_scrolls);
 	
@@ -8058,23 +7865,23 @@
 	
 	var _config2 = _interopRequireDefault(_config);
 	
-	var _env = __webpack_require__(/*! ./env */ 16);
+	var _env = __webpack_require__(/*! ./env */ 15);
 	
 	var _env2 = _interopRequireDefault(_env);
 	
-	var _log = __webpack_require__(/*! ./log */ 15);
+	var _log = __webpack_require__(/*! ./log */ 14);
 	
 	var _log2 = _interopRequireDefault(_log);
 	
-	var _api = __webpack_require__(/*! ./api */ 23);
+	var _api = __webpack_require__(/*! ./api */ 22);
 	
 	var _api2 = _interopRequireDefault(_api);
 	
-	var _cache = __webpack_require__(/*! ./cache */ 25);
+	var _cache = __webpack_require__(/*! ./cache */ 24);
 	
 	var _cache2 = _interopRequireDefault(_cache);
 	
-	var _Analytics = __webpack_require__(/*! ./Analytics */ 27);
+	var _Analytics = __webpack_require__(/*! ./Analytics */ 26);
 	
 	var _Analytics2 = _interopRequireDefault(_Analytics);
 	
@@ -8110,7 +7917,7 @@
 	
 	var _dom2 = _interopRequireDefault(_dom);
 	
-	var _log = __webpack_require__(/*! ./log */ 15);
+	var _log = __webpack_require__(/*! ./log */ 14);
 	
 	var _log2 = _interopRequireDefault(_log);
 	
@@ -8229,7 +8036,7 @@
 	var util = _interopRequireWildcard(_util);
 	
 	var $_jsOverlay = (0, _js_libsJqueryDistJquery2["default"])(".js-overlay");
-	var $_jsProject = (0, _js_libsJqueryDistJquery2["default"])(".js-project");
+	var $_jsProject = (0, _js_libsJqueryDistJquery2["default"])(".js-project-view");
 	
 	/**
 	 *
@@ -8248,26 +8055,6 @@
 	   *
 	   */
 	  doc: (0, _js_libsJqueryDistJquery2["default"])(document),
-	
-	  /**
-	   *
-	   * @public
-	   * @member win
-	   * @memberof dom
-	   * @description The cached window node.
-	   *
-	   */
-	  win: (0, _js_libsJqueryDistJquery2["default"])(window),
-	
-	  /**
-	   *
-	   * @public
-	   * @member nav
-	   * @memberof dom
-	   * @description The cached nav node.
-	   *
-	   */
-	  nav: (0, _js_libsJqueryDistJquery2["default"])(".js-nav"),
 	
 	  /**
 	   *
@@ -8292,6 +8079,39 @@
 	  /**
 	   *
 	   * @public
+	   * @member header
+	   * @memberof dom
+	   * @description The cached header node.
+	   *
+	   */
+	  header: (0, _js_libsJqueryDistJquery2["default"])(".js-header"),
+	
+	  /**
+	   *
+	   * @public
+	   * @member nav
+	   * @memberof dom
+	   * @description The cached nav node.
+	   *
+	   */
+	  nav: (0, _js_libsJqueryDistJquery2["default"])(".js-nav"),
+	
+	  /**
+	   *
+	   * @public
+	   * @member intro
+	   * @memberof dom
+	   * @description The cached brand moment node.
+	   *
+	   */
+	  overlay: {
+	    element: $_jsOverlay,
+	    elementTitle: $_jsOverlay.find(".js-overlay-title")
+	  },
+	
+	  /**
+	   *
+	   * @public
 	   * @member page
 	   * @memberof dom
 	   * @description The cached page container node.
@@ -8309,52 +8129,28 @@
 	   */
 	  project: {
 	    element: $_jsProject,
-	    elementNode: $_jsProject.find(".js-project-node"),
 	    elementTransitionDuration: util.getTransitionDuration($_jsProject[0])
 	  },
 	
 	  /**
 	   *
 	   * @public
-	   * @member logo
+	   * @member root
 	   * @memberof dom
-	   * @description The logo element.
+	   * @description The cached root node.
 	   *
 	   */
-	  logo: (0, _js_libsJqueryDistJquery2["default"])(".js-logo"),
+	  root: (0, _js_libsJqueryDistJquery2["default"])(".js-root"),
 	
 	  /**
 	   *
 	   * @public
-	   * @member appentry
+	   * @member main
 	   * @memberof dom
-	   * @description The appentry grid element.
+	   * @description The cached main node.
 	   *
 	   */
-	  appentry: (0, _js_libsJqueryDistJquery2["default"])(".js-appentry"),
-	
-	  /**
-	   *
-	   * @public
-	   * @member header
-	   * @memberof dom
-	   * @description The cached header node.
-	   *
-	   */
-	  header: (0, _js_libsJqueryDistJquery2["default"])(".js-header"),
-	
-	  /**
-	   *
-	   * @public
-	   * @member intro
-	   * @memberof dom
-	   * @description The cached brand moment node.
-	   *
-	   */
-	  overlay: {
-	    element: $_jsOverlay,
-	    elementTitle: $_jsOverlay.find(".js-overlay-title")
-	  }
+	  main: (0, _js_libsJqueryDistJquery2["default"])(".js-main")
 	};
 	
 	/******************************************************************************
@@ -8749,7 +8545,15 @@
 	};
 	
 	var getPageKey = function getPageKey() {
-	    return "" + window.location.pathname + window.location.search;
+	    var ret = null;
+	
+	    if (window.location.pathname === _config2["default"].appRoot) {
+	        ret = _config2["default"].homepageKey;
+	    } else {
+	        ret = "" + window.location.pathname + window.location.search;
+	    }
+	
+	    return ret;
 	};
 	
 	/******************************************************************************
@@ -12624,20 +12428,8 @@
 /*!*******************************!*\
   !*** ./js_src/core/config.js ***!
   \*******************************/
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-	
-	var _properjsEasing = __webpack_require__(/*! properjs-easing */ 14);
-	
-	var _properjsEasing2 = _interopRequireDefault(_properjsEasing);
-	
 	/**
 	 *
 	 * @public
@@ -12645,60 +12437,21 @@
 	 * @description Stores app-wide config values.
 	 *
 	 */
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
 	var config = {
+	  /**
+	   *
+	   * @public
+	   * @member homepageKey
+	   * @memberof config
+	   * @description The cache key to use for homepage.
+	   *
+	   */
 	  homepageKey: "homepage",
-	  rootEntryType: "index",
-	
-	  /**
-	   *
-	   * @public
-	   * @member sqsMaxImgWidth
-	   * @memberof config
-	   * @description The max width Squarespace allows for images.
-	   *
-	   */
-	  sqsMaxImgWidth: 2500,
-	
-	  /**
-	   *
-	   * @public
-	   * @member sqsSpecialProps
-	   * @memberof config
-	   * @description Normalize access to certain item object properties for application.
-	   *
-	   * Any of these indicate a post HAS a thumbnail image:
-	   * - systemDataId
-	   * - systemDataVariants
-	   * - systemDataSourceType
-	   * - systemDataOrigin
-	   *
-	   */
-	  sqsSpecialProps: {
-	    published: "publishOn",
-	    userUpload: "systemDataVariants",
-	    blockDataKey: "blockJson",
-	    mainContent: "main-content"
-	  },
-	
-	  /**
-	   *
-	   * @public
-	   * @member defaultEasing
-	   * @memberof config
-	   * @description The default easing function for javascript Tweens.
-	   *
-	   */
-	  defaultEasing: _properjsEasing2["default"].easeInOutCubic,
-	
-	  /**
-	   *
-	   * @public
-	   * @member defaultDuration
-	   * @memberof config
-	   * @description The default duration for javascript Tweens.
-	   *
-	   */
-	  defaultDuration: 300,
 	
 	  /**
 	   *
@@ -12728,27 +12481,7 @@
 	   * @description The string attribute ImageLoader gives loaded images.
 	   *
 	   */
-	  imageLoaderAttr: "data-imageloader",
-	
-	  /**
-	   *
-	   * @public
-	   * @member asyncScriptPath
-	   * @memberof config
-	   * @description The string path where async scripts are kept.
-	   *
-	   */
-	  asyncScriptPath: "/assets/async/scripts/",
-	
-	  /**
-	   *
-	   * @public
-	   * @member asyncStylePath
-	   * @memberof config
-	   * @description The string path where async styles are kept.
-	   *
-	   */
-	  asyncStylePath: "/assets/async/styles/"
+	  imageLoaderAttr: "data-imageloader"
 	};
 	
 	/******************************************************************************
@@ -12759,203 +12492,6 @@
 
 /***/ },
 /* 14 */
-/*!*************************************!*\
-  !*** ./~/properjs-easing/Easing.js ***!
-  \*************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	/*!
-	 *
-	 * A base set of easing methods
-	 * Most of which were found here:
-	 * https://gist.github.com/gre/1650294
-	 *
-	 * @Easing
-	 * @author: kitajchuk
-	 *
-	 */
-	(function ( factory ) {
-	    
-	    if ( true ) {
-	        module.exports = factory();
-	
-	    } else if ( typeof window !== "undefined" ) {
-	        window.Easing = factory();
-	    }
-	    
-	})(function () {
-	
-	    /**
-	     *
-	     * Easing functions
-	     * @namespace Easing
-	     * @memberof! <global>
-	     *
-	     */
-	    var Easing = {
-	        /**
-	         *
-	         * Produce a linear ease
-	         * @method linear
-	         * @param {number} t Difference in time
-	         * @memberof Easing
-	         * @returns a new t value
-	         *
-	         */
-	        linear: function ( t ) { return t; },
-	        
-	        /**
-	         *
-	         * Produce a swing ease like in jQuery
-	         * @method swing
-	         * @param {number} t Difference in time
-	         * @memberof Easing
-	         * @returns a new t value
-	         *
-	         */
-	        swing: function ( t ) { return (1-Math.cos( t*Math.PI ))/2; },
-	        
-	        /**
-	         *
-	         * Accelerating from zero velocity
-	         * @method easeInQuad
-	         * @param {number} t Difference in time
-	         * @memberof Easing
-	         * @returns a new t value
-	         *
-	         */
-	        easeInQuad: function ( t ) { return t*t; },
-	        
-	        /**
-	         *
-	         * Decelerating to zero velocity
-	         * @method easeOutQuad
-	         * @param {number} t Difference in time
-	         * @memberof Easing
-	         * @returns a new t value
-	         *
-	         */
-	        easeOutQuad: function ( t ) { return t*(2-t); },
-	        
-	        /**
-	         *
-	         * Acceleration until halfway, then deceleration
-	         * @method easeInOutQuad
-	         * @param {number} t Difference in time
-	         * @memberof Easing
-	         * @returns a new t value
-	         *
-	         */
-	        easeInOutQuad: function ( t ) { return t<0.5 ? 2*t*t : -1+(4-2*t)*t; },
-	        
-	        /**
-	         *
-	         * Accelerating from zero velocity
-	         * @method easeInCubic
-	         * @param {number} t Difference in time
-	         * @memberof Easing
-	         * @returns a new t value
-	         *
-	         */
-	        easeInCubic: function ( t ) { return t*t*t; },
-	        
-	        /**
-	         *
-	         * Decelerating to zero velocity
-	         * @method easeOutCubic
-	         * @param {number} t Difference in time
-	         * @memberof Easing
-	         * @returns a new t value
-	         *
-	         */
-	        easeOutCubic: function ( t ) { return (--t)*t*t+1; },
-	        
-	        /**
-	         *
-	         * Acceleration until halfway, then deceleration
-	         * @method easeInOutCubic
-	         * @param {number} t Difference in time
-	         * @memberof Easing
-	         * @returns a new t value
-	         *
-	         */
-	        easeInOutCubic: function ( t ) { return t<0.5 ? 4*t*t*t : (t-1)*(2*t-2)*(2*t-2)+1; },
-	        
-	        /**
-	         *
-	         * Accelerating from zero velocity
-	         * @method easeInQuart
-	         * @param {number} t Difference in time
-	         * @memberof Easing
-	         * @returns a new t value
-	         *
-	         */
-	        easeInQuart: function ( t ) { return t*t*t*t; },
-	        
-	        /**
-	         *
-	         * Decelerating to zero velocity
-	         * @method easeOutQuart
-	         * @param {number} t Difference in time
-	         * @memberof Easing
-	         * @returns a new t value
-	         *
-	         */
-	        easeOutQuart: function ( t ) { return 1-(--t)*t*t*t; },
-	        
-	        /**
-	         *
-	         * Acceleration until halfway, then deceleration
-	         * @method easeInOutQuart
-	         * @param {number} t Difference in time
-	         * @memberof Easing
-	         * @returns a new t value
-	         *
-	         */
-	        easeInOutQuart: function ( t ) { return t<0.5 ? 8*t*t*t*t : 1-8*(--t)*t*t*t; },
-	        
-	        /**
-	         *
-	         * Accelerating from zero velocity
-	         * @method easeInQuint
-	         * @param {number} t Difference in time
-	         * @memberof Easing
-	         * @returns a new t value
-	         *
-	         */
-	        easeInQuint: function ( t ) { return t*t*t*t*t; },
-	        
-	        /**
-	         *
-	         * Decelerating to zero velocity
-	         * @method easeOutQuint
-	         * @param {number} t Difference in time
-	         * @memberof Easing
-	         * @returns a new t value
-	         *
-	         */
-	        easeOutQuint: function ( t ) { return 1+(--t)*t*t*t*t; },
-	        
-	        /**
-	         *
-	         * Acceleration until halfway, then deceleration
-	         * @method easeInOutQuint
-	         * @param {number} t Difference in time
-	         * @memberof Easing
-	         * @returns a new t value
-	         *
-	         */
-	        easeInOutQuint: function ( t ) { return t<0.5 ? 16*t*t*t*t*t : 1+16*(--t)*t*t*t*t; }
-	    };
-	    
-	    
-	    return Easing;
-	
-	
-	});
-
-/***/ },
-/* 15 */
 /*!****************************!*\
   !*** ./js_src/core/log.js ***!
   \****************************/
@@ -12969,7 +12505,7 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 	
-	var _env = __webpack_require__(/*! ./env */ 16);
+	var _env = __webpack_require__(/*! ./env */ 15);
 	
 	var _env2 = _interopRequireDefault(_env);
 	
@@ -12997,7 +12533,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 16 */
+/* 15 */
 /*!****************************!*\
   !*** ./js_src/core/env.js ***!
   \****************************/
@@ -13067,7 +12603,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 17 */
+/* 16 */
 /*!*******************************!*\
   !*** ./js_src/core/images.js ***!
   \*******************************/
@@ -13091,7 +12627,7 @@
 	
 	var util = _interopRequireWildcard(_util);
 	
-	var _log = __webpack_require__(/*! ./log */ 15);
+	var _log = __webpack_require__(/*! ./log */ 14);
 	
 	var _log2 = _interopRequireDefault(_log);
 	
@@ -13103,7 +12639,7 @@
 	
 	var _properjsImageloader2 = _interopRequireDefault(_properjsImageloader);
 	
-	var _ImageController = __webpack_require__(/*! ./ImageController */ 18);
+	var _ImageController = __webpack_require__(/*! ./ImageController */ 17);
 	
 	var _ImageController2 = _interopRequireDefault(_ImageController);
 	
@@ -13214,7 +12750,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 18 */
+/* 17 */
 /*!****************************************!*\
   !*** ./js_src/core/ImageController.js ***!
   \****************************************/
@@ -13242,7 +12778,7 @@
 	
 	var util = _interopRequireWildcard(_util);
 	
-	var _log = __webpack_require__(/*! ./log */ 15);
+	var _log = __webpack_require__(/*! ./log */ 14);
 	
 	var _log2 = _interopRequireDefault(_log);
 	
@@ -13341,7 +12877,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 19 */
+/* 18 */
 /*!********************************!*\
   !*** ./js_src/core/resizes.js ***!
   \********************************/
@@ -13357,11 +12893,11 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 	
-	var _properjsThrottle = __webpack_require__(/*! properjs-throttle */ 20);
+	var _properjsThrottle = __webpack_require__(/*! properjs-throttle */ 19);
 	
 	var _properjsThrottle2 = _interopRequireDefault(_properjsThrottle);
 	
-	var _properjsDebounce = __webpack_require__(/*! properjs-debounce */ 21);
+	var _properjsDebounce = __webpack_require__(/*! properjs-debounce */ 20);
 	
 	var _properjsDebounce2 = _interopRequireDefault(_properjsDebounce);
 	
@@ -13369,7 +12905,7 @@
 	
 	var util = _interopRequireWildcard(_util);
 	
-	var _log = __webpack_require__(/*! ./log */ 15);
+	var _log = __webpack_require__(/*! ./log */ 14);
 	
 	var _log2 = _interopRequireDefault(_log);
 	
@@ -13436,7 +12972,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 20 */
+/* 19 */
 /*!*****************************************!*\
   !*** ./~/properjs-throttle/throttle.js ***!
   \*****************************************/
@@ -13495,7 +13031,7 @@
 	});
 
 /***/ },
-/* 21 */
+/* 20 */
 /*!*****************************************!*\
   !*** ./~/properjs-debounce/debounce.js ***!
   \*****************************************/
@@ -13566,7 +13102,7 @@
 	});
 
 /***/ },
-/* 22 */
+/* 21 */
 /*!********************************!*\
   !*** ./js_src/core/scrolls.js ***!
   \********************************/
@@ -13594,7 +13130,7 @@
 	
 	var util = _interopRequireWildcard(_util);
 	
-	var _log = __webpack_require__(/*! ./log */ 15);
+	var _log = __webpack_require__(/*! ./log */ 14);
 	
 	var _log2 = _interopRequireDefault(_log);
 	
@@ -13760,7 +13296,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 23 */
+/* 22 */
 /*!****************************!*\
   !*** ./js_src/core/api.js ***!
   \****************************/
@@ -13778,15 +13314,11 @@
 	
 	var _js_libsJqueryDistJquery2 = _interopRequireDefault(_js_libsJqueryDistJquery);
 	
-	var _paramalama = __webpack_require__(/*! paramalama */ 24);
+	var _paramalama = __webpack_require__(/*! paramalama */ 23);
 	
 	var _paramalama2 = _interopRequireDefault(_paramalama);
 	
 	//import config from "./config";
-	
-	var _cache = __webpack_require__(/*! ./cache */ 25);
-	
-	var _cache2 = _interopRequireDefault(_cache);
 	
 	var _rSlash = /^\/|\/$/g;
 	
@@ -13928,7 +13460,6 @@
 	        var i = 0;
 	        var def = new _js_libsJqueryDistJquery2["default"].Deferred();
 	        var colls = [];
-	        var cached = _cache2["default"].get(uri);
 	        var handle = function handle(data) {
 	            for (i = data.collections.length; i--;) {
 	                colls.push(data.collections[i].urlId);
@@ -13939,19 +13470,11 @@
 	            });
 	        };
 	
-	        if (cached) {
-	            setTimeout(function () {
-	                return handle(cached);
-	            }, 1);
-	        } else {
-	            this.request(this.endpoint(uri)).done(function (data) {
-	                //cache.set( data.collection.urlId, data.collection );
-	
-	                handle(data.collection);
-	            }).fail(function (xhr, status, error) {
-	                return def.reject(error);
-	            });
-	        }
+	        this.request(this.endpoint(uri)).done(function (data) {
+	            handle(data.collection);
+	        }).fail(function (xhr, status, error) {
+	            return def.reject(error);
+	        });
 	
 	        return def;
 	    },
@@ -13971,39 +13494,28 @@
 	    collection: function collection(uri, params, options) {
 	        var collection = {};
 	        var def = new _js_libsJqueryDistJquery2["default"].Deferred();
-	        var cached = _cache2["default"].get(uri);
 	        var seg = uri.split("?")[0];
 	
 	        params = _js_libsJqueryDistJquery2["default"].extend(params || {}, (0, _paramalama2["default"])(uri));
 	
-	        if (cached) {
-	            setTimeout(function () {
-	                return def.resolve(cached);
-	            }, 1);
-	        } else {
-	            this.request(this.endpoint(seg), params, options).done(function (data) {
-	                // Resolve with `responseText`
-	                if (typeof data === "string") {
-	                    //cache.set( uri, data );
+	        this.request(this.endpoint(seg), params, options).done(function (data) {
+	            // Resolve with `responseText`
+	            if (typeof data === "string") {
+	                def.resolve(data);
+	            } else {
+	                // Collection?
+	                collection = {
+	                    collection: data.collection,
+	                    item: data.item || null,
+	                    items: data.items || null,
+	                    pagination: data.pagination || null
+	                };
 	
-	                    def.resolve(data);
-	                } else {
-	                    // Collection?
-	                    collection = {
-	                        collection: data.collection,
-	                        item: data.item || null,
-	                        items: data.items || null,
-	                        pagination: data.pagination || null
-	                    };
-	
-	                    //cache.set( uri, collection );
-	
-	                    def.resolve(data.items || data.item ? collection : null);
-	                }
-	            }).fail(function (xhr, status, error) {
-	                def.reject(error);
-	            });
-	        }
+	                def.resolve(data.items || data.item ? collection : null);
+	            }
+	        }).fail(function (xhr, status, error) {
+	            def.reject(error);
+	        });
 	
 	        return def;
 	    },
@@ -14052,7 +13564,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 24 */
+/* 23 */
 /*!************************************!*\
   !*** ./~/paramalama/paramalama.js ***!
   \************************************/
@@ -14121,7 +13633,7 @@
 
 
 /***/ },
-/* 25 */
+/* 24 */
 /*!******************************!*\
   !*** ./js_src/core/cache.js ***!
   \******************************/
@@ -14135,7 +13647,7 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 	
-	var _Store = __webpack_require__(/*! ./Store */ 26);
+	var _Store = __webpack_require__(/*! ./Store */ 25);
 	
 	var _Store2 = _interopRequireDefault(_Store);
 	
@@ -14153,7 +13665,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 26 */
+/* 25 */
 /*!******************************!*\
   !*** ./js_src/core/Store.js ***!
   \******************************/
@@ -14175,7 +13687,7 @@
 	
 	var _js_libsJqueryDistJquery2 = _interopRequireDefault(_js_libsJqueryDistJquery);
 	
-	var _log = __webpack_require__(/*! ./log */ 15);
+	var _log = __webpack_require__(/*! ./log */ 14);
 	
 	var _log2 = _interopRequireDefault(_log);
 	
@@ -14405,7 +13917,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 27 */
+/* 26 */
 /*!**********************************!*\
   !*** ./js_src/core/Analytics.js ***!
   \**********************************/
@@ -14426,7 +13938,7 @@
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	var _log = __webpack_require__(/*! ./log */ 15);
+	var _log = __webpack_require__(/*! ./log */ 14);
 	
 	var _log2 = _interopRequireDefault(_log);
 	
@@ -14434,7 +13946,7 @@
 	
 	var util = _interopRequireWildcard(_util);
 	
-	var _cache = __webpack_require__(/*! ./cache */ 25);
+	var _cache = __webpack_require__(/*! ./cache */ 24);
 	
 	var _cache2 = _interopRequireDefault(_cache);
 	
@@ -14612,7 +14124,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 28 */
+/* 27 */
 /*!**************************!*\
   !*** ./js_src/router.js ***!
   \**************************/
@@ -14628,19 +14140,31 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 	
+	var _properjsPagecontroller = __webpack_require__(/*! properjs-pagecontroller */ 28);
+	
+	var _properjsPagecontroller2 = _interopRequireDefault(_properjsPagecontroller);
+	
 	var _js_libsJqueryDistJquery = __webpack_require__(/*! js_libs/jquery/dist/jquery */ 1);
 	
 	var _js_libsJqueryDistJquery2 = _interopRequireDefault(_js_libsJqueryDistJquery);
-	
-	var _properjsPagecontroller = __webpack_require__(/*! properjs-pagecontroller */ 29);
-	
-	var _properjsPagecontroller2 = _interopRequireDefault(_properjsPagecontroller);
 	
 	var _core = __webpack_require__(/*! ./core */ 4);
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _animate = __webpack_require__(/*! ./animate */ 34);
+	var _menus = __webpack_require__(/*! ./menus */ 33);
+	
+	var _menus2 = _interopRequireDefault(_menus);
+	
+	var _indexes = __webpack_require__(/*! ./indexes */ 35);
+	
+	var _indexes2 = _interopRequireDefault(_indexes);
+	
+	var _projects = __webpack_require__(/*! ./projects */ 39);
+	
+	var _projects2 = _interopRequireDefault(_projects);
+	
+	var _animate = __webpack_require__(/*! ./animate */ 40);
 	
 	var _animate2 = _interopRequireDefault(_animate);
 	
@@ -14661,10 +14185,18 @@
 	     *
 	     */
 	    init: function init() {
+	        var _this = this;
+	
 	        this.state = {};
+	        this.navData = core.dom.nav.data();
+	        this.pageData = core.dom.page.data();
 	        this.pageDuration = core.util.getTransitionDuration(core.dom.page[0]);
 	        this.bindEmptyHashLinks();
-	        this.createPageController();
+	        this.initPageController();
+	
+	        core.util.emitter.on("app--project-ended", function () {
+	            _this.route(_this.root);
+	        });
 	
 	        core.log("router initialized");
 	    },
@@ -14769,19 +14301,21 @@
 	    /**
 	     *
 	     * @public
-	     * @method createPageController
+	     * @method initPageController
 	     * @memberof router
 	     * @description Create the PageController instance.
 	     *
 	     */
-	    createPageController: function createPageController() {
+	    initPageController: function initPageController() {
 	        this.controller = new _properjsPagecontroller2["default"]({
-	            transitionTime: this.pageDuration
+	            transitionTime: 1
 	        });
 	
 	        this.controller.setConfig(["*"]);
 	
-	        this.controller.setModules([core.images, _animate2["default"]]);
+	        this.controller.setModules([_menus2["default"], _indexes2["default"], _animate2["default"], _projects2["default"]
+	        //core.images
+	        ]);
 	
 	        //this.controller.on( "page-controller-router-samepage", () => {} );
 	        this.controller.on("page-controller-router-transition-out", this.changePageOut.bind(this));
@@ -14796,15 +14330,49 @@
 	     *
 	     * @public
 	     * @method initPage
-	     * @param {string} html The responseText to parse out
 	     * @memberof router
 	     * @description Cache the initial page load.
 	     *
 	     */
-	    initPage: function initPage(html) {
-	        var cache = this.parseDoc(html);
+	    initPage: function initPage() {
+	        var _this2 = this;
 	
-	        this.cachePage(cache.$object, cache.response);
+	        this.root = window.location.pathname;
+	
+	        core.dom.nav.detach();
+	        core.dom.page.detach();
+	
+	        if (this.pageData.type !== "index") {
+	            this.navData.appTree.forEach(function (indexItem) {
+	                if (indexItem.items) {
+	                    indexItem.items.forEach(function (collectionItem) {
+	                        if (collectionItem.collection.id === _this2.pageData.id) {
+	                            _this2.root = indexItem.collection.fullUrl;
+	                        }
+	                    });
+	                }
+	            });
+	
+	            this.loadRootIndex(this.root);
+	        }
+	
+	        core.dom.root[0].href = this.root;
+	        core.dom.root.on("click", function () {
+	            core.util.emitter.fire("app--root");
+	        });
+	
+	        core.dom.html.removeClass("is-clipped");
+	        core.dom.body.removeClass("is-clipped");
+	    },
+	
+	    loadRootIndex: function loadRootIndex(url) {
+	        var _this3 = this;
+	
+	        core.api.collection(url, { format: "html" }, { dataType: "html" }).done(function (response) {
+	            var doc = _this3.parseDoc(response);
+	
+	            core.util.emitter.fire("app--load-root-index", doc.pageHtml);
+	        });
 	    },
 	
 	    /**
@@ -14825,26 +14393,10 @@
 	        doc = (0, _js_libsJqueryDistJquery2["default"])(doc);
 	
 	        return {
-	            $object: doc,
-	            response: doc.find(".js-page")[0].innerHTML
+	            $doc: doc,
+	            $page: doc.find(".js-page"),
+	            pageHtml: doc.find(".js-page")[0].innerHTML
 	        };
-	    },
-	
-	    /**
-	     *
-	     * @public
-	     * @method cachePage
-	     * @param {Hobo} $object The node for use
-	     * @param {string} response The XHR responseText
-	     * @memberof router
-	     * @description Cache the DOM content for a page once its parsed out.
-	     *
-	     */
-	    cachePage: function cachePage($object, response) {
-	        core.cache.set(core.util.getPageKey(), {
-	            $object: $object,
-	            response: response
-	        });
 	    },
 	
 	    /**
@@ -14864,44 +14416,18 @@
 	    /**
 	     *
 	     * @public
-	     * @method onPreloadDone
-	     * @memberof router
-	     * @description Finish routing sequence when image pre-loading is done.
-	     *
-	     */
-	    onPreloadDone: function onPreloadDone() {
-	        core.util.disableMouseWheel(false);
-	        core.util.disableTouchMove(false);
-	
-	        core.dom.html.removeClass("is-routing");
-	        core.dom.page.removeClass("is-inactive");
-	
-	        core.scrolls.topout(0);
-	        core.scrolls.clearStates();
-	
-	        setTimeout(function () {
-	            core.util.emitter.fire("app--intro-art");
-	        }, this.pageDuration);
-	
-	        core.util.emitter.off("app--preload-done", this.onPreloadDone);
-	    },
-	
-	    /**
-	     *
-	     * @public
 	     * @method changePageOut
 	     * @memberof router
 	     * @description Trigger transition-out animation.
 	     *
 	     */
 	    changePageOut: function changePageOut() {
-	        core.util.disableMouseWheel(true);
-	        core.util.disableTouchMove(true);
+	        //core.util.emitter.fire( "app--page-out" );
+	
+	        //core.util.disableMouseWheel( true );
+	        //core.util.disableTouchMove( true );
 	
 	        core.dom.html.addClass("is-routing");
-	        core.dom.page.addClass("is-inactive");
-	
-	        core.util.emitter.on("app--preload-done", this.onPreloadDone);
 	    },
 	
 	    /**
@@ -14914,17 +14440,13 @@
 	     *
 	     */
 	    changeContent: function changeContent(html) {
-	        var cached = core.cache.get(core.util.getPageKey());
+	        var doc = this.parseDoc(html);
 	
-	        if (!cached) {
-	            cached = this.parseDoc(html);
+	        core.dom.page[0].innerHTML = doc.pageHtml;
 	
-	            this.cachePage(cached.$object, cached.response);
-	        }
+	        core.util.emitter.fire("app--analytics-push", doc.$doc);
 	
-	        core.dom.page[0].innerHTML = cached.response;
-	
-	        core.util.emitter.fire("app--analytics-push", cached.$object);
+	        this.pageData = doc.$page.data();
 	
 	        // Check state before cycle finishes so `checked` state can be deleted
 	        this.checkState();
@@ -14939,7 +14461,22 @@
 	     * @description Trigger transition-in animation.
 	     *
 	     */
-	    changePageIn: function changePageIn() /* data */{}
+	    changePageIn: function changePageIn() /* data */{
+	        //core.util.emitter.fire( "app--page-in" );
+	
+	        //core.util.disableMouseWheel( false );
+	        //core.util.disableTouchMove( false );
+	
+	        core.dom.html.removeClass("is-routing");
+	
+	        //core.scrolls.topout( 0 );
+	        //core.scrolls.clearStates();
+	
+	        //setTimeout( () => {
+	        //    core.util.emitter.fire( "app--intro-art" );
+	
+	        //}, this.pageDuration );
+	    }
 	};
 	
 	/******************************************************************************
@@ -14949,7 +14486,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 29 */
+/* 28 */
 /*!*****************************************************!*\
   !*** ./~/properjs-pagecontroller/PageController.js ***!
   \*****************************************************/
@@ -14982,7 +14519,7 @@
 	})(function () {
 	
 	    // Useful stuff
-	    var Router = __webpack_require__( /*! properjs-router */ 30 ),
+	    var Router = __webpack_require__( /*! properjs-router */ 29 ),
 	        Controller = __webpack_require__( /*! properjs-controller */ 9 ),
 	
 	        _router = null,
@@ -15486,7 +15023,7 @@
 	});
 
 /***/ },
-/* 30 */
+/* 29 */
 /*!***************************************************************!*\
   !*** ./~/properjs-pagecontroller/~/properjs-router/Router.js ***!
   \***************************************************************/
@@ -15511,9 +15048,9 @@
 	    
 	})(function () {
 	
-	    var PushState = __webpack_require__( /*! properjs-pushstate */ 31 ),
-	        MatchRoute = __webpack_require__( /*! properjs-matchroute */ 32 ),
-	        matchElement = __webpack_require__( /*! properjs-matchelement */ 33 ),
+	    var PushState = __webpack_require__( /*! properjs-pushstate */ 30 ),
+	        MatchRoute = __webpack_require__( /*! properjs-matchroute */ 31 ),
+	        matchElement = __webpack_require__( /*! properjs-matchelement */ 32 ),
 	        _rSameDomain = new RegExp( document.domain ),
 	        _initDelay = 200,
 	        _triggerEl;
@@ -15961,7 +15498,7 @@
 	});
 
 /***/ },
-/* 31 */
+/* 30 */
 /*!***************************************************************************************!*\
   !*** ./~/properjs-pagecontroller/~/properjs-router/~/properjs-pushstate/PushState.js ***!
   \***************************************************************************************/
@@ -16502,7 +16039,7 @@
 	});
 
 /***/ },
-/* 32 */
+/* 31 */
 /*!*****************************************************************************************!*\
   !*** ./~/properjs-pagecontroller/~/properjs-router/~/properjs-matchroute/MatchRoute.js ***!
   \*****************************************************************************************/
@@ -16527,7 +16064,7 @@
 	    
 	})(function () {
 	
-	    var paramalama = __webpack_require__( /*! paramalama */ 24 ),
+	    var paramalama = __webpack_require__( /*! paramalama */ 23 ),
 	
 	    /**
 	     *
@@ -16861,7 +16398,7 @@
 	});
 
 /***/ },
-/* 33 */
+/* 32 */
 /*!*************************************************!*\
   !*** ./~/properjs-matchelement/matchElement.js ***!
   \*************************************************/
@@ -16923,7 +16460,941 @@
 	});
 
 /***/ },
+/* 33 */
+/*!*******************************!*\
+  !*** ./js_src/menus/index.js ***!
+  \*******************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	//import $ from "js_libs/jquery/dist/jquery";
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
+	
+	var _core = __webpack_require__(/*! ../core */ 4);
+	
+	var core = _interopRequireWildcard(_core);
+	
+	var _Menu = __webpack_require__(/*! ./Menu */ 34);
+	
+	var _Menu2 = _interopRequireDefault(_Menu);
+	
+	var $_jsElement = null;
+	var instance = null;
+	
+	/**
+	 *
+	 * @public
+	 * @namespace menus
+	 * @description A nice description of what this module does...
+	 *
+	 */
+	var menus = {
+	  /**
+	   *
+	   * @public
+	   * @method init
+	   * @memberof menus
+	   * @description Method runs once when window loads.
+	   *
+	   */
+	  init: function init() {
+	    core.log("menus initialized");
+	  },
+	
+	  /**
+	   *
+	   * @public
+	   * @method isActive
+	   * @memberof menus
+	   * @description Method informs PageController of active status.
+	   * @returns {boolean}
+	   *
+	   */
+	  isActive: function isActive() {
+	    return this.getElements() > 0;
+	  },
+	
+	  /**
+	   *
+	   * @public
+	   * @method onload
+	   * @memberof menus
+	   * @description Method performs onloading actions for this module.
+	   *
+	   */
+	  onload: function onload() {
+	    var data = $_jsElement.data();
+	
+	    instance = new _Menu2["default"]($_jsElement, data);
+	  },
+	
+	  /**
+	   *
+	   * @public
+	   * @method unload
+	   * @memberof menus
+	   * @description Method performs unloading actions for this module.
+	   *
+	   */
+	  unload: function unload() {
+	    this.teardown();
+	
+	    if (instance) {
+	      instance.destroy();
+	      instance = null;
+	    }
+	  },
+	
+	  /**
+	   *
+	   * @public
+	   * @method teardown
+	   * @memberof menus
+	   * @description Method performs cleanup after this module. Remmoves events, null vars etc...
+	   *
+	   */
+	  teardown: function teardown() {
+	    $_jsElement = null;
+	  },
+	
+	  /**
+	   *
+	   * @public
+	   * @method getElements
+	   * @memberof menus
+	   * @description Method queries DOM for this modules node.
+	   * @returns {number}
+	   *
+	   */
+	  getElements: function getElements() {
+	    $_jsElement = core.dom.page.find(".js-menu");
+	
+	    return $_jsElement.length;
+	  }
+	};
+	
+	/******************************************************************************
+	 * Export
+	*******************************************************************************/
+	exports["default"] = menus;
+	module.exports = exports["default"];
+
+/***/ },
 /* 34 */
+/*!******************************!*\
+  !*** ./js_src/menus/Menu.js ***!
+  \******************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var _core = __webpack_require__(/*! ../core */ 4);
+	
+	var core = _interopRequireWildcard(_core);
+	
+	/**
+	 *
+	 * @public
+	 * @class Menu
+	 * @param {jQuery} $node The element
+	 * @param {object} data The datas
+	 * @classdesc Handle an index.
+	 *
+	 */
+	
+	var Menu = (function () {
+	  function Menu($node, data) {
+	    _classCallCheck(this, Menu);
+	
+	    this.$node = $node;
+	    this.data = data;
+	    this.transTime = 400;
+	    this.$target = core.dom.main.find(".js-main--" + this.data.target);
+	    this.$anim = this.$node.find(".js-animate-in");
+	    this.$images = this.$node.find(".js-lazy-image");
+	
+	    core.images.handleImages(this.$images, this.onPreload.bind(this));
+	  }
+	
+	  /******************************************************************************
+	   * Export
+	  *******************************************************************************/
+	
+	  /**
+	   *
+	   * @public
+	   * @instance
+	   * @method onPreload
+	   * @memberof IndexClass
+	   * @description Handle loaded index grid.
+	   *
+	   */
+	
+	  _createClass(Menu, [{
+	    key: "onPreload",
+	    value: function onPreload() {
+	      var _this = this;
+	
+	      this.$target.html(this.$node);
+	
+	      setTimeout(function () {
+	        _this.$anim.addClass("is-active");
+	      }, this.transTime);
+	    }
+	
+	    /**
+	     *
+	     * @public
+	     * @instance
+	     * @method destroy
+	     * @memberof Menu
+	     * @description Undo event bindings for this instance.
+	     *
+	     */
+	  }, {
+	    key: "destroy",
+	    value: function destroy() {}
+	  }]);
+	
+	  return Menu;
+	})();
+	
+	exports["default"] = Menu;
+	module.exports = exports["default"];
+
+/***/ },
+/* 35 */
+/*!*********************************!*\
+  !*** ./js_src/indexes/index.js ***!
+  \*********************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+	
+	var _js_libsJqueryDistJquery = __webpack_require__(/*! js_libs/jquery/dist/jquery */ 1);
+	
+	var _js_libsJqueryDistJquery2 = _interopRequireDefault(_js_libsJqueryDistJquery);
+	
+	var _core = __webpack_require__(/*! ../core */ 4);
+	
+	var core = _interopRequireWildcard(_core);
+	
+	var _IndexClass = __webpack_require__(/*! ./IndexClass */ 36);
+	
+	var _IndexClass2 = _interopRequireDefault(_IndexClass);
+	
+	var _projectsProject = __webpack_require__(/*! ../projects/Project */ 37);
+	
+	var _projectsProject2 = _interopRequireDefault(_projectsProject);
+	
+	var _overlay = __webpack_require__(/*! ../overlay */ 38);
+	
+	var _overlay2 = _interopRequireDefault(_overlay);
+	
+	var $_jsElement = null;
+	var instance = null;
+	var timeoutId = null;
+	var timeoutDelay = core.util.getTransitionDuration(core.dom.overlay.element[0]);
+	
+	/**
+	 *
+	 * @public
+	 * @namespace indexes
+	 * @description A nice description of what this module does...
+	 *
+	 */
+	var indexes = {
+	    /**
+	     *
+	     * @public
+	     * @method init
+	     * @memberof indexes
+	     * @description Method runs once when window loads.
+	     *
+	     */
+	    init: function init() {
+	        core.util.emitter.on("app--load-root-index", this.onLoadRootIndex.bind(this));
+	
+	        core.log("indexes initialized");
+	    },
+	
+	    /**
+	     *
+	     * @public
+	     * @method isActive
+	     * @memberof indexes
+	     * @description Method informs PageController of active status.
+	     * @returns {boolean}
+	     *
+	     */
+	    isActive: function isActive() {
+	        return this.getElements() > 0;
+	    },
+	
+	    /**
+	     *
+	     * @public
+	     * @method onload
+	     * @memberof indexes
+	     * @description Method performs onloading actions for this module.
+	     *
+	     */
+	    onload: function onload() {
+	        var data = $_jsElement.data();
+	
+	        instance = new _IndexClass2["default"]($_jsElement, data);
+	
+	        core.dom.body.on("click", ".js-index-tile", onTileClick);
+	        core.dom.body.on("mouseenter", ".js-index-tile", onMouseEnter);
+	        core.dom.body.on("mousemove", ".js-index-tile", onMouseEnter);
+	        core.dom.body.on("mouseleave", ".js-index-tile", onMouseLeave);
+	    },
+	
+	    /**
+	     *
+	     * @public
+	     * @method unload
+	     * @memberof indexes
+	     * @description Method performs unloading actions for this module.
+	     *
+	     */
+	    unload: function unload() {
+	        this.teardown();
+	    },
+	
+	    /**
+	     *
+	     * @public
+	     * @method teardown
+	     * @memberof indexes
+	     * @description Method performs cleanup after this module. Remmoves events, null vars etc...
+	     *
+	     */
+	    teardown: function teardown() {
+	        $_jsElement = null;
+	
+	        if (instance) {
+	            instance.destroy();
+	            instance = null;
+	        }
+	
+	        core.dom.body.off("click", onTileClick);
+	        core.dom.body.off("mouseenter", onMouseEnter);
+	        core.dom.body.off("mousemove", onMouseEnter);
+	        core.dom.body.off("mouseleave", onMouseLeave);
+	    },
+	
+	    /**
+	     *
+	     * @public
+	     * @method getElements
+	     * @memberof indexes
+	     * @description Method queries DOM for this modules node.
+	     * @returns {number}
+	     *
+	     */
+	    getElements: function getElements() {
+	        $_jsElement = core.dom.page.find(".js-index");
+	
+	        return $_jsElement.length;
+	    },
+	
+	    onLoadRootIndex: function onLoadRootIndex(root) {
+	        $_jsElement = (0, _js_libsJqueryDistJquery2["default"])(root);
+	
+	        this.onload();
+	    }
+	};
+	
+	var clearTimeoutById = function clearTimeoutById(id) {
+	    try {
+	        clearTimeout(id);
+	    } catch (error) {
+	        core.log("warn", error);
+	    }
+	};
+	
+	var onTileClick = function onTileClick(e) {
+	    e.preventDefault();
+	
+	    _projectsProject2["default"].open();
+	};
+	
+	var onMouseEnter = function onMouseEnter() /* e */{
+	    clearTimeoutById(timeoutId);
+	
+	    if (_projectsProject2["default"].isActive()) {
+	        return;
+	    }
+	
+	    var $tile = (0, _js_libsJqueryDistJquery2["default"])(this);
+	
+	    _overlay2["default"].setTitle($tile.data("title"));
+	
+	    if (!_overlay2["default"].isActive()) {
+	        _overlay2["default"].open();
+	    }
+	};
+	
+	var onMouseLeave = function onMouseLeave() {
+	    if (_projectsProject2["default"].isActive()) {
+	        return;
+	    }
+	
+	    timeoutId = setTimeout(function () {
+	        if (!_projectsProject2["default"].isActive()) {
+	            _overlay2["default"].close();
+	        }
+	    }, timeoutDelay);
+	};
+	
+	/******************************************************************************
+	 * Export
+	*******************************************************************************/
+	exports["default"] = indexes;
+	module.exports = exports["default"];
+
+/***/ },
+/* 36 */
+/*!**************************************!*\
+  !*** ./js_src/indexes/IndexClass.js ***!
+  \**************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var _core = __webpack_require__(/*! ../core */ 4);
+	
+	var core = _interopRequireWildcard(_core);
+	
+	var instance = null;
+	
+	/**
+	 *
+	 * @public
+	 * @class IndexClass
+	 * @param {jQuery} $node The element
+	 * @param {object} data The datas
+	 * @classdesc Handle an index.
+	 *
+	 */
+	
+	var IndexClass = (function () {
+	    function IndexClass($node, data) {
+	        _classCallCheck(this, IndexClass);
+	
+	        if (instance && instance.data.id === data.id) {
+	            return instance;
+	        }
+	
+	        this.$node = $node;
+	        this.data = data;
+	        this.$target = core.dom.main.find(".js-main--" + this.data.target);
+	        this.$images = this.$node.find(".js-lazy-image");
+	
+	        core.images.handleImages(this.$images, this.onPreload.bind(this));
+	
+	        instance = this;
+	    }
+	
+	    /******************************************************************************
+	     * Export
+	    *******************************************************************************/
+	
+	    /**
+	     *
+	     * @public
+	     * @instance
+	     * @method onPreload
+	     * @memberof IndexClass
+	     * @description Handle loaded index grid.
+	     *
+	     */
+	
+	    _createClass(IndexClass, [{
+	        key: "onPreload",
+	        value: function onPreload() {
+	            this.$target.html(this.$node);
+	
+	            core.util.emitter.fire("app--update-animate");
+	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @instance
+	         * @method destroy
+	         * @memberof IndexClass
+	         * @description Undo event bindings for this instance.
+	         *
+	         */
+	    }, {
+	        key: "destroy",
+	        value: function destroy() {
+	            //instance = null;
+	        }
+	    }]);
+	
+	    return IndexClass;
+	})();
+	
+	exports["default"] = IndexClass;
+	module.exports = exports["default"];
+
+/***/ },
+/* 37 */
+/*!************************************!*\
+  !*** ./js_src/projects/Project.js ***!
+  \************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var _core = __webpack_require__(/*! ../core */ 4);
+	
+	var core = _interopRequireWildcard(_core);
+	
+	var _overlay = __webpack_require__(/*! ../overlay */ 38);
+	
+	var _overlay2 = _interopRequireDefault(_overlay);
+	
+	var isActive = false;
+	
+	/**
+	 *
+	 * @public
+	 * @class Project
+	 * @param {jQuery} $node The element
+	 * @param {object} data The datas
+	 * @classdesc Handle an index.
+	 *
+	 */
+	
+	var Project = (function () {
+	    function Project($node, data) {
+	        _classCallCheck(this, Project);
+	
+	        this.$node = $node;
+	        this.data = data;
+	        this.$plates = this.$node.find(".js-project-plate");
+	        this.$images = this.$node.find(".js-lazy-image");
+	        this.isEnded = false;
+	
+	        core.images.handleImages(this.$images, this.onPreload.bind(this));
+	    }
+	
+	    /******************************************************************************
+	     * Static
+	    *******************************************************************************/
+	
+	    /**
+	     *
+	     * @public
+	     * @instance
+	     * @method onPreload
+	     * @memberof Project
+	     * @description Handle loaded index grid.
+	     *
+	     */
+	
+	    _createClass(Project, [{
+	        key: "onPreload",
+	        value: function onPreload() {
+	            core.dom.project.element.html(this.$node);
+	
+	            if (_overlay2["default"].isActive()) {
+	                _overlay2["default"].close();
+	            }
+	
+	            this.cycleAnimation();
+	        }
+	    }, {
+	        key: "cycleAnimation",
+	        value: function cycleAnimation() {
+	            this.onUpdateEmitter();
+	
+	            core.util.emitter.go(this.onUpdateEmitter.bind(this));
+	        }
+	    }, {
+	        key: "updatePlates",
+	        value: function updatePlates() {
+	            var $plate = null;
+	            var i = this.$plates.length;
+	
+	            for (i; i--;) {
+	                $plate = this.$plates.eq(i);
+	
+	                if (core.util.isElementInViewport($plate[0])) {
+	                    $plate.addClass("is-active");
+	                } else {
+	                    $plate.removeClass("is-active");
+	                }
+	            }
+	        }
+	    }, {
+	        key: "updatePosition",
+	        value: function updatePosition() {
+	            var $imageloaded = this.$images.filter(".-is-lazy-handled");
+	            var scrollMaxY = core.dom.project.element[0].scrollHeight - window.innerHeight;
+	            var scrollCurrY = core.dom.project.element[0].scrollTop;
+	            var calcBuffer = 10;
+	
+	            if ($imageloaded.length !== this.$images.length) {
+	                return;
+	            }
+	
+	            if (scrollCurrY >= scrollMaxY - calcBuffer && !this.isEnded) {
+	                this.isEnded = true;
+	
+	                core.dom.project.element.addClass("is-inactive");
+	
+	                setTimeout(function () {
+	                    core.util.emitter.fire("app--project-ended");
+	                }, core.dom.project.elementTransitionDuration);
+	            }
+	        }
+	    }, {
+	        key: "onUpdateEmitter",
+	        value: function onUpdateEmitter() {
+	            this.updatePlates();
+	            this.updatePosition();
+	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @instance
+	         * @method destroy
+	         * @memberof Project
+	         * @description Undo event bindings for this instance.
+	         *
+	         */
+	    }, {
+	        key: "destroy",
+	        value: function destroy() {
+	            Project.close();
+	        }
+	    }]);
+	
+	    return Project;
+	})();
+	
+	Project.isActive = function () {
+	    return isActive;
+	};
+	
+	Project.open = function () {
+	    isActive = true;
+	
+	    core.dom.html.addClass("is-project");
+	    core.dom.body.append(core.dom.project.element);
+	
+	    setTimeout(function () {
+	        return core.dom.project.element.addClass("is-active");
+	    }, 10);
+	};
+	
+	Project.close = function () {
+	    isActive = false;
+	
+	    core.util.emitter.stop();
+	
+	    core.dom.project.element.removeClass("is-active is-inactive");
+	
+	    setTimeout(function () {
+	        core.dom.html.removeClass("is-project");
+	        core.dom.project.element.detach().empty();
+	    }, core.dom.project.elementTransitionDuration);
+	};
+	
+	/******************************************************************************
+	 * Export
+	*******************************************************************************/
+	exports["default"] = Project;
+	module.exports = exports["default"];
+
+/***/ },
+/* 38 */
+/*!***************************!*\
+  !*** ./js_src/overlay.js ***!
+  \***************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
+	
+	var _core = __webpack_require__(/*! ./core */ 4);
+	
+	var core = _interopRequireWildcard(_core);
+	
+	var _isActive = false;
+	var transTime = core.util.getTransitionDuration(core.dom.overlay.element[0]);
+	
+	/**
+	 *
+	 * @public
+	 * @module overlay
+	 * @description Performs the branded load-in screen sequence.
+	 *
+	 */
+	var overlay = {
+	    /**
+	     *
+	     * @public
+	     * @method init
+	     * @memberof overlay
+	     * @description Initialize the overlay element.
+	     *
+	     */
+	    init: function init() {
+	        if (core.dom.overlay.element.is(".is-active")) {
+	            _isActive = true;
+	        } else {
+	            core.dom.overlay.element.detach();
+	        }
+	    },
+	
+	    open: function open() {
+	        _isActive = true;
+	
+	        core.dom.html.addClass("is-overlay-active");
+	        core.dom.body.append(core.dom.overlay.element);
+	
+	        setTimeout(function () {
+	            return core.dom.overlay.element.addClass("is-active");
+	        }, 10);
+	    },
+	
+	    close: function close() {
+	        core.dom.overlay.element.removeClass("is-active");
+	
+	        setTimeout(function () {
+	            _isActive = false;
+	
+	            core.dom.html.removeClass("is-overlay-active");
+	            core.dom.overlay.element.detach().removeClass("is-intro");
+	        }, transTime);
+	    },
+	
+	    setTitle: function setTitle(text) {
+	        core.dom.overlay.elementTitle.html(text);
+	    },
+	
+	    isActive: function isActive() {
+	        return _isActive;
+	    }
+	};
+	
+	/******************************************************************************
+	 * Export
+	*******************************************************************************/
+	exports["default"] = overlay;
+	module.exports = exports["default"];
+
+/***/ },
+/* 39 */
+/*!**********************************!*\
+  !*** ./js_src/projects/index.js ***!
+  \**********************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	//import $ from "js_libs/jquery/dist/jquery";
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
+	
+	var _core = __webpack_require__(/*! ../core */ 4);
+	
+	var core = _interopRequireWildcard(_core);
+	
+	var _Project = __webpack_require__(/*! ./Project */ 37);
+	
+	var _Project2 = _interopRequireDefault(_Project);
+	
+	var _properjsImageloader = __webpack_require__(/*! properjs-imageloader */ 12);
+	
+	var _properjsImageloader2 = _interopRequireDefault(_properjsImageloader);
+	
+	var $_jsElement = null;
+	var instance = null;
+	
+	/**
+	 *
+	 * @public
+	 * @namespace projects
+	 * @description A nice description of what this module does...
+	 *
+	 */
+	var projects = {
+	    /**
+	     *
+	     * @public
+	     * @method init
+	     * @memberof projects
+	     * @description Method runs once when window loads.
+	     *
+	     */
+	    init: function init() {
+	        if (!core.dom.project.element.is(".is-active")) {
+	            core.dom.project.element.detach();
+	        }
+	
+	        core.log("projects initialized");
+	    },
+	
+	    /**
+	     *
+	     * @public
+	     * @method isActive
+	     * @memberof projects
+	     * @description Method informs PageController of active status.
+	     * @returns {boolean}
+	     *
+	     */
+	    isActive: function isActive() {
+	        return this.getElements() > 0;
+	    },
+	
+	    /**
+	     *
+	     * @public
+	     * @method onload
+	     * @memberof projects
+	     * @description Method performs onloading actions for this module.
+	     *
+	     */
+	    onload: function onload() {
+	        var data = $_jsElement.data();
+	
+	        instance = new _Project2["default"]($_jsElement, data);
+	
+	        core.util.emitter.on("app--root", killProject);
+	        core.util.emitter.on("app--project-ended", killProject);
+	    },
+	
+	    /**
+	     *
+	     * @public
+	     * @method unload
+	     * @memberof projects
+	     * @description Method performs unloading actions for this module.
+	     *
+	     */
+	    unload: function unload() {
+	        this.teardown();
+	    },
+	
+	    /**
+	     *
+	     * @public
+	     * @method teardown
+	     * @memberof projects
+	     * @description Method performs cleanup after this module. Remmoves events, null vars etc...
+	     *
+	     */
+	    teardown: function teardown() {
+	        $_jsElement = null;
+	
+	        if (instance) {
+	            instance.destroy();
+	            instance = null;
+	        }
+	
+	        core.util.emitter.off("app--root", killProject);
+	        core.util.emitter.off("app--project-ended", killProject);
+	    },
+	
+	    /**
+	     *
+	     * @public
+	     * @method getElements
+	     * @memberof projects
+	     * @description Method queries DOM for this modules node.
+	     * @returns {number}
+	     *
+	     */
+	    getElements: function getElements() {
+	        $_jsElement = core.dom.page.find(".js-project");
+	
+	        return $_jsElement.length;
+	    }
+	};
+	
+	var killProject = function killProject() {
+	    if (instance) {
+	        instance.destroy();
+	        instance = null;
+	    }
+	
+	    _properjsImageloader2["default"].killInstances();
+	};
+	
+	/******************************************************************************
+	 * Export
+	*******************************************************************************/
+	exports["default"] = projects;
+	module.exports = exports["default"];
+
+/***/ },
+/* 40 */
 /*!***************************!*\
   !*** ./js_src/animate.js ***!
   \***************************/
@@ -17049,9 +17520,9 @@
 	
 	        if (!_isActive) {
 	            this.onload();
+	        } else {
+	            updateAnimate();
 	        }
-	
-	        updateAnimate();
 	    }
 	};
 	
@@ -17083,308 +17554,6 @@
 	 * Export
 	*******************************************************************************/
 	exports["default"] = animate;
-	module.exports = exports["default"];
-
-/***/ },
-/* 35 */
-/*!***************************!*\
-  !*** ./js_src/overlay.js ***!
-  \***************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
-	
-	var _core = __webpack_require__(/*! ./core */ 4);
-	
-	var core = _interopRequireWildcard(_core);
-	
-	var _isActive = false;
-	var _transTime = core.util.getTransitionDuration(core.dom.overlay.element[0]);
-	
-	/**
-	 *
-	 * @public
-	 * @module overlay
-	 * @description Performs the branded load-in screen sequence.
-	 *
-	 */
-	var overlay = {
-	    /**
-	     *
-	     * @public
-	     * @method init
-	     * @memberof overlay
-	     * @description Initialize the overlay element.
-	     *
-	     */
-	    init: function init() {
-	        if (core.dom.overlay.element.is(".is-active")) {
-	            _isActive = true;
-	        } else {
-	            core.dom.overlay.element.detach();
-	        }
-	    },
-	
-	    open: function open() {
-	        _isActive = true;
-	
-	        core.dom.html.addClass("is-overlay-active");
-	        core.dom.page.append(core.dom.overlay.element);
-	
-	        setTimeout(function () {
-	            return core.dom.overlay.element.addClass("is-active");
-	        }, 10);
-	    },
-	
-	    close: function close() {
-	        core.dom.overlay.element.removeClass("is-active");
-	
-	        setTimeout(function () {
-	            _isActive = false;
-	
-	            core.dom.html.removeClass("is-overlay-active");
-	            core.dom.overlay.element.detach().removeClass("is-intro");
-	        }, _transTime);
-	    },
-	
-	    setTitle: function setTitle(text) {
-	        core.dom.overlay.elementTitle.html(text);
-	    },
-	
-	    isActive: function isActive() {
-	        return _isActive;
-	    }
-	};
-	
-	/******************************************************************************
-	 * Export
-	*******************************************************************************/
-	exports["default"] = overlay;
-	module.exports = exports["default"];
-
-/***/ },
-/* 36 */
-/*!***************************!*\
-  !*** ./js_src/Project.js ***!
-  \***************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	//import $ from "js_libs/jquery/dist/jquery";
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-	
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	var _core = __webpack_require__(/*! ./core */ 4);
-	
-	var core = _interopRequireWildcard(_core);
-	
-	var _router = __webpack_require__(/*! ./router */ 28);
-	
-	var _router2 = _interopRequireDefault(_router);
-	
-	var _overlay = __webpack_require__(/*! ./overlay */ 35);
-	
-	var _overlay2 = _interopRequireDefault(_overlay);
-	
-	/**
-	 *
-	 * @public
-	 * @class Project
-	 * @classdesc Load the Project collection into its container
-	 *            options { url, onLoad? }
-	 *
-	 */
-	
-	var Project = (function () {
-	    function Project(app, options) {
-	        _classCallCheck(this, Project);
-	
-	        this.app = app;
-	        this.opts = options;
-	        this.$plates = null;
-	        this.$images = null;
-	        this.isLoaded = false;
-	        this.isEnded = false;
-	
-	        if (this.opts.onLoad) {
-	            this.loadCollection();
-	        } else {
-	            this.initCollection();
-	        }
-	
-	        core.log("Project", this);
-	    }
-	
-	    /******************************************************************************
-	     * Export
-	    *******************************************************************************/
-	
-	    _createClass(Project, [{
-	        key: "destroy",
-	        value: function destroy() {
-	            this.close();
-	        }
-	    }, {
-	        key: "cycleAnimation",
-	        value: function cycleAnimation() {
-	            this.onUpdateEmitter();
-	
-	            core.util.emitter.go(this._onUpdateEmitter);
-	        }
-	    }, {
-	        key: "initCollection",
-	        value: function initCollection() {
-	            this._onUpdateEmitter = this.onUpdateEmitter.bind(this);
-	            this.$plates = core.dom.project.element.find(".js-project-plate");
-	            this.cycleAnimation();
-	        }
-	    }, {
-	        key: "loadCollection",
-	        value: function loadCollection() {
-	            var dataType = { dataType: "html" };
-	            var format = { format: "full", nocache: true };
-	            var cached = core.cache.get(this.opts.url);
-	
-	            this.open();
-	
-	            _router2["default"].push(this.opts.url, function () {});
-	
-	            if (cached) {
-	                this.handleCollection(cached);
-	            } else {
-	                core.api.collection(this.opts.url, format, dataType).done(this.onLoadCollection.bind(this));
-	            }
-	        }
-	
-	        // You are mutating your cache references here.
-	    }, {
-	        key: "handleCollection",
-	        value: function handleCollection(cache) {
-	            var _this = this;
-	
-	            var $project = cache.$object.find(".js-project");
-	
-	            this.$plates = $project.find(".js-project-plate");
-	            this.$images = this.$plates.find(".js-lazy-image");
-	
-	            core.dom.project.elementNode.html(this.$plates);
-	
-	            core.images.handleImages(this.$images, function () {
-	                if (_overlay2["default"].isActive()) {
-	                    _overlay2["default"].close();
-	                }
-	
-	                if (typeof _this.opts.onLoad === "function") {
-	                    _this.opts.onLoad();
-	                }
-	
-	                _this._onUpdateEmitter = _this.onUpdateEmitter.bind(_this);
-	                _this.cycleAnimation();
-	            });
-	        }
-	    }, {
-	        key: "updatePlates",
-	        value: function updatePlates() {
-	            var $plate = null;
-	            var i = this.$plates.length;
-	
-	            for (i; i--;) {
-	                $plate = this.$plates.eq(i);
-	
-	                if (core.util.isElementInViewport($plate[0])) {
-	                    $plate.addClass("is-active");
-	                } else {
-	                    $plate.removeClass("is-active");
-	                }
-	            }
-	        }
-	    }, {
-	        key: "updatePosition",
-	        value: function updatePosition() {
-	            var scrollMaxY = core.dom.project.element[0].scrollHeight - window.innerHeight;
-	            var scrollCurrY = core.dom.project.element[0].scrollTop;
-	            var calcBuffer = 10;
-	
-	            //console.log( scrollMaxY, scrollCurrY );
-	
-	            if (scrollCurrY >= scrollMaxY - calcBuffer && !this.isEnded) {
-	                core.log("Project Ended");
-	
-	                this.isEnded = true;
-	
-	                core.dom.project.element.addClass("is-inactive");
-	
-	                setTimeout(function () {
-	                    core.util.emitter.fire("app--project-ended");
-	                }, core.dom.project.elementTransitionDuration);
-	            }
-	        }
-	    }, {
-	        key: "onUpdateEmitter",
-	        value: function onUpdateEmitter() {
-	            this.updatePlates();
-	            this.updatePosition();
-	        }
-	    }, {
-	        key: "onLoadCollection",
-	        value: function onLoadCollection(response) {
-	            var cache = this.app.router.parseDoc(response);
-	
-	            this.handleCollection(cache);
-	
-	            // @todo:
-	            // Disable cache on Projects for now
-	            // You should circle back to this one later...
-	            // core.cache.set( this.opts.url, cache );
-	
-	            core.util.emitter.fire("app--analytics-push", cache.$object);
-	        }
-	    }, {
-	        key: "open",
-	        value: function open() {
-	            core.dom.html.addClass("is-neverflow is-project-active");
-	            core.dom.page.append(core.dom.project.element);
-	
-	            setTimeout(function () {
-	                return core.dom.project.element.addClass("is-active");
-	            }, 100);
-	        }
-	    }, {
-	        key: "close",
-	        value: function close() {
-	            core.util.emitter.stop();
-	
-	            core.dom.project.element.removeClass("is-active is-inactive");
-	            core.dom.html.removeClass("is-neverflow");
-	
-	            setTimeout(function () {
-	                core.dom.html.removeClass("is-project-active");
-	                core.dom.project.element.detach();
-	                core.dom.project.elementNode.empty();
-	            }, core.dom.project.elementTransitionDuration);
-	        }
-	    }]);
-	
-	    return Project;
-	})();
-	
-	exports["default"] = Project;
 	module.exports = exports["default"];
 
 /***/ }

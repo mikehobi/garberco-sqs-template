@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="is-clipped">
+<html class='is-clipped {.equal? collection.typeName "custom-photo"}is-project{.end}'>
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1" />
@@ -14,16 +14,6 @@
         {squarespace-headers}
     </head>
     <body class="is-clipped">
-        <header class="header js-header -text--center">
-            <h1 class="h3">
-                <a href="#" class="js-logo js-router--ignore">
-                    <img class="logo" src="/assets/svgs/GarberCo.svg" />
-                </a>
-            </h1>
-        </header>
-
-
-        <squarespace:navigation navigationId="nav" template="nav" />
-
-
-        <main class="page js-page" data-app-entry="{collection.fullUrl}" data-app-entry-type="{collection.typeName}">
+        <squarespace:navigation navigationId="projects" template="nav-projects" />
+        <squarespace:navigation navigationId="header" template="nav-header" />
+        {@|apply screens.block}
