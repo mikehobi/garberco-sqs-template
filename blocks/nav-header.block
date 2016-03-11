@@ -20,3 +20,4 @@
         {.end}
     {.end}
 </main>
+<script>console.log( {@|json-pretty} );</script>
