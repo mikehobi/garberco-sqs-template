@@ -8129,6 +8129,7 @@
 	   */
 	  project: {
 	    element: $_jsProject,
+	    elementPane: $_jsProject.find(".js-project-view-pane"),
 	    elementTransitionDuration: util.getTransitionDuration($_jsProject[0])
 	  },
 	
@@ -8397,8 +8398,6 @@
 	    var dims = null;
 	    var vars = null;
 	    var width = null;
-	    var height = null;
-	    var dimension = null;
 	    var variant = null;
 	    var source = null;
 	    var i = null;
@@ -8424,8 +8423,6 @@
 	        $img = images.eq(i);
 	        data = $img.data();
 	        width = $img[0].clientWidth || $img[0].parentNode.clientWidth || window.innerWidth;
-	        height = $img[0].clientHeight || $img[0].parentNode.clientHeight || window.innerHeight;
-	        dimension = Math.max(width, height);
 	        source = data.imgSrc.replace(rQuery, "");
 	
 	        // Pre-process portrait vs landscape using originalSize
@@ -8441,7 +8438,7 @@
 	
 	        if (useVariant && data.variants) {
 	            vars = data.variants.split(",").map(map);
-	            variant = getClosestValue(vars, dimension);
+	            variant = getClosestValue(vars, width);
 	
 	            // If the pixel density is higher, use a larger image ?
 	            if (window.devicePixelRatio > 1) {
@@ -14196,11 +14193,11 @@
 	
 	var _indexesListing2 = _interopRequireDefault(_indexesListing);
 	
-	var _projects = __webpack_require__(/*! ./projects */ 40);
+	var _projects = __webpack_require__(/*! ./projects */ 42);
 	
 	var _projects2 = _interopRequireDefault(_projects);
 	
-	var _animate = __webpack_require__(/*! ./animate */ 41);
+	var _animate = __webpack_require__(/*! ./animate */ 43);
 	
 	var _animate2 = _interopRequireDefault(_animate);
 	
@@ -14357,7 +14354,9 @@
 	        this.controller.on("page-controller-router-transition-out", this.changePageOut.bind(this));
 	        this.controller.on("page-controller-router-refresh-document", this.changeContent.bind(this));
 	        this.controller.on("page-controller-router-transition-in", this.changePageIn.bind(this));
-	        this.controller.on("page-controller-initialized-page", this.initPage.bind(this));
+	        //this.controller.on( "page-controller-initialized-page", this.initPage.bind( this ) );
+	
+	        this.initPage();
 	
 	        this.controller.initPage();
 	    },
@@ -14389,10 +14388,8 @@
 	                }
 	            });
 	
-	            this.loadRootIndex(this.root);
+	            this.loadRootIndex();
 	        }
-	
-	        this.loadFullIndex(this.root);
 	
 	        core.dom.root[0].href = this.root;
 	        core.dom.root.on("click", function () {
@@ -14403,20 +14400,18 @@
 	        core.dom.body.removeClass("is-clipped");
 	    },
 	
-	    loadRootIndex: function loadRootIndex(url) {
+	    loadRootIndex: function loadRootIndex() {
 	        var _this3 = this;
 	
-	        core.api.collection(url, { format: "html" }, { dataType: "html" }).done(function (response) {
+	        core.api.collection(this.root, { format: "html" }, { dataType: "html" }).done(function (response) {
 	            var doc = _this3.parseDoc(response);
 	
 	            core.util.emitter.fire("app--load-root", doc.pageHtml);
 	        });
 	    },
 	
-	    loadFullIndex: function loadFullIndex(url) {
-	        core.api.collection(url, { format: "json" }, { dataType: "json" }).done(function (json) {
-	            core.util.emitter.fire("app--load-index", json);
-	        });
+	    loadFullIndex: function loadFullIndex(cb) {
+	        core.api.collection(this.root, { format: "json" }, { dataType: "json" }).done(cb);
 	    },
 	
 	    /**
@@ -16622,7 +16617,7 @@
 	"use strict";
 	
 	Object.defineProperty(exports, "__esModule", {
-	  value: true
+	    value: true
 	});
 	
 	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
@@ -16635,6 +16630,8 @@
 	
 	var core = _interopRequireWildcard(_core);
 	
+	var instances = {};
+	
 	/**
 	 *
 	 * @public
@@ -16646,60 +16643,71 @@
 	 */
 	
 	var Menu = (function () {
-	  function Menu($node, data) {
-	    _classCallCheck(this, Menu);
+	    function Menu($node, data) {
+	        _classCallCheck(this, Menu);
 	
-	    this.$node = $node;
-	    this.data = data;
-	    this.transTime = 400;
-	    this.$target = core.dom.main.find(".js-main--" + this.data.target);
-	    this.$anim = this.$node.find(".js-animate-in");
-	    this.$images = this.$node.find(".js-lazy-image");
+	        if (!instances[data.id]) {
+	            this.initialize($node, data);
+	        }
 	
-	    core.images.handleImages(this.$images, this.onPreload.bind(this));
-	  }
-	
-	  /******************************************************************************
-	   * Export
-	  *******************************************************************************/
-	
-	  /**
-	   *
-	   * @public
-	   * @instance
-	   * @method onPreload
-	   * @memberof IndexClass
-	   * @description Handle loaded index grid.
-	   *
-	   */
-	
-	  _createClass(Menu, [{
-	    key: "onPreload",
-	    value: function onPreload() {
-	      var _this = this;
-	
-	      this.$target.html(this.$node);
-	
-	      setTimeout(function () {
-	        _this.$anim.addClass("is-active");
-	      }, this.transTime);
+	        return instances[data.id];
 	    }
 	
-	    /**
-	     *
-	     * @public
-	     * @instance
-	     * @method destroy
-	     * @memberof Menu
-	     * @description Undo event bindings for this instance.
-	     *
-	     */
-	  }, {
-	    key: "destroy",
-	    value: function destroy() {}
-	  }]);
+	    /******************************************************************************
+	     * Export
+	    *******************************************************************************/
 	
-	  return Menu;
+	    _createClass(Menu, [{
+	        key: "initialize",
+	        value: function initialize($node, data) {
+	            this.$node = $node;
+	            this.data = data;
+	            this.transTime = 400;
+	            this.$target = core.dom.main.find(".js-main--" + this.data.target);
+	            this.$anim = this.$node.find(".js-animate-in");
+	            this.$images = this.$node.find(".js-lazy-image");
+	
+	            instances[data.id] = this;
+	
+	            core.images.handleImages(this.$images, this.onPreload.bind(this));
+	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @instance
+	         * @method onPreload
+	         * @memberof IndexClass
+	         * @description Handle loaded index grid.
+	         *
+	         */
+	    }, {
+	        key: "onPreload",
+	        value: function onPreload() {
+	            var _this = this;
+	
+	            this.$target.html(this.$node);
+	
+	            setTimeout(function () {
+	                _this.$anim.addClass("is-active");
+	            }, this.transTime);
+	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @instance
+	         * @method destroy
+	         * @memberof Menu
+	         * @description Undo event bindings for this instance.
+	         *
+	         */
+	    }, {
+	        key: "destroy",
+	        value: function destroy() {}
+	    }]);
+	
+	    return Menu;
 	})();
 	
 	exports["default"] = Menu;
@@ -16730,9 +16738,9 @@
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _IndexClass = __webpack_require__(/*! ./IndexClass */ 36);
+	var _IndexRoot = __webpack_require__(/*! ./IndexRoot */ 36);
 	
-	var _IndexClass2 = _interopRequireDefault(_IndexClass);
+	var _IndexRoot2 = _interopRequireDefault(_IndexRoot);
 	
 	var _projectsProject = __webpack_require__(/*! ../projects/Project */ 37);
 	
@@ -16793,7 +16801,7 @@
 	    onload: function onload() {
 	        var data = $_jsElement.data();
 	
-	        instance = new _IndexClass2["default"]($_jsElement, data);
+	        instance = new _IndexRoot2["default"]($_jsElement, data);
 	
 	        core.dom.body.on("click", ".js-index-tile", onTileClick);
 	        core.dom.body.on("mouseenter", ".js-index-tile", onMouseEnter);
@@ -16907,9 +16915,9 @@
 
 /***/ },
 /* 36 */
-/*!**************************************!*\
-  !*** ./js_src/indexes/IndexClass.js ***!
-  \**************************************/
+/*!*************************************!*\
+  !*** ./js_src/indexes/IndexRoot.js ***!
+  \*************************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -16933,51 +16941,45 @@
 	/**
 	 *
 	 * @public
-	 * @class IndexClass
+	 * @class IndexRoot
 	 * @param {jQuery} $node The element
 	 * @param {object} data The datas
-	 * @classdesc Handle an index.
+	 * @classdesc Handle an index as a Singleton(ish).
 	 *
 	 */
 	
-	var IndexClass = (function () {
-	    function IndexClass($node, data) {
-	        _classCallCheck(this, IndexClass);
+	var IndexRoot = (function () {
+	    function IndexRoot($node, data) {
+	        _classCallCheck(this, IndexRoot);
 	
-	        if (instance && instance.data.id === data.id) {
-	            return instance;
+	        if (!instance || instance && instance.data.id !== data.id) {
+	            this.initialize($node, data);
 	        }
 	
-	        this.$node = $node;
-	        this.data = data;
-	        this.$target = core.dom.main.find(".js-main--" + this.data.target);
-	        this.$images = this.$node.find(".js-lazy-image");
-	
-	        core.images.handleImages(this.$images, this.onPreload.bind(this));
-	
-	        instance = this;
+	        return instance;
 	    }
 	
 	    /******************************************************************************
 	     * Export
 	    *******************************************************************************/
 	
-	    /**
-	     *
-	     * @public
-	     * @instance
-	     * @method onPreload
-	     * @memberof IndexClass
-	     * @description Handle loaded index grid.
-	     *
-	     */
+	    _createClass(IndexRoot, [{
+	        key: "initialize",
+	        value: function initialize($node, data) {
+	            var _this = this;
 	
-	    _createClass(IndexClass, [{
-	        key: "onPreload",
-	        value: function onPreload() {
-	            this.$target.html(this.$node);
+	            this.$node = $node;
+	            this.data = data;
+	            this.$target = core.dom.main.find(".js-main--" + this.data.target);
+	            this.$images = this.$node.find(".js-lazy-image");
 	
-	            core.util.emitter.fire("app--update-animate");
+	            core.images.handleImages(this.$images, function () {
+	                _this.$target.html(_this.$node);
+	
+	                core.util.emitter.fire("app--update-animate");
+	            });
+	
+	            instance = this;
 	        }
 	
 	        /**
@@ -16985,21 +16987,19 @@
 	         * @public
 	         * @instance
 	         * @method destroy
-	         * @memberof IndexClass
+	         * @memberof IndexRoot
 	         * @description Undo event bindings for this instance.
 	         *
 	         */
 	    }, {
 	        key: "destroy",
-	        value: function destroy() {
-	            //instance = null;
-	        }
+	        value: function destroy() {}
 	    }]);
 	
-	    return IndexClass;
+	    return IndexRoot;
 	})();
 	
-	exports["default"] = IndexClass;
+	exports["default"] = IndexRoot;
 	module.exports = exports["default"];
 
 /***/ },
@@ -17073,7 +17073,7 @@
 	    _createClass(Project, [{
 	        key: "onPreload",
 	        value: function onPreload() {
-	            core.dom.project.element.html(this.$node);
+	            core.dom.project.elementPane.html(this.$node);
 	
 	            if (_overlay2["default"].isActive()) {
 	                _overlay2["default"].close();
@@ -17174,7 +17174,8 @@
 	
 	    setTimeout(function () {
 	        core.dom.html.removeClass("is-project");
-	        core.dom.project.element.detach().empty();
+	        core.dom.project.element.detach();
+	        core.dom.project.elementPane.empty();
 	    }, core.dom.project.elementTransitionDuration);
 	};
 	
@@ -17274,12 +17275,13 @@
   \***********************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	//import $ from "js_libs/jquery/dist/jquery";
 	"use strict";
 	
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
 	
@@ -17287,9 +17289,12 @@
 	
 	var core = _interopRequireWildcard(_core);
 	
-	//import template from "properjs-template";
+	var _IndexFull = __webpack_require__(/*! ./IndexFull */ 40);
+	
+	var _IndexFull2 = _interopRequireDefault(_IndexFull);
 	
 	var $_jsElement = null;
+	var instance = null;
 	
 	/**
 	 *
@@ -17308,8 +17313,6 @@
 	   *
 	   */
 	  init: function init() {
-	    core.util.emitter.on("app--load-index", this.onLoadFullIndex.bind(this));
-	
 	    core.log("listing initialized");
 	  },
 	
@@ -17334,7 +17337,11 @@
 	   * @description Method performs onloading actions for this module.
 	   *
 	   */
-	  onload: function onload() {},
+	  onload: function onload() {
+	    var data = $_jsElement.data();
+	
+	    instance = new _IndexFull2["default"]($_jsElement, data);
+	  },
 	
 	  /**
 	   *
@@ -17358,6 +17365,11 @@
 	   */
 	  teardown: function teardown() {
 	    $_jsElement = null;
+	
+	    if (instance) {
+	      instance.destroy();
+	      instance = null;
+	    }
 	  },
 	
 	  /**
@@ -17373,26 +17385,6 @@
 	    $_jsElement = core.dom.page.find(".js-listing");
 	
 	    return $_jsElement.length;
-	  },
-	
-	  /**
-	   *
-	   * @public
-	   * @method onLoadFullIndex
-	   * @param {object} json The collection json
-	   * @memberof menus
-	   * @description Receive full collections data for an index.
-	   *
-	   */
-	  onLoadFullIndex: function onLoadFullIndex(json) {
-	    console.log(json);
-	    json.collection.collections.forEach(function (collection) {
-	      console.log(collection.title);
-	      collection.items.forEach(function (item) {
-	        console.log(item.title);
-	      });
-	      console.log("");
-	    });
 	  }
 	};
 	
@@ -17404,6 +17396,183 @@
 
 /***/ },
 /* 40 */
+/*!*************************************!*\
+  !*** ./js_src/indexes/IndexFull.js ***!
+  \*************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var _core = __webpack_require__(/*! ../core */ 4);
+	
+	var core = _interopRequireWildcard(_core);
+	
+	var _js_libsJqueryDistJquery = __webpack_require__(/*! js_libs/jquery/dist/jquery */ 1);
+	
+	var _js_libsJqueryDistJquery2 = _interopRequireDefault(_js_libsJqueryDistJquery);
+	
+	var _router = __webpack_require__(/*! ../router */ 27);
+	
+	var _router2 = _interopRequireDefault(_router);
+	
+	var _properjsTemplate = __webpack_require__(/*! properjs-template */ 41);
+	
+	var _properjsTemplate2 = _interopRequireDefault(_properjsTemplate);
+	
+	var instance = null;
+	var _gridTitleTpl = "<h4 class=\"h4\">{title}</h4>";
+	var _gridWrapTpl = "\n<div class=\"grid grid--index\"></div>\n";
+	var _gridItemTpl = "\n<div class=\"grid__item__small\">\n    <div class=\"grid__photo grid__photo--small js-listing-tile animate js-animate\">\n        <figure class=\"figure\">\n            <img class=\"figure__image image js-lazy-image\" data-img-src=\"{assetUrl}\" data-variants=\"{systemDataVariants}\" data-original-size=\"{originalSize}\" />\n        </figure>\n    </div>\n</div>\n";
+	
+	/**
+	 *
+	 * @public
+	 * @class IndexFull
+	 * @param {jQuery} $node The element
+	 * @param {object} data The datas
+	 * @classdesc Handle an index as a Singleton(ish).
+	 *
+	 */
+	
+	var IndexFull = (function () {
+	    function IndexFull($node, data) {
+	        _classCallCheck(this, IndexFull);
+	
+	        if (!instance || instance && instance.data.id !== data.id) {
+	            this.initialize($node, data);
+	        }
+	
+	        return instance;
+	    }
+	
+	    /******************************************************************************
+	     * Export
+	    *******************************************************************************/
+	
+	    _createClass(IndexFull, [{
+	        key: "initialize",
+	        value: function initialize($node, data) {
+	            this.$node = $node;
+	            this.data = data;
+	            this.$target = core.dom.main.find(".js-main--" + this.data.target);
+	
+	            _router2["default"].loadFullIndex(this.onLoadFullIndex.bind(this));
+	
+	            instance = this;
+	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @method onLoadFullIndex
+	         * @param {object} json The collection json
+	         * @memberof menus
+	         * @description Receive full collections data for an index.
+	         *
+	         */
+	    }, {
+	        key: "onLoadFullIndex",
+	        value: function onLoadFullIndex(json) {
+	            var _this = this;
+	
+	            json.collection.collections.forEach(function (collection) {
+	                var $title = (0, _js_libsJqueryDistJquery2["default"])((0, _properjsTemplate2["default"])(_gridTitleTpl.replace(/\n/g, ""), collection));
+	                var $grid = (0, _js_libsJqueryDistJquery2["default"])(_gridWrapTpl.replace(/\n/g, ""));
+	
+	                collection.items.forEach(function (item) {
+	                    $grid.append((0, _properjsTemplate2["default"])(_gridItemTpl.replace(/\n/g, ""), item));
+	                });
+	
+	                _this.$node.append($title);
+	                _this.$node.append($grid);
+	            });
+	
+	            this.$target.append(this.$node);
+	
+	            core.images.handleImages(this.$node.find(".js-lazy-image"), function () {
+	                core.util.emitter.fire("app--update-animate");
+	            });
+	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @instance
+	         * @method destroy
+	         * @memberof IndexFull
+	         * @description Undo event bindings for this instance.
+	         *
+	         */
+	    }, {
+	        key: "destroy",
+	        value: function destroy() {}
+	    }]);
+	
+	    return IndexFull;
+	})();
+	
+	exports["default"] = IndexFull;
+	module.exports = exports["default"];
+
+/***/ },
+/* 41 */
+/*!*****************************************!*\
+  !*** ./~/properjs-template/template.js ***!
+  \*****************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 *
+	 * As bare bones a template render as it comes
+	 * @method template
+	 * @param {string} html HTML to render from
+	 * @param {object} data Data to render with
+	 * @returns {string}
+	 * @memberof! <global>
+	 *
+	 */
+	(function ( factory ) {
+	    
+	    if ( true ) {
+	        module.exports = factory();
+	
+	    } else if ( typeof window !== "undefined" ) {
+	        window.template = factory();
+	    }
+	    
+	})(function () {
+	
+	    var template = function ( html, data ) {
+	        // Allow varying bracket styles, {{foo}} or {foo}
+	        return html.replace( /\{{1,2}([^{}]*)\}{1,2}/g, function ( a, b ) {
+	            // Replace spaces, allowing { foo } style
+	            var r = data[ b.replace( /\s/g, "" ) ];
+	    
+	            // Allow string or numeral replacement
+	            // This would be interesting also, return ("" + r);
+	            // That would give you [Object object] for values that are iterable
+	            return ( typeof r === "string" || typeof r === "number" ) ? r : a;
+	        });
+	    };
+	
+	    return template;
+	
+	});
+
+/***/ },
+/* 42 */
 /*!**********************************!*\
   !*** ./js_src/projects/index.js ***!
   \**********************************/
@@ -17553,7 +17722,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 41 */
+/* 43 */
 /*!***************************!*\
   !*** ./js_src/animate.js ***!
   \***************************/

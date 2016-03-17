@@ -1,3 +1,3 @@
 <div class="page js-page" data-type="menu" data-id="{collection.id}">
-    <section class="listing js-listing wrapper" data-target="index" data-id="{collection.id}"></section>
+    <section class="listing js-listing -topper" data-target="index" data-id="{collection.id}"></section>
 </div>

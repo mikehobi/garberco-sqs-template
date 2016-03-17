@@ -1,7 +1,7 @@
 <div class="page js-page" data-type="menu" data-id="{collection.id}">
-    <section class="menu menu--about js-menu wrapper" data-target="about" data-id="{collection.id}">
-        <div class="grid grid--about -text--left animate animate--fade js-animate-in">
-            <h2 class="h2">{collection.description}</h2>
+    <section class="menu menu--about js-menu wrapper -topper" data-target="about" data-id="{collection.id}">
+        <div class="animate animate--fade js-animate-in">
+            <h2 class="h2 about">{collection.description}</h2>
             <div class="expander-top">
                 {.repeated section collection.collections}
                     <div class="-column -column--2of4 -valign-top">
