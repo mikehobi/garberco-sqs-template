@@ -17434,7 +17434,7 @@
 	var instance = null;
 	var _gridTitleTpl = "<h4 class=\"h4\">{title}</h4>";
 	var _gridWrapTpl = "\n<div class=\"grid grid--index\"></div>\n";
-	var _gridItemTpl = "\n<div class=\"grid__item__small\">\n    <div class=\"grid__photo grid__photo--small js-listing-tile animate js-animate\">\n        <figure class=\"figure\">\n            <img class=\"figure__image image js-lazy-image\" data-img-src=\"{assetUrl}\" data-variants=\"{systemDataVariants}\" data-original-size=\"{originalSize}\" />\n        </figure>\n    </div>\n</div>\n";
+	var _gridItemTpl = "\n<div class=\"grid__item__small\">\n    <div class=\"grid__photo grid__photo--small js-listing-tile animate animate--fade js-animate\">\n        <figure class=\"figure\">\n            <img class=\"figure__image image js-lazy-image\" data-img-src=\"{assetUrl}\" data-variants=\"{systemDataVariants}\" data-original-size=\"{originalSize}\" />\n        </figure>\n    </div>\n</div>\n";
 	
 	/**
 	 *
