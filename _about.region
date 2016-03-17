@@ -3,28 +3,13 @@
         <div class="grid grid--about -text--left animate animate--fade js-animate-in">
             <h2 class="h2">{collection.description}</h2>
             <div class="expander-top">
-                <div class="-column -column--2of4 -valign-top">
-                    <h4 class="h4">
-                        Clients:<br />
-                        Google<br />
-                        Levi&rsquo;s<br />
-                        Amazon<br />
-                        Black Diamond<br />
-                        Stumptown Coffee<br />
-                        Woolrich<br />
-                        Zinio<br />
-                        TEDx<br />
-                        Depactus<br />
-                        The James Brand
-                    </h4>
-                </div>
-                <div class="-column -column--2of4 -valign-top">
-                    <h4 class="h4">
-                        Features:<br />
-                        VSCO Journal<br />
-                        Hypebeast
-                    </h4>
-                </div>
+                {.repeated section collection.collections}
+                    <div class="-column -column--2of4 -valign-top">
+                        <h4 class="h4">
+                            {description}
+                        </h4>
+                    </div>
+                {.end}
             </div>
         </div>
     </section>
