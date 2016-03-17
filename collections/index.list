@@ -1,5 +1,5 @@
 <div class="page js-page" data-type="index" data-id="{collection.id}">
-    <section class="index js-index grid" data-target="garberco" data-id="{collection.id}">
+    <section class="index js-index grid grid--garberco" data-target="garberco" data-id="{collection.id}">
         {.section collection}
             {.repeated section collections}
                 <div class="grid__item expander-bottom">

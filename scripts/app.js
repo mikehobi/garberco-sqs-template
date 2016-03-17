@@ -8394,6 +8394,7 @@
 	    };
 	    var $img = null;
 	    var data = null;
+	    var dims = null;
 	    var vars = null;
 	    var width = null;
 	    var height = null;
@@ -8426,6 +8427,17 @@
 	        height = $img[0].clientHeight || $img[0].parentNode.clientHeight || window.innerHeight;
 	        dimension = Math.max(width, height);
 	        source = data.imgSrc.replace(rQuery, "");
+	
+	        // Pre-process portrait vs landscape using originalSize
+	        if (data.originalSize) {
+	            dims = getOriginalDims(data.originalSize);
+	
+	            if (dims.width > dims.height) {
+	                $img.addClass("image--wide");
+	            } else {
+	                $img.addClass("image--tall");
+	            }
+	        }
 	
 	        if (useVariant && data.variants) {
 	            vars = data.variants.split(",").map(map);
@@ -8541,6 +8553,26 @@
 	            userDragString: false,
 	            userSelectString: false
 	        }
+	    };
+	};
+	
+	/**
+	 *
+	 * @public
+	 * @method getOriginalDims
+	 * @memberof util
+	 * @param {string} original The original image dims
+	 * @description Get an object reference to original dims.
+	 *              Format: "1600x1600"
+	 * @returns {object}
+	 *
+	 */
+	var getOriginalDims = function getOriginalDims(original) {
+	    var dims = original.split("x");
+	
+	    return {
+	        width: parseInt(dims[0], 10),
+	        height: parseInt(dims[1], 10)
 	    };
 	};
 	
@@ -13431,8 +13463,8 @@
 	     */
 	    request: function request(url, params, options) {
 	        var data = _js_libsJqueryDistJquery2["default"].extend({
-	            format: this.format,
-	            nocache: true
+	            format: this.format
+	            //nocache: true
 	        }, params);
 	        var opts = _js_libsJqueryDistJquery2["default"].extend({
 	            url: url,
@@ -14073,7 +14105,7 @@
 	        key: "getStaticContext",
 	        value: function getStaticContext(resHTML) {
 	            // Match the { data } in Static.SQUARESPACE_CONTEXT
-	            var ctx = _cache2["default"].get(util.getPageKey() + "-context");
+	            var ctx = _cache2["default"].get("context--" + util.getPageKey());
 	
 	            if (!ctx) {
 	                ctx = resHTML.match(/Static\.SQUARESPACE_CONTEXT\s=\s(.*?)\};/);
@@ -14113,7 +14145,7 @@
 	    }, {
 	        key: "cacheStaticContext",
 	        value: function cacheStaticContext(json) {
-	            _cache2["default"].set(util.getPageKey() + "-context", json);
+	            _cache2["default"].set("context--" + util.getPageKey(), json);
 	        }
 	    }]);
 	
@@ -14160,11 +14192,15 @@
 	
 	var _indexes2 = _interopRequireDefault(_indexes);
 	
-	var _projects = __webpack_require__(/*! ./projects */ 39);
+	var _indexesListing = __webpack_require__(/*! ./indexes/listing */ 39);
+	
+	var _indexesListing2 = _interopRequireDefault(_indexesListing);
+	
+	var _projects = __webpack_require__(/*! ./projects */ 40);
 	
 	var _projects2 = _interopRequireDefault(_projects);
 	
-	var _animate = __webpack_require__(/*! ./animate */ 40);
+	var _animate = __webpack_require__(/*! ./animate */ 41);
 	
 	var _animate2 = _interopRequireDefault(_animate);
 	
@@ -14313,7 +14349,7 @@
 	
 	        this.controller.setConfig(["*"]);
 	
-	        this.controller.setModules([_menus2["default"], _indexes2["default"], _animate2["default"], _projects2["default"]
+	        this.controller.setModules([_menus2["default"], _indexes2["default"], _indexesListing2["default"], _animate2["default"], _projects2["default"]
 	        //core.images
 	        ]);
 	
@@ -14356,6 +14392,8 @@
 	            this.loadRootIndex(this.root);
 	        }
 	
+	        this.loadFullIndex(this.root);
+	
 	        core.dom.root[0].href = this.root;
 	        core.dom.root.on("click", function () {
 	            core.util.emitter.fire("app--root");
@@ -14371,7 +14409,13 @@
 	        core.api.collection(url, { format: "html" }, { dataType: "html" }).done(function (response) {
 	            var doc = _this3.parseDoc(response);
 	
-	            core.util.emitter.fire("app--load-root-index", doc.pageHtml);
+	            core.util.emitter.fire("app--load-root", doc.pageHtml);
+	        });
+	    },
+	
+	    loadFullIndex: function loadFullIndex(url) {
+	        core.api.collection(url, { format: "json" }, { dataType: "json" }).done(function (json) {
+	            core.util.emitter.fire("app--load-index", json);
 	        });
 	    },
 	
@@ -14422,11 +14466,6 @@
 	     *
 	     */
 	    changePageOut: function changePageOut() {
-	        //core.util.emitter.fire( "app--page-out" );
-	
-	        //core.util.disableMouseWheel( true );
-	        //core.util.disableTouchMove( true );
-	
 	        core.dom.html.addClass("is-routing");
 	    },
 	
@@ -14462,20 +14501,7 @@
 	     *
 	     */
 	    changePageIn: function changePageIn() /* data */{
-	        //core.util.emitter.fire( "app--page-in" );
-	
-	        //core.util.disableMouseWheel( false );
-	        //core.util.disableTouchMove( false );
-	
 	        core.dom.html.removeClass("is-routing");
-	
-	        //core.scrolls.topout( 0 );
-	        //core.scrolls.clearStates();
-	
-	        //setTimeout( () => {
-	        //    core.util.emitter.fire( "app--intro-art" );
-	
-	        //}, this.pageDuration );
 	    }
 	};
 	
@@ -16738,7 +16764,7 @@
 	     *
 	     */
 	    init: function init() {
-	        core.util.emitter.on("app--load-root-index", this.onLoadRootIndex.bind(this));
+	        core.util.emitter.on("app--load-root", this.onLoadRootIndex.bind(this));
 	
 	        core.log("indexes initialized");
 	    },
@@ -17081,16 +17107,14 @@
 	    }, {
 	        key: "updatePosition",
 	        value: function updatePosition() {
+	            var nodeRect = this.$node[0].getBoundingClientRect();
 	            var $imageloaded = this.$images.filter(".-is-lazy-handled");
-	            var scrollMaxY = core.dom.project.element[0].scrollHeight - window.innerHeight;
-	            var scrollCurrY = core.dom.project.element[0].scrollTop;
-	            var calcBuffer = 10;
 	
 	            if ($imageloaded.length !== this.$images.length) {
 	                return;
 	            }
 	
-	            if (scrollCurrY >= scrollMaxY - calcBuffer && !this.isEnded) {
+	            if (Math.floor(nodeRect.bottom) <= 0 && !this.isEnded) {
 	                this.isEnded = true;
 	
 	                core.dom.project.element.addClass("is-inactive");
@@ -17245,6 +17269,141 @@
 
 /***/ },
 /* 39 */
+/*!***********************************!*\
+  !*** ./js_src/indexes/listing.js ***!
+  \***********************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	//import $ from "js_libs/jquery/dist/jquery";
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
+	
+	var _core = __webpack_require__(/*! ../core */ 4);
+	
+	var core = _interopRequireWildcard(_core);
+	
+	//import template from "properjs-template";
+	
+	var $_jsElement = null;
+	
+	/**
+	 *
+	 * @public
+	 * @namespace menus
+	 * @description A nice description of what this module does...
+	 *
+	 */
+	var menus = {
+	  /**
+	   *
+	   * @public
+	   * @method init
+	   * @memberof menus
+	   * @description Method runs once when window loads.
+	   *
+	   */
+	  init: function init() {
+	    core.util.emitter.on("app--load-index", this.onLoadFullIndex.bind(this));
+	
+	    core.log("listing initialized");
+	  },
+	
+	  /**
+	   *
+	   * @public
+	   * @method isActive
+	   * @memberof menus
+	   * @description Method informs PageController of active status.
+	   * @returns {boolean}
+	   *
+	   */
+	  isActive: function isActive() {
+	    return this.getElements() > 0;
+	  },
+	
+	  /**
+	   *
+	   * @public
+	   * @method onload
+	   * @memberof menus
+	   * @description Method performs onloading actions for this module.
+	   *
+	   */
+	  onload: function onload() {},
+	
+	  /**
+	   *
+	   * @public
+	   * @method unload
+	   * @memberof menus
+	   * @description Method performs unloading actions for this module.
+	   *
+	   */
+	  unload: function unload() {
+	    this.teardown();
+	  },
+	
+	  /**
+	   *
+	   * @public
+	   * @method teardown
+	   * @memberof menus
+	   * @description Method performs cleanup after this module. Remmoves events, null vars etc...
+	   *
+	   */
+	  teardown: function teardown() {
+	    $_jsElement = null;
+	  },
+	
+	  /**
+	   *
+	   * @public
+	   * @method getElements
+	   * @memberof menus
+	   * @description Method queries DOM for this modules node.
+	   * @returns {number}
+	   *
+	   */
+	  getElements: function getElements() {
+	    $_jsElement = core.dom.page.find(".js-listing");
+	
+	    return $_jsElement.length;
+	  },
+	
+	  /**
+	   *
+	   * @public
+	   * @method onLoadFullIndex
+	   * @param {object} json The collection json
+	   * @memberof menus
+	   * @description Receive full collections data for an index.
+	   *
+	   */
+	  onLoadFullIndex: function onLoadFullIndex(json) {
+	    console.log(json);
+	    json.collection.collections.forEach(function (collection) {
+	      console.log(collection.title);
+	      collection.items.forEach(function (item) {
+	        console.log(item.title);
+	      });
+	      console.log("");
+	    });
+	  }
+	};
+	
+	/******************************************************************************
+	 * Export
+	*******************************************************************************/
+	exports["default"] = menus;
+	module.exports = exports["default"];
+
+/***/ },
+/* 40 */
 /*!**********************************!*\
   !*** ./js_src/projects/index.js ***!
   \**********************************/
@@ -17394,7 +17553,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 40 */
+/* 41 */
 /*!***************************!*\
   !*** ./js_src/animate.js ***!
   \***************************/

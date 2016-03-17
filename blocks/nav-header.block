@@ -1,12 +1,12 @@
 <nav class="nav nav--header header js-header -text--center">
     {.repeated section items}
         {.section externalLink}
-            <a class="header__nav header__nav--{title|slugify} js-root h4 -column" href="{url}">
-                <img class="logo js-controller js-controller--{title|slugify}" src="/assets/svgs/GarberCo.svg" />
+            <a class="header__nav header__nav--{title|slugify} js-root js-controller js-controller--{title|slugify} h3 -column" href="{url}">
+                <img class="logo" src="/assets/svgs/GarberCo.svg" />
             </a>
         {.end}
         {.section collection}
-            <a class="header__nav header__nav--{urlId} js-controller js-controller--{urlId} h4 -column" href="{fullUrl}" data-target="{urlId}">{navigationTitle}</a>
+            <a class="header__nav header__nav--{urlId} js-controller js-controller--{urlId} h3 -column" href="{fullUrl}" data-target="{urlId}">{navigationTitle}</a>
         {.end}
     {.end}
 </nav>
@@ -20,4 +20,3 @@
         {.end}
     {.end}
 </main>
-<script>console.log( {@|json-pretty} );</script>
