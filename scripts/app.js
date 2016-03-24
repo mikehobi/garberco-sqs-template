@@ -43,7 +43,7 @@
 /******/ ([
 /* 0 */
 /*!***********************!*\
-  !*** ./js_src/App.js ***!
+  !*** ./js_src/app.js ***!
   \***********************/
 /***/ function(module, exports, __webpack_require__) {
 
@@ -65,13 +65,17 @@
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _router = __webpack_require__(/*! ./router */ 27);
+	var _router = __webpack_require__(/*! ./router */ 30);
 	
 	var _router2 = _interopRequireDefault(_router);
 	
-	var _overlay = __webpack_require__(/*! ./overlay */ 38);
+	var _overlay = __webpack_require__(/*! ./overlay */ 41);
 	
 	var _overlay2 = _interopRequireDefault(_overlay);
+	
+	var _gallery = __webpack_require__(/*! ./gallery */ 44);
+	
+	var _gallery2 = _interopRequireDefault(_gallery);
 	
 	/**
 	 *
@@ -88,10 +92,15 @@
 	        this.core = core;
 	        this.router = _router2["default"];
 	        this.overlay = _overlay2["default"];
+	        this.gallery = _gallery2["default"];
 	        this.analytics = new core.Analytics();
 	
 	        this.initModules();
 	        this.bindEvents();
+	
+	        // @note:
+	        // Remove cart until it has a use ?
+	        (0, _js_libsJqueryDistJquery2["default"])(".absolute-cart-box").remove();
 	
 	        core.log("App", this);
 	    }
@@ -108,6 +117,7 @@
 	            this.core.scrolls.init(this);
 	            this.router.init(this);
 	            this.overlay.init(this);
+	            this.gallery.init(this);
 	        }
 	    }, {
 	        key: "bindEvents",
@@ -117,12 +127,14 @@
 	            this.core.dom.header.on("click", ".js-controller", function (e) {
 	                e.preventDefault();
 	
-	                var $target = (0, _js_libsJqueryDistJquery2["default"])(e.target);
-	                var data = $target.data();
+	                var $controller = (0, _js_libsJqueryDistJquery2["default"])(e.currentTarget);
+	                var data = $controller.data();
+	                var $target = _this.core.dom.main.find(".js-main--" + data.target);
+	
+	                $target.siblings().removeClass("is-active");
+	                $target.addClass("is-active");
 	
 	                _this.core.dom.main[0].id = data.target ? "is-main--" + data.target : "";
-	
-	                core.log("controller", data.target);
 	            });
 	        }
 	    }]);
@@ -130,9 +142,9 @@
 	    return App;
 	})();
 	
-	window.onload = function () {
+	window.Squarespace.onInitialize(window.Y, function () {
 	    window.app = new App();
-	};
+	});
 
 /***/ },
 /* 1 */
@@ -7845,15 +7857,15 @@
 	
 	var _dom2 = _interopRequireDefault(_dom);
 	
-	var _images = __webpack_require__(/*! ./images */ 16);
+	var _images = __webpack_require__(/*! ./images */ 13);
 	
 	var _images2 = _interopRequireDefault(_images);
 	
-	var _resizes = __webpack_require__(/*! ./resizes */ 18);
+	var _resizes = __webpack_require__(/*! ./resizes */ 17);
 	
 	var _resizes2 = _interopRequireDefault(_resizes);
 	
-	var _scrolls = __webpack_require__(/*! ./scrolls */ 21);
+	var _scrolls = __webpack_require__(/*! ./scrolls */ 22);
 	
 	var _scrolls2 = _interopRequireDefault(_scrolls);
 	
@@ -7861,29 +7873,41 @@
 	
 	var util = _interopRequireWildcard(_util);
 	
-	var _config = __webpack_require__(/*! ./config */ 13);
+	var _config = __webpack_require__(/*! ./config */ 10);
 	
 	var _config2 = _interopRequireDefault(_config);
 	
-	var _env = __webpack_require__(/*! ./env */ 15);
+	var _env = __webpack_require__(/*! ./env */ 12);
 	
 	var _env2 = _interopRequireDefault(_env);
 	
-	var _log = __webpack_require__(/*! ./log */ 14);
+	var _log = __webpack_require__(/*! ./log */ 11);
 	
 	var _log2 = _interopRequireDefault(_log);
 	
-	var _api = __webpack_require__(/*! ./api */ 22);
+	var _api = __webpack_require__(/*! ./api */ 25);
 	
 	var _api2 = _interopRequireDefault(_api);
 	
-	var _cache = __webpack_require__(/*! ./cache */ 24);
+	var _cache = __webpack_require__(/*! ./cache */ 27);
 	
 	var _cache2 = _interopRequireDefault(_cache);
 	
-	var _Analytics = __webpack_require__(/*! ./Analytics */ 26);
+	var _Analytics = __webpack_require__(/*! ./Analytics */ 29);
 	
 	var _Analytics2 = _interopRequireDefault(_Analytics);
+	
+	var _emitter = __webpack_require__(/*! ./emitter */ 14);
+	
+	var _emitter2 = _interopRequireDefault(_emitter);
+	
+	var _scroller = __webpack_require__(/*! ./scroller */ 23);
+	
+	var _scroller2 = _interopRequireDefault(_scroller);
+	
+	var _resizer = __webpack_require__(/*! ./resizer */ 18);
+	
+	var _resizer2 = _interopRequireDefault(_resizer);
 	
 	exports.detect = _detect2["default"];
 	exports.dom = _dom2["default"];
@@ -7897,6 +7921,9 @@
 	exports.api = _api2["default"];
 	exports.cache = _cache2["default"];
 	exports.Analytics = _Analytics2["default"];
+	exports.emitter = _emitter2["default"];
+	exports.scroller = _scroller2["default"];
+	exports.resizer = _resizer2["default"];
 
 /***/ },
 /* 5 */
@@ -7917,7 +7944,7 @@
 	
 	var _dom2 = _interopRequireDefault(_dom);
 	
-	var _log = __webpack_require__(/*! ./log */ 14);
+	var _log = __webpack_require__(/*! ./log */ 11);
 	
 	var _log2 = _interopRequireDefault(_log);
 	
@@ -8037,6 +8064,7 @@
 	
 	var $_jsOverlay = (0, _js_libsJqueryDistJquery2["default"])(".js-overlay");
 	var $_jsProject = (0, _js_libsJqueryDistJquery2["default"])(".js-project-view");
+	var $_jsGallery = (0, _js_libsJqueryDistJquery2["default"])(".js-gallery");
 	
 	/**
 	 *
@@ -8099,14 +8127,27 @@
 	  /**
 	   *
 	   * @public
-	   * @member intro
+	   * @member overlay
 	   * @memberof dom
-	   * @description The cached brand moment node.
+	   * @description The cached overlay node.
 	   *
 	   */
 	  overlay: {
 	    element: $_jsOverlay,
 	    elementTitle: $_jsOverlay.find(".js-overlay-title")
+	  },
+	
+	  /**
+	   *
+	   * @public
+	   * @member gallery
+	   * @memberof dom
+	   * @description The cached gallery node.
+	   *
+	   */
+	  gallery: {
+	    element: $_jsGallery,
+	    elementNode: $_jsGallery.find(".js-gallery-node")
 	  },
 	
 	  /**
@@ -8191,19 +8232,7 @@
 	
 	var _hammerjs2 = _interopRequireDefault(_hammerjs);
 	
-	var _properjsController = __webpack_require__(/*! properjs-controller */ 9);
-	
-	var _properjsController2 = _interopRequireDefault(_properjsController);
-	
-	var _properjsScrollcontroller = __webpack_require__(/*! properjs-scrollcontroller */ 10);
-	
-	var _properjsScrollcontroller2 = _interopRequireDefault(_properjsScrollcontroller);
-	
-	var _properjsResizecontroller = __webpack_require__(/*! properjs-resizecontroller */ 11);
-	
-	var _properjsResizecontroller2 = _interopRequireDefault(_properjsResizecontroller);
-	
-	var _properjsImageloader = __webpack_require__(/*! properjs-imageloader */ 12);
+	var _properjsImageloader = __webpack_require__(/*! properjs-imageloader */ 9);
 	
 	var _properjsImageloader2 = _interopRequireDefault(_properjsImageloader);
 	
@@ -8211,7 +8240,7 @@
 	
 	var _dom2 = _interopRequireDefault(_dom);
 	
-	var _config = __webpack_require__(/*! ./config */ 13);
+	var _config = __webpack_require__(/*! ./config */ 10);
 	
 	var _config2 = _interopRequireDefault(_config);
 	
@@ -8259,33 +8288,6 @@
 	var translate3d = function translate3d(el, x, y, z) {
 	    el.style[_hammerjs2["default"].prefixed(el.style, "transform")] = "translate3d( " + x + ", " + y + ", " + z + " )";
 	};
-	
-	/**
-	 *
-	 * @description Single app instanceof [Controller]{@link https://github.com/ProperJS/Controller} for arbitrary event emitting
-	 * @member emitter
-	 * @memberof util
-	 *
-	 */
-	var emitter = new _properjsController2["default"]();
-	
-	/**
-	 *
-	 * @description Single app instanceof [ScrollController]{@link https://github.com/ProperJS/ScrollController}
-	 * @member scroller
-	 * @memberof util
-	 *
-	 */
-	var scroller = new _properjsScrollcontroller2["default"]();
-	
-	/**
-	 *
-	 * @description Single app instanceof [ResizeController]{@link https://github.com/ProperJS/ResizeController}
-	 * @member resizer
-	 * @memberof util
-	 *
-	 */
-	var resizer = new _properjsResizecontroller2["default"]();
 	
 	/**
 	 *
@@ -8589,11 +8591,6 @@
 	 * Export
 	*******************************************************************************/
 	exports["default"] = {
-	    // Classes
-	    emitter: emitter,
-	    scroller: scroller,
-	    resizer: resizer,
-	
 	    // Loading
 	    loadImages: loadImages,
 	    updateImages: updateImages,
@@ -11194,701 +11191,6 @@
 
 /***/ },
 /* 9 */
-/*!*********************************************!*\
-  !*** ./~/properjs-controller/Controller.js ***!
-  \*********************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	/*!
-	 *
-	 * Event / Animation cycle manager
-	 *
-	 * @Controller
-	 * @author: kitajchuk
-	 *
-	 *
-	 */
-	(function ( factory ) {
-	    
-	    if ( true ) {
-	        module.exports = factory();
-	
-	    } else if ( typeof window !== "undefined" ) {
-	        window.Controller = factory();
-	    }
-	    
-	})(function () {
-	    // Private animation functions
-	    var raf = window.requestAnimationFrame,
-	        caf = window.cancelAnimationFrame,
-	    
-	    
-	    /**
-	     *
-	     * Event / Animation cycle manager
-	     * @constructor Controller
-	     * @requires raf
-	     * @memberof! <global>
-	     *
-	     */
-	    Controller = function () {
-	        return this.init.apply( this, arguments );
-	    };
-	    
-	    Controller.prototype = {
-	        constructor: Controller,
-	    
-	        /**
-	         *
-	         * Controller constructor method
-	         * @memberof Controller
-	         * @method Controller.init
-	         *
-	         */
-	        init: function () {
-	            /**
-	             *
-	             * Controller event handlers object
-	             * @memberof Controller
-	             * @member _handlers
-	             * @private
-	             *
-	             */
-	            this._handlers = {};
-	    
-	            /**
-	             *
-	             * Controller unique ID
-	             * @memberof Controller
-	             * @member _uid
-	             * @private
-	             *
-	             */
-	            this._uid = 0;
-	    
-	            /**
-	             *
-	             * Started iteration flag
-	             * @memberof Controller
-	             * @member _started
-	             * @private
-	             *
-	             */
-	            this._started = false;
-	    
-	            /**
-	             *
-	             * Paused flag
-	             * @memberof Controller
-	             * @member _paused
-	             * @private
-	             *
-	             */
-	            this._paused = false;
-	    
-	            /**
-	             *
-	             * Timeout reference
-	             * @memberof Controller
-	             * @member _cycle
-	             * @private
-	             *
-	             */
-	            this._cycle = null;
-	        },
-	    
-	        /**
-	         *
-	         * Controller go method to start frames
-	         * @memberof Controller
-	         * @method go
-	         *
-	         */
-	        go: function ( fn ) {
-	            if ( this._started && this._cycle ) {
-	                return this;
-	            }
-	    
-	            this._started = true;
-	    
-	            var self = this,
-	                anim = function () {
-	                    self._cycle = raf( anim );
-	    
-	                    if ( self._started ) {
-	                        if ( typeof fn === "function" ) {
-	                            fn();
-	                        }
-	                    }
-	                };
-	    
-	            anim();
-	        },
-	    
-	        /**
-	         *
-	         * Pause the cycle
-	         * @memberof Controller
-	         * @method pause
-	         *
-	         */
-	        pause: function () {
-	            this._paused = true;
-	    
-	            return this;
-	        },
-	    
-	        /**
-	         *
-	         * Play the cycle
-	         * @memberof Controller
-	         * @method play
-	         *
-	         */
-	        play: function () {
-	            this._paused = false;
-	    
-	            return this;
-	        },
-	    
-	        /**
-	         *
-	         * Stop the cycle
-	         * @memberof Controller
-	         * @method stop
-	         *
-	         */
-	        stop: function () {
-	            caf( this._cycle );
-	    
-	            this._paused = false;
-	            this._started = false;
-	            this._cycle = null;
-	    
-	            return this;
-	        },
-	    
-	        /**
-	         *
-	         * Controller add event handler
-	         * @memberof Controller
-	         * @method on
-	         * @param {string} event the event to listen for
-	         * @param {function} handler the handler to call
-	         *
-	         */
-	        on: function ( event, handler ) {
-	            var events = event.split( " " );
-	    
-	            // One unique ID per handler
-	            handler._jsControllerID = this.getUID();
-	    
-	            for ( var i = events.length; i--; ) {
-	                if ( typeof handler === "function" ) {
-	                    if ( !this._handlers[ events[ i ] ] ) {
-	                        this._handlers[ events[ i ] ] = [];
-	                    }
-	    
-	                    // Handler can be stored with multiple events
-	                    this._handlers[ events[ i ] ].push( handler );
-	                }
-	            }
-	    
-	            return this;
-	        },
-	    
-	        /**
-	         *
-	         * Controller remove event handler
-	         * @memberof Controller
-	         * @method off
-	         * @param {string} event the event to remove handler for
-	         * @param {function} handler the handler to remove
-	         *
-	         */
-	        off: function ( event, handler ) {
-	            if ( !this._handlers[ event ] ) {
-	                return this;
-	            }
-	    
-	            // Remove a single handler
-	            if ( handler ) {
-	                this._off( event, handler );
-	    
-	            // Remove all handlers for event
-	            } else {
-	                this._offed( event );
-	            }
-	    
-	            return this;
-	        },
-	    
-	        /**
-	         *
-	         * Controller fire an event
-	         * @memberof Controller
-	         * @method fire
-	         * @param {string} event the event to fire
-	         *
-	         */
-	        fire: function ( event ) {
-	            if ( !this._handlers[ event ] ) {
-	                return this;
-	            }
-	    
-	            var args = [].slice.call( arguments, 1 );
-	    
-	            for ( var i = this._handlers[ event ].length; i--; ) {
-	                this._handlers[ event ][ i ].apply( this, args );
-	            }
-	    
-	            return this;
-	        },
-	    
-	        /**
-	         *
-	         * Get a unique ID
-	         * @memberof Controller
-	         * @method getUID
-	         * @returns number
-	         *
-	         */
-	        getUID: function () {
-	            this._uid = (this._uid + 1);
-	    
-	            return this._uid;
-	        },
-	    
-	        /**
-	         *
-	         * Controller internal off method assumes event AND handler are good
-	         * @memberof Controller
-	         * @method _off
-	         * @param {string} event the event to remove handler for
-	         * @param {function} handler the handler to remove
-	         * @private
-	         *
-	         */
-	        _off: function ( event, handler ) {
-	            for ( var i = 0, len = this._handlers[ event ].length; i < len; i++ ) {
-	                if ( handler._jsControllerID === this._handlers[ event ][ i ]._jsControllerID ) {
-	                    this._handlers[ event ].splice( i, 1 );
-	    
-	                    break;
-	                }
-	            }
-	        },
-	    
-	        /**
-	         *
-	         * Controller completely remove all handlers and an event type
-	         * @memberof Controller
-	         * @method _offed
-	         * @param {string} event the event to remove handler for
-	         * @private
-	         *
-	         */
-	        _offed: function ( event ) {
-	            for ( var i = this._handlers[ event ].length; i--; ) {
-	                this._handlers[ event ][ i ] = null;
-	            }
-	    
-	            delete this._handlers[ event ];
-	        }
-	    };
-	
-	    return Controller;
-	});
-
-/***/ },
-/* 10 */
-/*!*********************************************************!*\
-  !*** ./~/properjs-scrollcontroller/ScrollController.js ***!
-  \*********************************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	/*!
-	 *
-	 * Window scroll event controller
-	 *
-	 * @ScrollController
-	 * @author: kitajchuk
-	 *
-	 *
-	 */
-	(function ( factory ) {
-	    
-	    if ( true ) {
-	        module.exports = factory();
-	
-	    } else if ( typeof window !== "undefined" ) {
-	        window.ScrollController = factory();
-	    }
-	    
-	})(function () {
-	
-	    var Controller = __webpack_require__( /*! properjs-controller */ 9 ),
-	        
-	        // Current scroll position
-	        _currentY = null,
-	    
-	        // Singleton
-	        _instance = null;
-	    
-	    /**
-	     *
-	     * Window scroll event controller
-	     * @constructor ScrollController
-	     * @augments Controller
-	     * @requires Controller
-	     * @memberof! <global>
-	     *
-	     * @fires scroll
-	     * @fires scrolldown
-	     * @fires scrollup
-	     * @fires scrollmax
-	     * @fires scrollmin
-	     *
-	     */
-	    var ScrollController = function () {
-	        // Singleton
-	        if ( !_instance ) {
-	            _instance = this;
-	    
-	            // Call on parent cycle
-	            this.go(function () {
-	                var currentY = _instance.getScrollY(),
-	                    isStill = (currentY === _currentY),
-	                    isScroll = (currentY !== _currentY),
-	                    isScrollUp = (currentY < _currentY),
-	                    isScrollDown = (currentY > _currentY),
-	                    isScrollMax = (currentY !== _currentY && _instance.isScrollMax()),
-	                    isScrollMin = (currentY !== _currentY && _instance.isScrollMin());
-	    
-	                // Fire blanket scroll event
-	                if ( isScroll ) {
-	                    /**
-	                     *
-	                     * @event scroll
-	                     *
-	                     */
-	                    _instance.fire( "scroll" );
-	                }
-	    
-	                // Fire scrollup and scrolldown
-	                if ( isScrollDown ) {
-	                    /**
-	                     *
-	                     * @event scrolldown
-	                     *
-	                     */
-	                    _instance.fire( "scrolldown" );
-	    
-	                } else if ( isScrollUp ) {
-	                    /**
-	                     *
-	                     * @event scrollup
-	                     *
-	                     */
-	                    _instance.fire( "scrollup" );
-	                }
-	    
-	                // Fire scrollmax and scrollmin
-	                if ( isScrollMax ) {
-	                    /**
-	                     *
-	                     * @event scrollmax
-	                     *
-	                     */
-	                    _instance.fire( "scrollmax" );
-	    
-	                } else if ( isScrollMin ) {
-	                    /**
-	                     *
-	                     * @event scrollmin
-	                     *
-	                     */
-	                    _instance.fire( "scrollmin" );
-	                }
-	    
-	                _currentY = currentY;
-	            });
-	        }
-	    
-	        return _instance;
-	    };
-	    
-	    ScrollController.prototype = new Controller();
-	    
-	    /**
-	     *
-	     * Returns the current window vertical scroll position
-	     * @memberof ScrollController
-	     * @method getScrollY
-	     * @returns number
-	     *
-	     */
-	    ScrollController.prototype.getScrollY = function () {
-	        return (window.scrollY || document.documentElement.scrollTop);
-	    };
-	    
-	    /**
-	     *
-	     * Get the max document scrollable height
-	     * @memberof ScrollController
-	     * @method getScrollMax
-	     * @returns number
-	     *
-	     */
-	    ScrollController.prototype.getScrollMax = function () {
-	        return Math.max(
-	            document.body.scrollHeight, document.documentElement.scrollHeight,
-	            document.body.offsetHeight, document.documentElement.offsetHeight,
-	            document.documentElement.clientHeight
-	
-	        ) - window.innerHeight;
-	    };
-	    
-	    /**
-	     *
-	     * Determines if scroll position is at maximum for document
-	     * @memberof ScrollController
-	     * @method isScrollMax
-	     * @returns boolean
-	     *
-	     */
-	    ScrollController.prototype.isScrollMax = function () {
-	        return (this.getScrollY() >= this.getScrollMax());
-	    };
-	    
-	    /**
-	     *
-	     * Determines if scroll position is at minimum for document
-	     * @memberof ScrollController
-	     * @method isScrollMin
-	     * @returns boolean
-	     *
-	     */
-	    ScrollController.prototype.isScrollMin = function () {
-	        return (this.getScrollY() <= 0);
-	    };
-	    
-	    
-	    return ScrollController;
-	
-	});
-
-/***/ },
-/* 11 */
-/*!*********************************************************!*\
-  !*** ./~/properjs-resizecontroller/ResizeController.js ***!
-  \*********************************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	/*!
-	 *
-	 * Window resize / orientationchange event controller
-	 *
-	 * @ResizeController
-	 * @author: kitajchuk
-	 *
-	 *
-	 */
-	(function ( factory ) {
-	    
-	    if ( true ) {
-	        module.exports = factory();
-	
-	    } else if ( typeof window !== "undefined" ) {
-	        window.ResizeController = factory();
-	    }
-	    
-	})(function () {
-	
-	    var Controller = __webpack_require__( /*! properjs-controller */ 9 ),
-	
-	        // Orientation?
-	        _hasOrientation = ("orientation" in window),
-	
-	        // Current window viewport
-	        _currentView = null,
-	
-	        // Singleton
-	        _instance = null;
-	
-	    /**
-	     *
-	     * Window resize / orientationchange event controller
-	     * @constructor ResizeController
-	     * @augments Controller
-	     * @requires Controller
-	     * @memberof! <global>
-	     *
-	     * @fires resize
-	     * @fires resizedown
-	     * @fires resizeup
-	     * @fires resizewidth
-	     * @fires resizeheight
-	     * @fires orientationchange
-	     * @fires orientationportrait
-	     * @fires orientationlandscape
-	     *
-	     */
-	    var ResizeController = function () {
-	        // Singleton
-	        if ( !_instance ) {
-	            _instance = this;
-	
-	            // Initial viewport settings
-	            _currentView = _instance.getViewport();
-	
-	            // Call on parent cycle
-	            this.go(function () {
-	                var currentView = _instance.getViewport(),
-	                    isStill = (currentView.width === _currentView.width && currentView.height === _currentView.height),
-	                    isResize = (currentView.width !== _currentView.width || currentView.height !== _currentView.height),
-	                    isResizeUp = (currentView.width > _currentView.width || currentView.height > _currentView.height),
-	                    isResizeDown = (currentView.width < _currentView.width || currentView.height < _currentView.height),
-	                    isResizeWidth = (currentView.width !== _currentView.width),
-	                    isResizeHeight = (currentView.height !== _currentView.height),
-	                    isOrientation = (currentView.orient !== _currentView.orient),
-	                    isOrientationPortrait = (currentView.orient !== _currentView.orient && currentView.orient !== 90),
-	                    isOrientationLandscape = (currentView.orient !== _currentView.orient && currentView.orient === 90);
-	
-	                // Fire blanket resize event
-	                if ( isResize ) {
-	                    /**
-	                     *
-	                     * @event resize
-	                     *
-	                     */
-	                    _instance.fire( "resize" );
-	                }
-	
-	                // Fire resizeup and resizedown
-	                if ( isResizeDown ) {
-	                    /**
-	                     *
-	                     * @event resizedown
-	                     *
-	                     */
-	                    _instance.fire( "resizedown" );
-	
-	                } else if ( isResizeUp ) {
-	                    /**
-	                     *
-	                     * @event resizeup
-	                     *
-	                     */
-	                    _instance.fire( "resizeup" );
-	                }
-	
-	                // Fire resizewidth and resizeheight
-	                if ( isResizeWidth ) {
-	                    /**
-	                     *
-	                     * @event resizewidth
-	                     *
-	                     */
-	                    _instance.fire( "resizewidth" );
-	
-	                } else if ( isResizeHeight ) {
-	                    /**
-	                     *
-	                     * @event resizeheight
-	                     *
-	                     */
-	                    _instance.fire( "resizeheight" );
-	                }
-	
-	                // Fire blanket orientationchange event
-	                if ( isOrientation ) {
-	                    /**
-	                     *
-	                     * @event orientationchange
-	                     *
-	                     */
-	                    _instance.fire( "orientationchange" );
-	                }
-	
-	                // Fire orientationportrait and orientationlandscape
-	                if ( isOrientationPortrait ) {
-	                    /**
-	                     *
-	                     * @event orientationportrait
-	                     *
-	                     */
-	                    _instance.fire( "orientationportrait" );
-	
-	                } else if ( isOrientationLandscape ) {
-	                    /**
-	                     *
-	                     * @event orientationlandscape
-	                     *
-	                     */
-	                    _instance.fire( "orientationlandscape" );
-	                }
-	
-	                _currentView = currentView;
-	            });
-	        }
-	
-	        return _instance;
-	    };
-	
-	    ResizeController.prototype = new Controller();
-	
-	    /**
-	     *
-	     * Returns the current window viewport specs
-	     * @memberof ResizeController
-	     * @method getViewport
-	     * @returns object
-	     *
-	     */
-	    ResizeController.prototype.getViewport = function () {
-	        return {
-	            width: window.innerWidth,
-	            height: window.innerHeight,
-	            orient: _hasOrientation ? Math.abs( window.orientation ) : null
-	        };
-	    };
-	
-	    /**
-	     *
-	     * Tells if the viewport is in protrait mode
-	     * @memberof ResizeController
-	     * @method isPortrait
-	     * @returns boolean
-	     *
-	     */
-	    ResizeController.prototype.isPortrait = function () {
-	        var orient = this.getViewport().orient;
-	
-	        return (orient !== null && orient !== 90);
-	    };
-	
-	    /**
-	     *
-	     * Tells if the viewport is in landscape mode
-	     * @memberof ResizeController
-	     * @method isLandscape
-	     * @returns boolean
-	     *
-	     */
-	    ResizeController.prototype.isLandscape = function () {
-	        var orient = this.getViewport().orient;
-	
-	        return (orient !== null && orient === 90);
-	    };
-	
-	
-	    return ResizeController;
-	
-	});
-
-/***/ },
-/* 12 */
 /*!***********************************************!*\
   !*** ./~/properjs-imageloader/ImageLoader.js ***!
   \***********************************************/
@@ -12453,7 +11755,7 @@
 	});
 
 /***/ },
-/* 13 */
+/* 10 */
 /*!*******************************!*\
   !*** ./js_src/core/config.js ***!
   \*******************************/
@@ -12520,7 +11822,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 14 */
+/* 11 */
 /*!****************************!*\
   !*** ./js_src/core/log.js ***!
   \****************************/
@@ -12534,7 +11836,7 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 	
-	var _env = __webpack_require__(/*! ./env */ 15);
+	var _env = __webpack_require__(/*! ./env */ 12);
 	
 	var _env2 = _interopRequireDefault(_env);
 	
@@ -12562,7 +11864,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 15 */
+/* 12 */
 /*!****************************!*\
   !*** ./js_src/core/env.js ***!
   \****************************/
@@ -12632,7 +11934,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 16 */
+/* 13 */
 /*!*******************************!*\
   !*** ./js_src/core/images.js ***!
   \*******************************/
@@ -12656,19 +11958,23 @@
 	
 	var util = _interopRequireWildcard(_util);
 	
-	var _log = __webpack_require__(/*! ./log */ 14);
+	var _log = __webpack_require__(/*! ./log */ 11);
 	
 	var _log2 = _interopRequireDefault(_log);
 	
-	var _config = __webpack_require__(/*! ./config */ 13);
+	var _config = __webpack_require__(/*! ./config */ 10);
 	
 	var _config2 = _interopRequireDefault(_config);
 	
-	var _properjsImageloader = __webpack_require__(/*! properjs-imageloader */ 12);
+	var _emitter = __webpack_require__(/*! ./emitter */ 14);
+	
+	var _emitter2 = _interopRequireDefault(_emitter);
+	
+	var _properjsImageloader = __webpack_require__(/*! properjs-imageloader */ 9);
 	
 	var _properjsImageloader2 = _interopRequireDefault(_properjsImageloader);
 	
-	var _ImageController = __webpack_require__(/*! ./ImageController */ 17);
+	var _ImageController = __webpack_require__(/*! ./ImageController */ 16);
 	
 	var _ImageController2 = _interopRequireDefault(_ImageController);
 	
@@ -12742,7 +12048,7 @@
 	            callback();
 	        }
 	
-	        util.emitter.fire("app--preload-done");
+	        _emitter2["default"].fire("app--preload-done");
 	    },
 	
 	    /**
@@ -12764,7 +12070,7 @@
 	            imageController.on("preload", this.handlePreload.bind(this, callback));
 	
 	            imageController.on("lazyload", function () {
-	                util.emitter.fire("app--lazyload-done");
+	                _emitter2["default"].fire("app--lazyload-done");
 	            });
 	        } else {
 	            this.handlePreload(callback);
@@ -12779,7 +12085,349 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 17 */
+/* 14 */
+/*!********************************!*\
+  !*** ./js_src/core/emitter.js ***!
+  \********************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+	
+	var _properjsController = __webpack_require__(/*! properjs-controller */ 15);
+	
+	var _properjsController2 = _interopRequireDefault(_properjsController);
+	
+	/**
+	 *
+	 * @description Single app instanceof [Controller]{@link https://github.com/ProperJS/Controller} for arbitrary event emitting
+	 * @member emitter
+	 * @memberof core
+	 *
+	 */
+	var emitter = new _properjsController2["default"]();
+	
+	/******************************************************************************
+	 * Export
+	*******************************************************************************/
+	exports["default"] = emitter;
+	module.exports = exports["default"];
+
+/***/ },
+/* 15 */
+/*!*********************************************!*\
+  !*** ./~/properjs-controller/Controller.js ***!
+  \*********************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	/*!
+	 *
+	 * Event / Animation cycle manager
+	 *
+	 * @Controller
+	 * @author: kitajchuk
+	 *
+	 *
+	 */
+	(function ( factory ) {
+	    
+	    if ( true ) {
+	        module.exports = factory();
+	
+	    } else if ( typeof window !== "undefined" ) {
+	        window.Controller = factory();
+	    }
+	    
+	})(function () {
+	    // Private animation functions
+	    var raf = window.requestAnimationFrame,
+	        caf = window.cancelAnimationFrame,
+	    
+	    
+	    /**
+	     *
+	     * Event / Animation cycle manager
+	     * @constructor Controller
+	     * @requires raf
+	     * @memberof! <global>
+	     *
+	     */
+	    Controller = function () {
+	        return this.init.apply( this, arguments );
+	    };
+	    
+	    Controller.prototype = {
+	        constructor: Controller,
+	    
+	        /**
+	         *
+	         * Controller constructor method
+	         * @memberof Controller
+	         * @method Controller.init
+	         *
+	         */
+	        init: function () {
+	            /**
+	             *
+	             * Controller event handlers object
+	             * @memberof Controller
+	             * @member _handlers
+	             * @private
+	             *
+	             */
+	            this._handlers = {};
+	    
+	            /**
+	             *
+	             * Controller unique ID
+	             * @memberof Controller
+	             * @member _uid
+	             * @private
+	             *
+	             */
+	            this._uid = 0;
+	    
+	            /**
+	             *
+	             * Started iteration flag
+	             * @memberof Controller
+	             * @member _started
+	             * @private
+	             *
+	             */
+	            this._started = false;
+	    
+	            /**
+	             *
+	             * Paused flag
+	             * @memberof Controller
+	             * @member _paused
+	             * @private
+	             *
+	             */
+	            this._paused = false;
+	    
+	            /**
+	             *
+	             * Timeout reference
+	             * @memberof Controller
+	             * @member _cycle
+	             * @private
+	             *
+	             */
+	            this._cycle = null;
+	        },
+	    
+	        /**
+	         *
+	         * Controller go method to start frames
+	         * @memberof Controller
+	         * @method go
+	         *
+	         */
+	        go: function ( fn ) {
+	            if ( this._started && this._cycle ) {
+	                return this;
+	            }
+	    
+	            this._started = true;
+	    
+	            var self = this,
+	                anim = function () {
+	                    self._cycle = raf( anim );
+	    
+	                    if ( self._started ) {
+	                        if ( typeof fn === "function" ) {
+	                            fn();
+	                        }
+	                    }
+	                };
+	    
+	            anim();
+	        },
+	    
+	        /**
+	         *
+	         * Pause the cycle
+	         * @memberof Controller
+	         * @method pause
+	         *
+	         */
+	        pause: function () {
+	            this._paused = true;
+	    
+	            return this;
+	        },
+	    
+	        /**
+	         *
+	         * Play the cycle
+	         * @memberof Controller
+	         * @method play
+	         *
+	         */
+	        play: function () {
+	            this._paused = false;
+	    
+	            return this;
+	        },
+	    
+	        /**
+	         *
+	         * Stop the cycle
+	         * @memberof Controller
+	         * @method stop
+	         *
+	         */
+	        stop: function () {
+	            caf( this._cycle );
+	    
+	            this._paused = false;
+	            this._started = false;
+	            this._cycle = null;
+	    
+	            return this;
+	        },
+	    
+	        /**
+	         *
+	         * Controller add event handler
+	         * @memberof Controller
+	         * @method on
+	         * @param {string} event the event to listen for
+	         * @param {function} handler the handler to call
+	         *
+	         */
+	        on: function ( event, handler ) {
+	            var events = event.split( " " );
+	    
+	            // One unique ID per handler
+	            handler._jsControllerID = this.getUID();
+	    
+	            for ( var i = events.length; i--; ) {
+	                if ( typeof handler === "function" ) {
+	                    if ( !this._handlers[ events[ i ] ] ) {
+	                        this._handlers[ events[ i ] ] = [];
+	                    }
+	    
+	                    // Handler can be stored with multiple events
+	                    this._handlers[ events[ i ] ].push( handler );
+	                }
+	            }
+	    
+	            return this;
+	        },
+	    
+	        /**
+	         *
+	         * Controller remove event handler
+	         * @memberof Controller
+	         * @method off
+	         * @param {string} event the event to remove handler for
+	         * @param {function} handler the handler to remove
+	         *
+	         */
+	        off: function ( event, handler ) {
+	            if ( !this._handlers[ event ] ) {
+	                return this;
+	            }
+	    
+	            // Remove a single handler
+	            if ( handler ) {
+	                this._off( event, handler );
+	    
+	            // Remove all handlers for event
+	            } else {
+	                this._offed( event );
+	            }
+	    
+	            return this;
+	        },
+	    
+	        /**
+	         *
+	         * Controller fire an event
+	         * @memberof Controller
+	         * @method fire
+	         * @param {string} event the event to fire
+	         *
+	         */
+	        fire: function ( event ) {
+	            if ( !this._handlers[ event ] ) {
+	                return this;
+	            }
+	    
+	            var args = [].slice.call( arguments, 1 );
+	    
+	            for ( var i = this._handlers[ event ].length; i--; ) {
+	                this._handlers[ event ][ i ].apply( this, args );
+	            }
+	    
+	            return this;
+	        },
+	    
+	        /**
+	         *
+	         * Get a unique ID
+	         * @memberof Controller
+	         * @method getUID
+	         * @returns number
+	         *
+	         */
+	        getUID: function () {
+	            this._uid = (this._uid + 1);
+	    
+	            return this._uid;
+	        },
+	    
+	        /**
+	         *
+	         * Controller internal off method assumes event AND handler are good
+	         * @memberof Controller
+	         * @method _off
+	         * @param {string} event the event to remove handler for
+	         * @param {function} handler the handler to remove
+	         * @private
+	         *
+	         */
+	        _off: function ( event, handler ) {
+	            for ( var i = 0, len = this._handlers[ event ].length; i < len; i++ ) {
+	                if ( handler._jsControllerID === this._handlers[ event ][ i ]._jsControllerID ) {
+	                    this._handlers[ event ].splice( i, 1 );
+	    
+	                    break;
+	                }
+	            }
+	        },
+	    
+	        /**
+	         *
+	         * Controller completely remove all handlers and an event type
+	         * @memberof Controller
+	         * @method _offed
+	         * @param {string} event the event to remove handler for
+	         * @private
+	         *
+	         */
+	        _offed: function ( event ) {
+	            for ( var i = this._handlers[ event ].length; i--; ) {
+	                this._handlers[ event ][ i ] = null;
+	            }
+	    
+	            delete this._handlers[ event ];
+	        }
+	    };
+	
+	    return Controller;
+	});
+
+/***/ },
+/* 16 */
 /*!****************************************!*\
   !*** ./js_src/core/ImageController.js ***!
   \****************************************/
@@ -12807,11 +12455,11 @@
 	
 	var util = _interopRequireWildcard(_util);
 	
-	var _log = __webpack_require__(/*! ./log */ 14);
+	var _log = __webpack_require__(/*! ./log */ 11);
 	
 	var _log2 = _interopRequireDefault(_log);
 	
-	var _properjsController = __webpack_require__(/*! properjs-controller */ 9);
+	var _properjsController = __webpack_require__(/*! properjs-controller */ 15);
 	
 	var _properjsController2 = _interopRequireDefault(_properjsController);
 	
@@ -12906,7 +12554,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 18 */
+/* 17 */
 /*!********************************!*\
   !*** ./js_src/core/resizes.js ***!
   \********************************/
@@ -12922,21 +12570,29 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 	
-	var _properjsThrottle = __webpack_require__(/*! properjs-throttle */ 19);
+	var _log = __webpack_require__(/*! ./log */ 11);
 	
-	var _properjsThrottle2 = _interopRequireDefault(_properjsThrottle);
-	
-	var _properjsDebounce = __webpack_require__(/*! properjs-debounce */ 20);
-	
-	var _properjsDebounce2 = _interopRequireDefault(_properjsDebounce);
+	var _log2 = _interopRequireDefault(_log);
 	
 	var _util = __webpack_require__(/*! ./util */ 7);
 	
 	var util = _interopRequireWildcard(_util);
 	
-	var _log = __webpack_require__(/*! ./log */ 14);
+	var _emitter = __webpack_require__(/*! ./emitter */ 14);
 	
-	var _log2 = _interopRequireDefault(_log);
+	var _emitter2 = _interopRequireDefault(_emitter);
+	
+	var _resizer = __webpack_require__(/*! ./resizer */ 18);
+	
+	var _resizer2 = _interopRequireDefault(_resizer);
+	
+	var _properjsThrottle = __webpack_require__(/*! properjs-throttle */ 20);
+	
+	var _properjsThrottle2 = _interopRequireDefault(_properjsThrottle);
+	
+	var _properjsDebounce = __webpack_require__(/*! properjs-debounce */ 21);
+	
+	var _properjsDebounce2 = _interopRequireDefault(_properjsDebounce);
 	
 	var _throttled = 50;
 	var _debounced = 300;
@@ -12944,7 +12600,8 @@
 	/**
 	 *
 	 * @public
-	 * @module resizes
+	 * @namespace resizes
+	 * @memberof core
 	 * @description Handles app-wide emission of various resize detection events.
 	 *
 	 */
@@ -12953,16 +12610,16 @@
 	   *
 	   * @public
 	   * @method init
-	   * @memberof resizes
+	   * @memberof core.resizes
 	   * @description Method binds event listeners for resize controller.
 	   *
 	   */
 	  init: function init() {
-	    util.resizer.on("resize", (0, _properjsThrottle2["default"])(onThrottle, _throttled));
+	    _resizer2["default"].on("resize", (0, _properjsThrottle2["default"])(onThrottle, _throttled));
 	
 	    // Hook into resize of `width` only for this handler
 	    // @bug: iOS window size changes when Safari's chrome switches between full and minimal-ui.
-	    util.resizer.on("resizewidth", (0, _properjsDebounce2["default"])(onDebounce, _debounced));
+	    _resizer2["default"].on("resizewidth", (0, _properjsDebounce2["default"])(onDebounce, _debounced));
 	
 	    (0, _log2["default"])("resizes initialized");
 	  }
@@ -12972,12 +12629,12 @@
 	 *
 	 * @private
 	 * @method onDebounce
-	 * @memberof resizes
+	 * @memberof core.resizes
 	 * @description Debounced resize events.
 	 *
 	 */
 	var onDebounce = function onDebounce() {
-	  util.emitter.fire("app--resize-debounced");
+	  _emitter2["default"].fire("app--resize-debounced");
 	
 	  util.updateImages();
 	};
@@ -12986,12 +12643,12 @@
 	 *
 	 * @private
 	 * @method onThrottle
-	 * @memberof resizes
+	 * @memberof core.resizes
 	 * @description Method handles the window resize event via [ResizeController]{@link https://github.com/ProperJS/ResizeController}.
 	 *
 	 */
 	var onThrottle = function onThrottle() {
-	  util.emitter.fire("app--resize");
+	  _emitter2["default"].fire("app--resize");
 	};
 	
 	/******************************************************************************
@@ -13001,7 +12658,250 @@
 	module.exports = exports["default"];
 
 /***/ },
+/* 18 */
+/*!********************************!*\
+  !*** ./js_src/core/resizer.js ***!
+  \********************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+	
+	var _properjsResizecontroller = __webpack_require__(/*! properjs-resizecontroller */ 19);
+	
+	var _properjsResizecontroller2 = _interopRequireDefault(_properjsResizecontroller);
+	
+	/**
+	 *
+	 * @description Single app instanceof [ResizeController]{@link https://github.com/ProperJS/ResizeController} for raf resize handling
+	 * @member resizer
+	 * @memberof core
+	 *
+	 */
+	var resizer = new _properjsResizecontroller2["default"]();
+	
+	/******************************************************************************
+	 * Export
+	*******************************************************************************/
+	exports["default"] = resizer;
+	module.exports = exports["default"];
+
+/***/ },
 /* 19 */
+/*!*********************************************************!*\
+  !*** ./~/properjs-resizecontroller/ResizeController.js ***!
+  \*********************************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	/*!
+	 *
+	 * Window resize / orientationchange event controller
+	 *
+	 * @ResizeController
+	 * @author: kitajchuk
+	 *
+	 *
+	 */
+	(function ( factory ) {
+	    
+	    if ( true ) {
+	        module.exports = factory();
+	
+	    } else if ( typeof window !== "undefined" ) {
+	        window.ResizeController = factory();
+	    }
+	    
+	})(function () {
+	
+	    var Controller = __webpack_require__( /*! properjs-controller */ 15 ),
+	
+	        // Orientation?
+	        _hasOrientation = ("orientation" in window),
+	
+	        // Current window viewport
+	        _currentView = null,
+	
+	        // Singleton
+	        _instance = null;
+	
+	    /**
+	     *
+	     * Window resize / orientationchange event controller
+	     * @constructor ResizeController
+	     * @augments Controller
+	     * @requires Controller
+	     * @memberof! <global>
+	     *
+	     * @fires resize
+	     * @fires resizedown
+	     * @fires resizeup
+	     * @fires resizewidth
+	     * @fires resizeheight
+	     * @fires orientationchange
+	     * @fires orientationportrait
+	     * @fires orientationlandscape
+	     *
+	     */
+	    var ResizeController = function () {
+	        // Singleton
+	        if ( !_instance ) {
+	            _instance = this;
+	
+	            // Initial viewport settings
+	            _currentView = _instance.getViewport();
+	
+	            // Call on parent cycle
+	            this.go(function () {
+	                var currentView = _instance.getViewport(),
+	                    isStill = (currentView.width === _currentView.width && currentView.height === _currentView.height),
+	                    isResize = (currentView.width !== _currentView.width || currentView.height !== _currentView.height),
+	                    isResizeUp = (currentView.width > _currentView.width || currentView.height > _currentView.height),
+	                    isResizeDown = (currentView.width < _currentView.width || currentView.height < _currentView.height),
+	                    isResizeWidth = (currentView.width !== _currentView.width),
+	                    isResizeHeight = (currentView.height !== _currentView.height),
+	                    isOrientation = (currentView.orient !== _currentView.orient),
+	                    isOrientationPortrait = (currentView.orient !== _currentView.orient && currentView.orient !== 90),
+	                    isOrientationLandscape = (currentView.orient !== _currentView.orient && currentView.orient === 90);
+	
+	                // Fire blanket resize event
+	                if ( isResize ) {
+	                    /**
+	                     *
+	                     * @event resize
+	                     *
+	                     */
+	                    _instance.fire( "resize" );
+	                }
+	
+	                // Fire resizeup and resizedown
+	                if ( isResizeDown ) {
+	                    /**
+	                     *
+	                     * @event resizedown
+	                     *
+	                     */
+	                    _instance.fire( "resizedown" );
+	
+	                } else if ( isResizeUp ) {
+	                    /**
+	                     *
+	                     * @event resizeup
+	                     *
+	                     */
+	                    _instance.fire( "resizeup" );
+	                }
+	
+	                // Fire resizewidth and resizeheight
+	                if ( isResizeWidth ) {
+	                    /**
+	                     *
+	                     * @event resizewidth
+	                     *
+	                     */
+	                    _instance.fire( "resizewidth" );
+	
+	                } else if ( isResizeHeight ) {
+	                    /**
+	                     *
+	                     * @event resizeheight
+	                     *
+	                     */
+	                    _instance.fire( "resizeheight" );
+	                }
+	
+	                // Fire blanket orientationchange event
+	                if ( isOrientation ) {
+	                    /**
+	                     *
+	                     * @event orientationchange
+	                     *
+	                     */
+	                    _instance.fire( "orientationchange" );
+	                }
+	
+	                // Fire orientationportrait and orientationlandscape
+	                if ( isOrientationPortrait ) {
+	                    /**
+	                     *
+	                     * @event orientationportrait
+	                     *
+	                     */
+	                    _instance.fire( "orientationportrait" );
+	
+	                } else if ( isOrientationLandscape ) {
+	                    /**
+	                     *
+	                     * @event orientationlandscape
+	                     *
+	                     */
+	                    _instance.fire( "orientationlandscape" );
+	                }
+	
+	                _currentView = currentView;
+	            });
+	        }
+	
+	        return _instance;
+	    };
+	
+	    ResizeController.prototype = new Controller();
+	
+	    /**
+	     *
+	     * Returns the current window viewport specs
+	     * @memberof ResizeController
+	     * @method getViewport
+	     * @returns object
+	     *
+	     */
+	    ResizeController.prototype.getViewport = function () {
+	        return {
+	            width: window.innerWidth,
+	            height: window.innerHeight,
+	            orient: _hasOrientation ? Math.abs( window.orientation ) : null
+	        };
+	    };
+	
+	    /**
+	     *
+	     * Tells if the viewport is in protrait mode
+	     * @memberof ResizeController
+	     * @method isPortrait
+	     * @returns boolean
+	     *
+	     */
+	    ResizeController.prototype.isPortrait = function () {
+	        var orient = this.getViewport().orient;
+	
+	        return (orient !== null && orient !== 90);
+	    };
+	
+	    /**
+	     *
+	     * Tells if the viewport is in landscape mode
+	     * @memberof ResizeController
+	     * @method isLandscape
+	     * @returns boolean
+	     *
+	     */
+	    ResizeController.prototype.isLandscape = function () {
+	        var orient = this.getViewport().orient;
+	
+	        return (orient !== null && orient === 90);
+	    };
+	
+	
+	    return ResizeController;
+	
+	});
+
+/***/ },
+/* 20 */
 /*!*****************************************!*\
   !*** ./~/properjs-throttle/throttle.js ***!
   \*****************************************/
@@ -13060,7 +12960,7 @@
 	});
 
 /***/ },
-/* 20 */
+/* 21 */
 /*!*****************************************!*\
   !*** ./~/properjs-debounce/debounce.js ***!
   \*****************************************/
@@ -13131,7 +13031,7 @@
 	});
 
 /***/ },
-/* 21 */
+/* 22 */
 /*!********************************!*\
   !*** ./js_src/core/scrolls.js ***!
   \********************************/
@@ -13143,34 +13043,38 @@
 	    value: true
 	});
 	
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
-	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 	
 	var _dom = __webpack_require__(/*! ./dom */ 6);
 	
 	var _dom2 = _interopRequireDefault(_dom);
 	
+	var _log = __webpack_require__(/*! ./log */ 11);
+	
+	var _log2 = _interopRequireDefault(_log);
+	
 	var _detect = __webpack_require__(/*! ./detect */ 5);
 	
 	var _detect2 = _interopRequireDefault(_detect);
 	
-	var _util = __webpack_require__(/*! ./util */ 7);
+	var _emitter = __webpack_require__(/*! ./emitter */ 14);
 	
-	var util = _interopRequireWildcard(_util);
+	var _emitter2 = _interopRequireDefault(_emitter);
 	
-	var _log = __webpack_require__(/*! ./log */ 14);
+	var _scroller = __webpack_require__(/*! ./scroller */ 23);
 	
-	var _log2 = _interopRequireDefault(_log);
+	var _scroller2 = _interopRequireDefault(_scroller);
 	
 	var _timeout = null;
-	var _isNones = false;
+	var _isSuppressed = false;
+	var _isSuppressedEvents = false;
 	var _idleout = 300;
 	
 	/**
 	 *
 	 * @public
-	 * @module scrolls
+	 * @namespace scrolls
+	 * @memberof core
 	 * @description Handles app-wide emission of various scroll detection events.
 	 *
 	 */
@@ -13179,14 +13083,14 @@
 	     *
 	     * @public
 	     * @method init
-	     * @memberof scrolls
+	     * @memberof core.scrolls
 	     * @description Method runs once when window loads.
 	     *
 	     */
 	    init: function init() {
-	        util.scroller.on("scroll", onScroller);
-	        util.scroller.on("scrollup", onScrollerUp);
-	        util.scroller.on("scrolldown", onScrollerDown);
+	        _scroller2["default"].on("scroll", onScroller);
+	        _scroller2["default"].on("scrollup", onScrollerUp);
+	        _scroller2["default"].on("scrolldown", onScrollerDown);
 	
 	        onScroller();
 	
@@ -13200,8 +13104,8 @@
 	     * @public
 	     * @method topout
 	     * @param {number} top Optionally, the scroll position to apply
-	     * @memberof preload
-	     * @description Method set scroll position to argument value or sero.
+	     * @memberof core.scrolls
+	     * @description Method set scroll position to argument value or zero.
 	     *
 	     */
 	    topout: function topout(top) {
@@ -13213,14 +13117,75 @@
 	    /**
 	     *
 	     * @public
+	     * @method suppress
+	     * @param {boolean} bool Whether or not to suppress
+	     * @memberof core.scrolls
+	     * @description Method will suppress scroll position broadcasting.
+	     *
+	     */
+	    suppress: function suppress(bool) {
+	        _isSuppressed = bool;
+	    },
+	
+	    /**
+	     *
+	     * @public
 	     * @method clearStates
-	     * @memberof scrolls
+	     * @memberof core.scrolls
 	     * @description Method removes all applied classNames from this module
 	     *
 	     */
 	    clearStates: function clearStates() {
 	        _dom2["default"].html.removeClass("is-scrolling-up is-scrolling-down is-scrolling");
+	    },
+	
+	    /**
+	     *
+	     * @public
+	     * @method isScrollInRange
+	     * @memberof core.scrolls
+	     * @description Method determines if scroll is within range
+	     * @returns {boolean}
+	     *
+	     */
+	    isScrollInRange: function isScrollInRange() {
+	        var scrollPos = _scroller2["default"].getScrollY();
+	
+	        return scrollPos > 0 || scrollPos < _scroller2["default"].getScrollMax();
+	    },
+	
+	    /**
+	     *
+	     * @public
+	     * @method isScrollOutOfRange
+	     * @memberof core.scrolls
+	     * @description Method determines if scroll is out of range
+	     * @returns {boolean}
+	     *
+	     */
+	    isScrollOutOfRange: function isScrollOutOfRange() {
+	        var scrollPos = _scroller2["default"].getScrollY();
+	
+	        return scrollPos <= 0 || scrollPos >= _scroller2["default"].getScrollMax();
 	    }
+	};
+	
+	/**
+	 *
+	 * @private
+	 * @method broadcast
+	 * @param {string} event The scroll event to emit
+	 * @param {number} position The current scroll position
+	 * @memberof core.scrolls
+	 * @description Method will emit scroll position information.
+	 *
+	 */
+	var broadcast = function broadcast(event, position) {
+	    if (_isSuppressed) {
+	        return;
+	    }
+	
+	    _emitter2["default"].fire(event, position);
 	};
 	
 	/**
@@ -13228,12 +13193,12 @@
 	 * @private
 	 * @method suppressEvents
 	 * @param {number} scrollPos The current scrollY position
-	 * @memberof scrolls
+	 * @memberof core.scrolls
 	 * @description Method applies className to disable events while scrolling
 	 *
 	 */
 	var suppressEvents = function suppressEvents(scrollPos) {
-	    if (_detect2["default"].isDevice()) {
+	    if (_detect2["default"].isStandalone()) {
 	        return;
 	    }
 	
@@ -13243,21 +13208,21 @@
 	        (0, _log2["default"])(error);
 	    }
 	
-	    if (!_isNones) {
-	        _isNones = true;
+	    if (!_isSuppressedEvents) {
+	        _isSuppressedEvents = true;
 	
 	        _dom2["default"].html.addClass("is-scrolling");
 	
-	        util.emitter.fire("app--scroll-start");
+	        broadcast("app--scroll-start", scrollPos);
 	    }
 	
 	    _timeout = setTimeout(function () {
-	        if (scrollPos === util.scroller.getScrollY()) {
-	            _isNones = false;
+	        if (scrollPos === _scroller2["default"].getScrollY()) {
+	            _isSuppressedEvents = false;
 	
 	            _dom2["default"].html.removeClass("is-scrolling");
 	
-	            util.emitter.fire("app--scroll-end");
+	            broadcast("app--scroll-end", scrollPos);
 	        }
 	    }, _idleout);
 	};
@@ -13266,18 +13231,18 @@
 	 *
 	 * @private
 	 * @method onScrollerUp
-	 * @memberof scrolls
+	 * @memberof core.scrolls
 	 * @description Method handles upward scroll event
 	 *
 	 */
 	var onScrollerUp = function onScrollerUp() {
-	    if (util.scroller.getScrollY() <= 0 || _detect2["default"].isDevice()) {
+	    if (!scrolls.isScrollInRange() || _detect2["default"].isStandalone()) {
 	        return;
 	    }
 	
-	    var scrollPos = util.scroller.getScrollY();
+	    var scrollPos = _scroller2["default"].getScrollY();
 	
-	    util.emitter.fire("app--scroll-up", scrollPos);
+	    broadcast("app--scroll-up", scrollPos);
 	
 	    _dom2["default"].html.removeClass("is-scrolling-down").addClass("is-scrolling-up");
 	};
@@ -13286,18 +13251,18 @@
 	 *
 	 * @private
 	 * @method onScrollerDown
-	 * @memberof scrolls
+	 * @memberof core.scrolls
 	 * @description Method handles downward scroll event
 	 *
 	 */
 	var onScrollerDown = function onScrollerDown() {
-	    if (util.scroller.getScrollY() <= 0 || _detect2["default"].isDevice()) {
+	    if (!scrolls.isScrollInRange() || _detect2["default"].isStandalone()) {
 	        return;
 	    }
 	
-	    var scrollPos = util.scroller.getScrollY();
+	    var scrollPos = _scroller2["default"].getScrollY();
 	
-	    util.emitter.fire("app--scroll-down", scrollPos);
+	    broadcast("app--scroll-down", scrollPos);
 	
 	    _dom2["default"].html.removeClass("is-scrolling-up").addClass("is-scrolling-down");
 	};
@@ -13306,16 +13271,20 @@
 	 *
 	 * @private
 	 * @method onScroller
-	 * @memberof scrolls
+	 * @memberof core.scrolls
 	 * @description Method handles regular scroll event via [ScrollController]{@link https://github.com/ProperJS/ScrollController}
 	 *
 	 */
 	var onScroller = function onScroller() {
-	    var scrollPos = util.scroller.getScrollY();
+	    if (!scrolls.isScrollInRange() || _detect2["default"].isStandalone()) {
+	        return;
+	    }
+	
+	    var scrollPos = _scroller2["default"].getScrollY();
 	
 	    suppressEvents(scrollPos);
 	
-	    util.emitter.fire("app--scroll", scrollPos);
+	    broadcast("app--scroll", scrollPos);
 	};
 	
 	/******************************************************************************
@@ -13325,7 +13294,219 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 22 */
+/* 23 */
+/*!*********************************!*\
+  !*** ./js_src/core/scroller.js ***!
+  \*********************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+	
+	var _properjsScrollcontroller = __webpack_require__(/*! properjs-scrollcontroller */ 24);
+	
+	var _properjsScrollcontroller2 = _interopRequireDefault(_properjsScrollcontroller);
+	
+	/**
+	 *
+	 * @description Single app instanceof [ScrollController]{@link https://github.com/ProperJS/ScrollController} for raf scroll handling
+	 * @member scroller
+	 * @memberof core
+	 *
+	 */
+	var scroller = new _properjsScrollcontroller2["default"]();
+	
+	/******************************************************************************
+	 * Export
+	*******************************************************************************/
+	exports["default"] = scroller;
+	module.exports = exports["default"];
+
+/***/ },
+/* 24 */
+/*!*********************************************************!*\
+  !*** ./~/properjs-scrollcontroller/ScrollController.js ***!
+  \*********************************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	/*!
+	 *
+	 * Window scroll event controller
+	 *
+	 * @ScrollController
+	 * @author: kitajchuk
+	 *
+	 *
+	 */
+	(function ( factory ) {
+	    
+	    if ( true ) {
+	        module.exports = factory();
+	
+	    } else if ( typeof window !== "undefined" ) {
+	        window.ScrollController = factory();
+	    }
+	    
+	})(function () {
+	
+	    var Controller = __webpack_require__( /*! properjs-controller */ 15 ),
+	        
+	        // Current scroll position
+	        _currentY = null,
+	    
+	        // Singleton
+	        _instance = null;
+	    
+	    /**
+	     *
+	     * Window scroll event controller
+	     * @constructor ScrollController
+	     * @augments Controller
+	     * @requires Controller
+	     * @memberof! <global>
+	     *
+	     * @fires scroll
+	     * @fires scrolldown
+	     * @fires scrollup
+	     * @fires scrollmax
+	     * @fires scrollmin
+	     *
+	     */
+	    var ScrollController = function () {
+	        // Singleton
+	        if ( !_instance ) {
+	            _instance = this;
+	    
+	            // Call on parent cycle
+	            this.go(function () {
+	                var currentY = _instance.getScrollY(),
+	                    isStill = (currentY === _currentY),
+	                    isScroll = (currentY !== _currentY),
+	                    isScrollUp = (currentY < _currentY),
+	                    isScrollDown = (currentY > _currentY),
+	                    isScrollMax = (currentY !== _currentY && _instance.isScrollMax()),
+	                    isScrollMin = (currentY !== _currentY && _instance.isScrollMin());
+	    
+	                // Fire blanket scroll event
+	                if ( isScroll ) {
+	                    /**
+	                     *
+	                     * @event scroll
+	                     *
+	                     */
+	                    _instance.fire( "scroll" );
+	                }
+	    
+	                // Fire scrollup and scrolldown
+	                if ( isScrollDown ) {
+	                    /**
+	                     *
+	                     * @event scrolldown
+	                     *
+	                     */
+	                    _instance.fire( "scrolldown" );
+	    
+	                } else if ( isScrollUp ) {
+	                    /**
+	                     *
+	                     * @event scrollup
+	                     *
+	                     */
+	                    _instance.fire( "scrollup" );
+	                }
+	    
+	                // Fire scrollmax and scrollmin
+	                if ( isScrollMax ) {
+	                    /**
+	                     *
+	                     * @event scrollmax
+	                     *
+	                     */
+	                    _instance.fire( "scrollmax" );
+	    
+	                } else if ( isScrollMin ) {
+	                    /**
+	                     *
+	                     * @event scrollmin
+	                     *
+	                     */
+	                    _instance.fire( "scrollmin" );
+	                }
+	    
+	                _currentY = currentY;
+	            });
+	        }
+	    
+	        return _instance;
+	    };
+	    
+	    ScrollController.prototype = new Controller();
+	    
+	    /**
+	     *
+	     * Returns the current window vertical scroll position
+	     * @memberof ScrollController
+	     * @method getScrollY
+	     * @returns number
+	     *
+	     */
+	    ScrollController.prototype.getScrollY = function () {
+	        return (window.scrollY || document.documentElement.scrollTop);
+	    };
+	    
+	    /**
+	     *
+	     * Get the max document scrollable height
+	     * @memberof ScrollController
+	     * @method getScrollMax
+	     * @returns number
+	     *
+	     */
+	    ScrollController.prototype.getScrollMax = function () {
+	        return Math.max(
+	            document.body.scrollHeight, document.documentElement.scrollHeight,
+	            document.body.offsetHeight, document.documentElement.offsetHeight,
+	            document.documentElement.clientHeight
+	
+	        ) - window.innerHeight;
+	    };
+	    
+	    /**
+	     *
+	     * Determines if scroll position is at maximum for document
+	     * @memberof ScrollController
+	     * @method isScrollMax
+	     * @returns boolean
+	     *
+	     */
+	    ScrollController.prototype.isScrollMax = function () {
+	        return (this.getScrollY() >= this.getScrollMax());
+	    };
+	    
+	    /**
+	     *
+	     * Determines if scroll position is at minimum for document
+	     * @memberof ScrollController
+	     * @method isScrollMin
+	     * @returns boolean
+	     *
+	     */
+	    ScrollController.prototype.isScrollMin = function () {
+	        return (this.getScrollY() <= 0);
+	    };
+	    
+	    
+	    return ScrollController;
+	
+	});
+
+/***/ },
+/* 25 */
 /*!****************************!*\
   !*** ./js_src/core/api.js ***!
   \****************************/
@@ -13343,7 +13524,7 @@
 	
 	var _js_libsJqueryDistJquery2 = _interopRequireDefault(_js_libsJqueryDistJquery);
 	
-	var _paramalama = __webpack_require__(/*! paramalama */ 23);
+	var _paramalama = __webpack_require__(/*! paramalama */ 26);
 	
 	var _paramalama2 = _interopRequireDefault(_paramalama);
 	
@@ -13593,7 +13774,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 23 */
+/* 26 */
 /*!************************************!*\
   !*** ./~/paramalama/paramalama.js ***!
   \************************************/
@@ -13662,7 +13843,7 @@
 
 
 /***/ },
-/* 24 */
+/* 27 */
 /*!******************************!*\
   !*** ./js_src/core/cache.js ***!
   \******************************/
@@ -13676,7 +13857,7 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 	
-	var _Store = __webpack_require__(/*! ./Store */ 25);
+	var _Store = __webpack_require__(/*! ./Store */ 28);
 	
 	var _Store2 = _interopRequireDefault(_Store);
 	
@@ -13694,7 +13875,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 25 */
+/* 28 */
 /*!******************************!*\
   !*** ./js_src/core/Store.js ***!
   \******************************/
@@ -13716,11 +13897,11 @@
 	
 	var _js_libsJqueryDistJquery2 = _interopRequireDefault(_js_libsJqueryDistJquery);
 	
-	var _log = __webpack_require__(/*! ./log */ 14);
+	var _log = __webpack_require__(/*! ./log */ 11);
 	
 	var _log2 = _interopRequireDefault(_log);
 	
-	var _config = __webpack_require__(/*! ./config */ 13);
+	var _config = __webpack_require__(/*! ./config */ 10);
 	
 	var _config2 = _interopRequireDefault(_config);
 	
@@ -13946,7 +14127,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 26 */
+/* 29 */
 /*!**********************************!*\
   !*** ./js_src/core/Analytics.js ***!
   \**********************************/
@@ -13967,7 +14148,7 @@
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	var _log = __webpack_require__(/*! ./log */ 14);
+	var _log = __webpack_require__(/*! ./log */ 11);
 	
 	var _log2 = _interopRequireDefault(_log);
 	
@@ -13975,9 +14156,13 @@
 	
 	var util = _interopRequireWildcard(_util);
 	
-	var _cache = __webpack_require__(/*! ./cache */ 24);
+	var _cache = __webpack_require__(/*! ./cache */ 27);
 	
 	var _cache2 = _interopRequireDefault(_cache);
+	
+	var _emitter = __webpack_require__(/*! ./emitter */ 14);
+	
+	var _emitter2 = _interopRequireDefault(_emitter);
 	
 	// Singleton
 	var _instance = null;
@@ -13999,7 +14184,7 @@
 	        if (!_instance) {
 	            this.initSQSMetrics();
 	
-	            util.emitter.on("app--analytics-push", this.pushTrack.bind(this));
+	            _emitter2["default"].on("app--analytics-push", this.pushTrack.bind(this));
 	
 	            (0, _log2["default"])("Analytics initialized");
 	
@@ -14153,7 +14338,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 27 */
+/* 30 */
 /*!**************************!*\
   !*** ./js_src/router.js ***!
   \**************************/
@@ -14169,7 +14354,7 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 	
-	var _properjsPagecontroller = __webpack_require__(/*! properjs-pagecontroller */ 28);
+	var _properjsPagecontroller = __webpack_require__(/*! properjs-pagecontroller */ 31);
 	
 	var _properjsPagecontroller2 = _interopRequireDefault(_properjsPagecontroller);
 	
@@ -14181,23 +14366,23 @@
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _menus = __webpack_require__(/*! ./menus */ 33);
+	var _menus = __webpack_require__(/*! ./menus */ 36);
 	
 	var _menus2 = _interopRequireDefault(_menus);
 	
-	var _indexes = __webpack_require__(/*! ./indexes */ 35);
+	var _indexes = __webpack_require__(/*! ./indexes */ 38);
 	
 	var _indexes2 = _interopRequireDefault(_indexes);
 	
-	var _indexesListing = __webpack_require__(/*! ./indexes/listing */ 39);
+	var _indexesListing = __webpack_require__(/*! ./indexes/listing */ 42);
 	
 	var _indexesListing2 = _interopRequireDefault(_indexesListing);
 	
-	var _projects = __webpack_require__(/*! ./projects */ 42);
+	var _projects = __webpack_require__(/*! ./projects */ 47);
 	
 	var _projects2 = _interopRequireDefault(_projects);
 	
-	var _animate = __webpack_require__(/*! ./animate */ 43);
+	var _animate = __webpack_require__(/*! ./animate */ 48);
 	
 	var _animate2 = _interopRequireDefault(_animate);
 	
@@ -14224,10 +14409,11 @@
 	        this.navData = core.dom.nav.data();
 	        this.pageData = core.dom.page.data();
 	        this.pageDuration = core.util.getTransitionDuration(core.dom.page[0]);
+	        this.prepPage();
 	        this.bindEmptyHashLinks();
 	        this.initPageController();
 	
-	        core.util.emitter.on("app--project-ended", function () {
+	        core.emitter.on("app--project-ended", function () {
 	            _this.route(_this.root);
 	        });
 	
@@ -14354,9 +14540,7 @@
 	        this.controller.on("page-controller-router-transition-out", this.changePageOut.bind(this));
 	        this.controller.on("page-controller-router-refresh-document", this.changeContent.bind(this));
 	        this.controller.on("page-controller-router-transition-in", this.changePageIn.bind(this));
-	        //this.controller.on( "page-controller-initialized-page", this.initPage.bind( this ) );
-	
-	        this.initPage();
+	        this.controller.on("page-controller-initialized-page", this.initPage.bind(this));
 	
 	        this.controller.initPage();
 	    },
@@ -14364,18 +14548,15 @@
 	    /**
 	     *
 	     * @public
-	     * @method initPage
+	     * @method prepPage
 	     * @memberof router
-	     * @description Cache the initial page load.
+	     * @description Perform actions before PageController init callback.
 	     *
 	     */
-	    initPage: function initPage() {
+	    prepPage: function prepPage() {
 	        var _this2 = this;
 	
 	        this.root = this.pageData.type === "menu" ? "/" : window.location.pathname;
-	
-	        core.dom.nav.detach();
-	        core.dom.page.detach();
 	
 	        if (this.pageData.type !== "index") {
 	            this.navData.appTree.forEach(function (indexItem) {
@@ -14393,8 +14574,21 @@
 	
 	        core.dom.root[0].href = this.root;
 	        core.dom.root.on("click", function () {
-	            core.util.emitter.fire("app--root");
+	            core.emitter.fire("app--root");
 	        });
+	    },
+	
+	    /**
+	     *
+	     * @public
+	     * @method initPage
+	     * @memberof router
+	     * @description Perform actions after PageController init callback.
+	     *
+	     */
+	    initPage: function initPage() {
+	        core.dom.nav.detach();
+	        core.dom.page.detach();
 	
 	        core.dom.html.removeClass("is-clipped");
 	        core.dom.body.removeClass("is-clipped");
@@ -14406,7 +14600,7 @@
 	        core.api.collection(this.root, { format: "html" }, { dataType: "html" }).done(function (response) {
 	            var doc = _this3.parseDoc(response);
 	
-	            core.util.emitter.fire("app--load-root", doc.pageHtml);
+	            core.emitter.fire("app--load-root", doc.pageHtml);
 	        });
 	    },
 	
@@ -14468,17 +14662,17 @@
 	     *
 	     * @public
 	     * @method changeContent
-	     * @param {string} html The responseText as an HTML string
+	     * @param {object} data The PageController data object
 	     * @memberof router
 	     * @description Swap the new content into the DOM.
 	     *
 	     */
-	    changeContent: function changeContent(html) {
-	        var doc = this.parseDoc(html);
+	    changeContent: function changeContent(data) {
+	        var doc = this.parseDoc(data.response);
 	
 	        core.dom.page[0].innerHTML = doc.pageHtml;
 	
-	        core.util.emitter.fire("app--analytics-push", doc.$doc);
+	        core.emitter.fire("app--analytics-push", doc.$doc);
 	
 	        this.pageData = doc.$page.data();
 	
@@ -14507,7 +14701,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 28 */
+/* 31 */
 /*!*****************************************************!*\
   !*** ./~/properjs-pagecontroller/PageController.js ***!
   \*****************************************************/
@@ -14540,8 +14734,8 @@
 	})(function () {
 	
 	    // Useful stuff
-	    var Router = __webpack_require__( /*! properjs-router */ 29 ),
-	        Controller = __webpack_require__( /*! properjs-controller */ 9 ),
+	    var Router = __webpack_require__( /*! properjs-router */ 32 ),
+	        Controller = __webpack_require__( /*! properjs-controller */ 15 ),
 	
 	        _router = null,
 	        _config = [],
@@ -14552,7 +14746,7 @@
 	        },
 	        _initialized = false,
 	        _timeBefore = null,
-	        _timeDelay = 600,
+	        _timeDelay = 0,
 	        _eventPrefix = "page-controller-",
 	        _currentRoute = null,
 	        _isFirstRoute = true,
@@ -14561,6 +14755,7 @@
 	        _isSamePage = false,
 	        _silentMode = false,
 	        _silentCallback = null,
+	        _isRoutingActive = false,
 	
 	        // Singleton
 	        _instance = null,
@@ -14669,8 +14864,14 @@
 	
 	
 	    onRouterResponse = function ( data ) {
+	        if ( _isRoutingActive ) {
+	            return;
+	        }
+	
+	        _isRoutingActive = true;
+	
 	        function __route() {
-	            if ( (Date.now() - _timeBefore) >= _instance._transitionTime ) {
+	            if ( (Date.now() - _timeBefore) >= _instance._options.transitionTime ) {
 	                _instance.stop();
 	
 	                handleRouterResponse( data );
@@ -14682,12 +14883,16 @@
 	
 	
 	    onPopGetRouter = function ( data ) {
+	        if ( _isRoutingActive ) {
+	            return;
+	        }
+	
 	        onPreGetRouter( data.request );
 	    
 	        setTimeout( function () {
 	            handleRouterResponse( data );
 	
-	        }, _instance._transitionTime );
+	        }, _instance._options.transitionTime );
 	    },
 	
 	
@@ -14696,10 +14901,16 @@
 	     * @fires page-controller-router-samepage
 	     */
 	    onPreGetRouter = function ( data ) {
+	        if ( _isRoutingActive ) {
+	            return;
+	        }
+	
 	        var isSameRequest = (_currentToString === getRouteDataToString( data ));
 	
 	        if ( isSameRequest ) {
-	            fire( "router-samepage", data );
+	            fire( "router-samepage", {
+	                request: data
+	            });
 	            _isSamePage = true;
 	            return;
 	        }
@@ -14707,7 +14918,9 @@
 	        _timeBefore = Date.now();
 	
 	        if ( !_isFirstRoute ) {
-	            fire( "router-transition-out", data );
+	            fire( "router-transition-out", {
+	                request: data
+	            });
 	        }
 	    },
 	
@@ -14719,6 +14932,7 @@
 	    handleRouterResponse = function ( res ) {
 	        if ( _isSamePage ) {
 	            _isSamePage = false;
+	            _isRoutingActive = false;
 	            return;
 	        }
 	
@@ -14735,10 +14949,11 @@
 	        // Think of this as window.onload, happens once
 	        if ( _isFirstRoute ) {
 	            _isFirstRoute = false;
+	            _isRoutingActive = false;
 	            syncModules();
 	            execOnload();
 	
-	            fire( "initialized-page", data.response );
+	            fire( "initialized-page", data );
 	
 	        // All other Router sequences fall here
 	        } else {
@@ -14749,7 +14964,7 @@
 	                execUnload();
 	
 	                // 0.2 Refresh the document content
-	                fire( "router-refresh-document", data.response );
+	                fire( "router-refresh-document", data );
 	
 	                // 0.3 Sync modules and onload newly active ones
 	                syncModules();
@@ -14757,6 +14972,8 @@
 	
 	                // 0.4 Trigger transition of content to come back in
 	                fire( "router-transition-in", data );
+	
+	                _isRoutingActive = false;
 	
 	                // 0.5 Check `silent` mode
 	                if ( _silentMode ) {
@@ -14768,7 +14985,7 @@
 	                    }
 	                }
 	
-	            }, _instance._transitionTime );
+	            }, _instance._options.transitionTime );
 	        }
 	    };
 	
@@ -14783,8 +15000,8 @@
 	     * @memberof! <global>
 	     * @param {object} options Settings for control features
 	     * <ul>
-	     * <li>transitionTime - Number</li>
-	     * <li>routerOptions - Object</li>
+	     * <li>transitionTime</li>
+	     * <li>routerOptions</li>
 	     * </ul>
 	     *
 	     */
@@ -14793,31 +15010,34 @@
 	        if ( !_instance ) {
 	            _instance = this;
 	
-	            options = (options || {});
-	
 	            /**
 	             *
-	             * The duration of your transition for page content
-	             * @memberof PageController
-	             * @member _transitionTime
-	             * @private
-	             *
-	             */
-	            this._transitionTime = (options.transitionTime || _timeDelay);
-	
-	            /**
-	             *
-	             * The flag to anchor to top of page on transitions
-	             * @memberof PageController
+	             * The default options
+	             * @memberof _options
 	             * @member _routerOptions
 	             * @private
 	             *
 	             */
-	            this._routerOptions = (options.routerOptions || {
-	                async: true,
-	                caching: true,
-	                preventDefault: true
-	            });
+	            this._options = {
+	                transitionTime: _timeDelay,
+	                routerOptions: {
+	                    pushStateOptions: {}
+	                }
+	            };
+	
+	            // Normalize usage options passed in
+	            options = (options || {});
+	
+	            // Merge usage options with defaults
+	            if ( options.transitionTime ) {
+	                this._options.transitionTime = options.transitionTime;
+	            }
+	
+	            if ( options.routerOptions ) {
+	                for ( var i in options.routerOptions ) {
+	                    this._options.routerOptions[ i ] = options.routerOptions[ i ];
+	                }
+	            }
 	        }
 	
 	        return _instance;
@@ -14845,7 +15065,7 @@
 	         * @private
 	         *
 	         */
-	        _router = new Router( this._routerOptions );
+	        _router = new Router( this._options.routerOptions );
 	
 	        if ( _router._matcher.parse( window.location.href, _config ).matched ) {
 	            _router.bind();
@@ -15007,44 +15227,12 @@
 	        return _currentQuery;
 	    };
 	
-	    /**
-	     *
-	     * Returns true if current page path equals slug
-	     * Loose match if no second parameter is passed
-	     * @memberof PageController
-	     * @method is
-	     * @param {string} slug The page slug to check
-	     * @param {boolean} looseMatch Perform a less strict match
-	     * @returns boolean
-	     *
-	     */
-	    PageController.prototype.is = function ( slug, looseMatch ) {
-	        var ret = false,
-	            reg;
-	
-	        reg = new RegExp( looseMatch ? ("^" + slug) : ("^" + slug + "$") );
-	        ret = reg.test( _currentRoute );
-	
-	        return ret;
-	    };
-	
-	    /**
-	     *
-	     * Flushes the current route known as `active`
-	     * @memberof PageController
-	     * @method flushRoute
-	     *
-	     */
-	    PageController.prototype.flushRoute = function () {
-	        _currentToString = "";
-	    };
-	
 	    return PageController;
 	
 	});
 
 /***/ },
-/* 29 */
+/* 32 */
 /*!***************************************************************!*\
   !*** ./~/properjs-pagecontroller/~/properjs-router/Router.js ***!
   \***************************************************************/
@@ -15059,24 +15247,23 @@
 	 *
 	 */
 	(function ( factory ) {
-	    
+	
 	    if ( true ) {
 	        module.exports = factory();
 	
 	    } else if ( typeof window !== "undefined" ) {
 	        window.Router = factory();
 	    }
-	    
+	
 	})(function () {
 	
-	    var PushState = __webpack_require__( /*! properjs-pushstate */ 30 ),
-	        MatchRoute = __webpack_require__( /*! properjs-matchroute */ 31 ),
-	        matchElement = __webpack_require__( /*! properjs-matchelement */ 32 ),
-	        _rSameDomain = new RegExp( document.domain ),
+	    var PushState = __webpack_require__( /*! properjs-pushstate */ 33 ),
+	        MatchRoute = __webpack_require__( /*! properjs-matchroute */ 34 ),
+	        matchElement = __webpack_require__( /*! properjs-matchelement */ 35 ),
 	        _initDelay = 200,
 	        _triggerEl;
-	    
-	    
+	
+	
 	    /**
 	     *
 	     * A simple router Class
@@ -15090,10 +15277,50 @@
 	    var Router = function () {
 	        return this.init.apply( this, arguments );
 	    };
-	    
+	
 	    Router.prototype = {
 	        constructor: Router,
-	        
+	
+	        /**
+	         *
+	         * Expression match http/https
+	         * @memberof Router
+	         * @member _rHTTPs
+	         * @private
+	         *
+	         */
+	        _rHTTPs: /^http[s]?:\/\/.*?\//,
+	
+	        /**
+	         *
+	         * Expression match common file types...
+	         * @memberof Router
+	         * @member _rFiles
+	         * @private
+	         *
+	         */
+	        _rFiles: /\.jpg|jpeg|png|gif|pdf|csv|txt|md|doc|docx|xls|xlsx|webm|mp4|mp3$/gi,
+	
+	        /**
+	         *
+	         * Expression match this documents domain
+	         * @memberof Router
+	         * @member _rDomain
+	         * @private
+	         *
+	         */
+	        _rDomain: new RegExp( document.domain ),
+	
+	        /**
+	         *
+	         * Flag routing state
+	         * @memberof Router
+	         * @member _isRouting
+	         * @private
+	         *
+	         */
+	        _isRouting: false,
+	
 	        /**
 	         *
 	         * Router init constructor method
@@ -15101,16 +15328,44 @@
 	         * @method init
 	         * @param {object} options Settings for PushState
 	         * <ul>
-	         * <li>options.async</li>
 	         * <li>options.caching</li>
+	         * <li>options.proxy</li>
+	         * <li>options.proxy.domain</li>
+	         * <li>options.handle404</li>
+	         * <li>options.handle500</li>
+	         * <li>options.pushStateOptions</li>
 	         * </ul>
 	         *
-	         * @fires beforeget
-	         * @fires afterget
+	         * @fires preget
+	         * @fires popget
 	         * @fires get
 	         *
 	         */
 	        init: function ( options ) {
+	            /**
+	             *
+	             * Router Store user options
+	             * @memberof Router
+	             * @member _options
+	             * @private
+	             *
+	             */
+	            this._options = {
+	                proxy: false,
+	                caching: true,
+	                handle404: true,
+	                handle500: true,
+	                pushStateOptions: {}
+	            };
+	
+	            // Normalize usage options passed in
+	            options = (options || {});
+	
+	            // Merge usage options with defaults
+	            for ( var i in options ) {
+	                this._options[ i ] = options[ i ];
+	            }
+	
 	            /**
 	             *
 	             * Internal MatchRoute instance
@@ -15120,7 +15375,7 @@
 	             *
 	             */
 	            this._matcher = new MatchRoute();
-	            
+	
 	            /**
 	             *
 	             * Internal PushState instance
@@ -15129,8 +15384,8 @@
 	             * @private
 	             *
 	             */
-	            this._pusher = null;
-	            
+	            this._pusher = new PushState( this._options.pushStateOptions );
+	
 	            /**
 	             *
 	             * Event handling callbacks
@@ -15140,17 +15395,17 @@
 	             *
 	             */
 	            this._callbacks = {};
-	            
+	
 	            /**
 	             *
-	             * Router Store user options
+	             * Stored XHR responses
 	             * @memberof Router
-	             * @member _options
+	             * @member _responses
 	             * @private
 	             *
 	             */
-	            this._options = options;
-	            
+	            this._responses = {};
+	
 	            /**
 	             *
 	             * Router unique ID
@@ -15160,8 +15415,18 @@
 	             *
 	             */
 	            this._uid = 0;
+	
+	            /**
+	             *
+	             * Router is READY status ?
+	             * @memberof Router
+	             * @member _ready
+	             * @private
+	             *
+	             */
+	            this._ready = false;
 	        },
-	        
+	
 	        /**
 	         *
 	         * Create PushState instance and add event listener
@@ -15171,75 +15436,41 @@
 	         */
 	        bind: function () {
 	            var self = this,
-	                isReady = false;
-	            
+	                // Ensure this first cache URL is clean as a whistle
+	                url = window.location.href.replace( window.location.hash, "" );
+	
 	            // Bind GET requests to links
-	            if ( document.addEventListener ) {
-	                document.addEventListener( "click", function ( e ) {
-	                    self._handler( this, e );
-	                    
-	                }, false );
-	                
-	            } else if ( document.attachEvent ) {
-	                document.attachEvent( "onclick", function ( e ) {
-	                    self._handler( this, e );
-	                });
-	            }
-	            
-	            /**
-	             *
-	             * Instantiate PushState
-	             *
-	             */
-	            this._pusher = new PushState( this._options );
-	            
-	            /**
-	             *
-	             * @event popstate
-	             *
-	             */
-	            this._pusher.on( "popstate", function ( url, data, status ) {
-	                // Hook around browsers firing popstate on pageload
-	                if ( isReady ) {
-	                    for ( var i = self._callbacks.get.length; i--; ) {
-	                        var dat = self._matcher.parse( url, self._callbacks.get[ i ]._routerRoutes );
-	                        
-	                        if ( dat.matched ) {
-	                            break;
-	                        }
-	                    }
-	                    
-	                    data = {
-	                        route: self._matcher._cleanRoute( url ),
-	                        response: data,
-	                        request: dat,
-	                        status: status || data.status
-	                    };
-	                    
-	                    self._fire( "popget", url, data, status );
-	                    
-	                } else {
-	                    isReady = true;
-	                }
+	            document.addEventListener( "click", function ( e ) {
+	                self._handleClick( this, e );
+	
+	            }, false );
+	
+	            // Bind popstate event for history
+	            this._pusher.on( "popstate", function ( url, state ) {
+	                self._handlePopstate( url, state );
 	            });
-	            
-	            // Manually fire first GET
+	
+	            // Fire first route - shim a little and bypass true XHR here
 	            // Async this in order to allow .get() to work after instantiation
 	            setTimeout(function () {
-	                self._pusher.push( window.location.href, function ( response, status ) {
-	                    self._fire( "get", window.location.href, response, status );
-	                    
-	                    isReady = true;
-	                });
-	                
+	                // https://developer.mozilla.org/en-US/docs/Web/API/XMLSerializer
+	                var doc = new XMLSerializer().serializeToString( document );
+	                var xhr = {
+	                    status: 200,
+	                    responseText: doc
+	                };
+	
+	                self._fire( "get", url, xhr, xhr.status );
+	                self._cache( url, xhr );
+	                self._ready = true;
+	
 	            }, _initDelay );
 	        },
-	        
+	
 	        /**
 	         *
 	         * Add an event listener
-	         * Binding "beforeget" and "afterget" is a wrapper
-	         * to hook into the PushState classes "beforestate" and "afterstate".
+	         * Binding "beforeget" and "afterget" wraps the XHR request
 	         * @memberof Router
 	         * @method on
 	         * @param {string} event The event to bind to
@@ -15249,7 +15480,7 @@
 	        on: function ( event, callback ) {
 	            this._bind( event, callback );
 	        },
-	    
+	
 	        /**
 	         *
 	         * Remove an event listener
@@ -15262,7 +15493,7 @@
 	        off: function ( event, callback ) {
 	            this._unbind( event, callback );
 	        },
-	    
+	
 	        /**
 	         *
 	         * Support router triggers by url
@@ -15275,14 +15506,14 @@
 	            if ( !_triggerEl ) {
 	                _triggerEl = document.createElement( "a" );
 	            }
-	    
+	
 	            _triggerEl.href = url;
-	    
-	            this._handler( _triggerEl, {
+	
+	            this._handleClick( _triggerEl, {
 	                target: _triggerEl
 	            });
 	        },
-	        
+	
 	        /**
 	         *
 	         * Bind a GET request route
@@ -15295,15 +15526,15 @@
 	        get: function ( route, callback ) {
 	            // Add route to matcher
 	            this._matcher.config( [route] );
-	            
+	
 	            // Bind the route to the callback
 	            if ( callback._routerRoutes ) {
 	                callback._routerRoutes.push( route );
-	                
+	
 	            } else {
 	                callback._routerRoutes = [route];
 	            }
-	            
+	
 	            // When binding multiple routes to a single
 	            // callback, we need to make sure the callbacks
 	            // routes array is updated above but the callback
@@ -15312,7 +15543,7 @@
 	                this._bind( "get", callback );
 	            }
 	        },
-	    
+	
 	        /**
 	         *
 	         * Get a sanitized route for a url
@@ -15325,7 +15556,7 @@
 	        getRouteForUrl: function ( url ) {
 	            return this._matcher._cleanRoute( url );
 	        },
-	    
+	
 	        /**
 	         *
 	         * Get the match data for a url against the routes config
@@ -15338,7 +15569,7 @@
 	        getRouteDataForUrl: function ( url ) {
 	            return this._matcher.parse( url, this._matcher.getRoutes() ).params;
 	        },
-	        
+	
 	        /**
 	         *
 	         * Get a unique ID
@@ -15349,10 +15580,10 @@
 	         */
 	        getUID: function () {
 	            this._uid = (this._uid + 1);
-	            
+	
 	            return this._uid;
 	        },
-	        
+	
 	        /**
 	         * Compatible event preventDefault
 	         * @memberof Router
@@ -15362,22 +15593,18 @@
 	         *
 	         */
 	        _preventDefault: function ( e ) {
-	            if ( !this._options.preventDefault ) {
-	                return this;
-	            }
-	            
 	            if ( e.preventDefault ) {
 	                e.preventDefault();
-	                
+	
 	            } else {
 	                e.returnValue = false;
 	            }
 	        },
-	        
+	
 	        /**
 	         * GET click event handler
 	         * @memberof Router
-	         * @method _handler
+	         * @method _handleClick
 	         * @param {object} el The event context element
 	         * @param {object} e The event object
 	         * @private
@@ -15385,38 +15612,206 @@
 	         * @fires get
 	         *
 	         */
-	        _handler: function ( el, e ) {
-	            var self = this,
-	                elem = (matchElement( el, "a" ) || matchElement( e.target, "a" )),
-	                isDomain = elem && _rSameDomain.test( elem.href ),
-	                isHashed = elem && elem.href.indexOf( "#" ) !== -1,
+	        _handleClick: function ( el, e ) {
+	            var elem = (matchElement( el, "a" ) || matchElement( e.target, "a" )),
 	                isMatched = elem && this._matcher.test( elem.href ),
+	                isDomain = elem && this._rDomain.test( elem.href ),
+	                isProxy = elem && this._options.proxy && this._options.proxy.domain,
+	                isHashed = elem && elem.href.indexOf( "#" ) !== -1,
 	                isIgnore = elem && elem.className.indexOf( "js-router--ignore" ) !== -1,
-	                isMetaKey = elem && e.metaKey;
-	            
+	                isMetaKey = elem && e.metaKey,
+	                isBlank = elem && elem.target === "_blank",
+	                isFile = elem && isDomain && elem.href.match( this._rFiles );
+	
 	            // 0.1 => Ensure url passes MatchRoute config
 	            // 0.2 => Ensure url is on the Document's Domain
-	            // 0.3 => Ensure url is not a #hash
-	            // 0.4 => Ensure the element does not contain a `js-router--ignore` className
-	            // 0.5 => Ensure the Event.metaKey is not TRUE - Command+click
-	            if ( isMatched && isDomain && !isHashed && !isIgnore && !isMetaKey ) {
-	                this._preventDefault( e );
-	                
-	                for ( var i = this._callbacks.get.length; i--; ) {
-	                    var data = this._matcher.parse( elem.href, this._callbacks.get[ i ]._routerRoutes );
+	            // 0.X => Allow proxy domain's to go through this checkpoint
+	            if ( (isMatched && isDomain) || isProxy ) {
+	                // 0.3 => Ensure url is not a #hash
+	                // 0.4 => Ensure the element does not contain a `js-router--ignore` className
+	                // 0.5 => Ensure the Event.metaKey is not TRUE - Command+click
+	                // 0.6 => Ensure the element target is not for a new tab
+	                // 0.7 => Ensure url is not a file link on the same document domain
+	                if ( !isHashed && !isIgnore && !isMetaKey && !isBlank && !isFile ) {
+	                    this._preventDefault( e );
 	                    
-	                    if ( data.matched ) {
-	                        this._fire( "preget", elem.href, data );
+	                    if ( !this._isRouting ) {
+	                        this._route( elem.href );
+	                    }
+	                }
+	            }
+	        },
+	
+	        /**
+	         * Handle history popstate event from PushState
+	         * @memberof Router
+	         * @method _handlePopstate
+	         * @param {string} url The url popped to
+	         * @param {object} state The PushState state object
+	         * @private
+	         *
+	         * @fires get
+	         *
+	         */
+	        _handlePopstate: function ( url, state ) {
+	            // Hook around browsers firing popstate on pageload
+	            if ( this._ready ) {
+	                for ( var i = this._callbacks.get.length; i--; ) {
+	                    var dat = this._matcher.parse( url, this._callbacks.get[ i ]._routerRoutes );
+	
+	                    if ( dat.matched ) {
 	                        break;
 	                    }
 	                }
-	                
-	                this._pusher.push( elem.href, function ( response, status ) {
-	                    self._fire( "get", elem.href, response, status );
-	                });
+	
+	                data = {
+	                    route: this._matcher._cleanRoute( url ),
+	                    response: this._responses[ url ],
+	                    request: dat,
+	                    status: this._responses[ url ].status
+	                };
+	
+	                this._fire( "popget", url, data );
+	
+	            } else {
+	                this._ready = true;
 	            }
 	        },
-	        
+	
+	        /**
+	         * Execute the route
+	         * @memberof Router
+	         * @method _route
+	         * @param {string} url The url in question
+	         * @param {function} callback Optional, fired with done
+	         * @private
+	         *
+	         */
+	        _route: function ( url, callback ) {
+	            var self = this,
+	                urls = {
+	                    // For XHR
+	                    request: url,
+	
+	                    // For pushState and Cache
+	                    original: url
+	                };
+	
+	            this._isRouting = true;
+	
+	            this._matchUrl( urls.original );
+	
+	            // Handle proxy first since we modify the request URL
+	            // Basically, just piece together a URL that swaps this domain with proxy domain
+	            if ( this._options.proxy && this._options.proxy.domain ) {
+	                // Use window.location.host so it includes port for localhost
+	                urls.request = (this._options.proxy.domain + "/" + urls.request.replace( this._rHTTPs, "" ));
+	            }
+	
+	            this._getUrl( urls, function ( response, status ) {
+	                self._isRouting = false;
+	
+	                // Push the URL to window History
+	                self._pusher.push( urls.original );
+	
+	                // Fire event for routing
+	                self._fire( "get", urls.original, response, status );
+	
+	                if ( typeof callback === "function" ) {
+	                    callback( response, status );
+	                }
+	            });
+	        },
+	
+	        /**
+	         * Match a URL and fire "preget"
+	         * @memberof Router
+	         * @method _matchUrl
+	         * @param {string} url The url in question
+	         * @private
+	         *
+	         */
+	        _matchUrl: function ( url ) {
+	            for ( var i = this._callbacks.get.length; i--; ) {
+	                var data = this._matcher.parse( url, this._callbacks.get[ i ]._routerRoutes );
+	
+	                if ( data.matched ) {
+	                    this._fire( "preget", url, data );
+	                    break;
+	                }
+	            }
+	        },
+	
+	        /**
+	         *
+	         * Request a url with an XMLHttpRequest
+	         * @memberof Router
+	         * @method _getUrl
+	         * @param {object} urls The urls to request / push / cache
+	         * @param {function} callback The function to call when done
+	         * @private
+	         *
+	         */
+	        _getUrl: function ( urls, callback ) {
+	            var handler = function ( res, stat ) {
+	                    try {
+	                        // Cache if option enabled
+	                        self._cache( urls.original, res );
+	
+	                        if ( typeof callback === "function" ) {
+	                            callback( res, stat );
+	                        }
+	
+	                    } catch ( error ) {}
+	                },
+	                xhr = null,
+	                self = this;
+	
+	            // Cached response ?
+	            if ( this._responses[ urls.original ] ) {
+	                handler( this._responses[ urls.original ], this._responses[ urls.original ].status );
+	
+	            // Fresh request ?
+	            } else {
+	                xhr = new XMLHttpRequest();
+	
+	                xhr.open( "GET", urls.request, true );
+	
+	                xhr.onreadystatechange = function ( e ) {
+	                    if ( this.readyState === 4 ) {
+	                        if ( this.status === 200 ) {
+	                            handler( this, 200 );
+	
+	                        } else if ( this.status === 404 && self._options.handle404 ) {
+	                            handler( this, 404 );
+	
+	                        } else if ( this.status === 500 && self._options.handle500 ) {
+	                            handler( this, 500 );
+	                        }
+	                    }
+	                };
+	
+	                xhr.send();
+	            }
+	        },
+	
+	        /**
+	         *
+	         * Cache an XHR response object
+	         * @memberof Router
+	         * @method _cache
+	         * @param {string} url The url to cache for
+	         * @param {object} res The XHR object
+	         * @private
+	         *
+	         */
+	        _cache: function ( url, res ) {
+	            // Caching is enabled, Not currently cached yet
+	            if ( this._options.caching && !this._responses[ url ] ) {
+	                this._responses[ url ] = res;
+	            }
+	        },
+	
 	        /**
 	         *
 	         * Bind an event to a callback
@@ -15432,13 +15827,13 @@
 	                if ( !this._callbacks[ event ] ) {
 	                    this._callbacks[ event ] = [];
 	                }
-	                
+	
 	                callback._jsRouterID = this.getUID();
-	                
+	
 	                this._callbacks[ event ].push( callback );
 	            }
 	        },
-	    
+	
 	        /**
 	         *
 	         * Unbind an event to a callback(s)
@@ -15453,27 +15848,27 @@
 	            if ( !this._callbacks[ event ] ) {
 	                return this;
 	            }
-	    
+	
 	            // Remove a single callback
 	            if ( callback ) {
 	                for ( var i = 0, len = this._callbacks[ event ].length; i < len; i++ ) {
 	                    if ( callback._jsRouterID === this._callbacks[ event ][ i ]._jsRouterID ) {
 	                        this._callbacks[ event ].splice( i, 1 );
-	        
+	
 	                        break;
 	                    }
 	                }
-	    
+	
 	            // Remove all callbacks for event
 	            } else {
 	                for ( var j = this._callbacks[ event ].length; j--; ) {
 	                    this._callbacks[ event ][ j ] = null;
 	                }
-	        
+	
 	                delete this._callbacks[ event ];
 	            }
 	        },
-	        
+	
 	        /**
 	         *
 	         * Fire an event to a callback
@@ -15488,12 +15883,12 @@
 	         */
 	        _fire: function ( event, url, response, status ) {
 	            var i;
-	            
+	
 	            // GET events have routes and are special ;-P
 	            if ( event === "get" ) {
 	                for ( i = this._callbacks[ event ].length; i--; ) {
 	                    var data = this._matcher.parse( url, this._callbacks[ event ][ i ]._routerRoutes );
-	                    
+	
 	                    if ( data.matched ) {
 	                        this._callbacks[ event ][ i ].call( this, {
 	                            route: this._matcher._cleanRoute( url ),
@@ -15503,8 +15898,8 @@
 	                        });
 	                    }
 	                }
-	            
-	            // Fires basic timing events "beforeget" / "afterget"    
+	
+	            // Fires basic timing events "preget", "popget"
 	            } else if ( this._callbacks[ event ] ) {
 	                for ( i = this._callbacks[ event ].length; i--; ) {
 	                    this._callbacks[ event ][ i ].call( this, response );
@@ -15512,14 +15907,14 @@
 	            }
 	        }
 	    };
-	    
-	    
+	
+	
 	    return Router;
 	
 	});
 
 /***/ },
-/* 30 */
+/* 33 */
 /*!***************************************************************************************!*\
   !*** ./~/properjs-pagecontroller/~/properjs-router/~/properjs-pushstate/PushState.js ***!
   \***************************************************************************************/
@@ -15535,25 +15930,19 @@
 	 *
 	 */
 	(function ( factory ) {
-	    
+	
 	    if ( true ) {
 	        module.exports = factory();
 	
 	    } else if ( typeof window !== "undefined" ) {
 	        window.PushState = factory();
 	    }
-	    
+	
 	})(function () {
 	
 	    /**
 	     *
 	     * A simple pushState Class
-	     * Supported events with .on():
-	     * <ul>
-	     * <li>popstate</li>
-	     * <li>beforestate</li>
-	     * <li>afterstate</li>
-	     * </ul>
 	     * @constructor PushState
 	     * @memberof! <global>
 	     *
@@ -15561,30 +15950,10 @@
 	    var PushState = function () {
 	        return this.init.apply( this, arguments );
 	    };
-	    
+	
 	    PushState.prototype = {
 	        constructor: PushState,
-	        
-	        /**
-	         *
-	         * Expression match #
-	         * @memberof PushState
-	         * @member _rHash
-	         * @private
-	         *
-	         */
-	        _rHash: /#/,
-	        
-	        /**
-	         *
-	         * Expression match http/https
-	         * @memberof PushState
-	         * @member _rHTTPs
-	         * @private
-	         *
-	         */
-	        _rHTTPs: /^http[s]?:\/\/.*?\//,
-	        
+	
 	        /**
 	         *
 	         * Flag whether pushState is enabled
@@ -15594,7 +15963,7 @@
 	         *
 	         */
 	        _pushable: ("history" in window && "pushState" in window.history),
-	        
+	
 	        /**
 	         *
 	         * Fallback to hashchange if needed. Support:
@@ -15611,7 +15980,7 @@
 	         *
 	         */
 	        _hashable: ("onhashchange" in window),
-	        
+	
 	        /**
 	         *
 	         * PushState init constructor method
@@ -15619,16 +15988,35 @@
 	         * @method PushState.init
 	         * @param {object} options Settings for PushState
 	         * <ul>
-	         * <li>options.async</li>
-	         * <li>options.caching</li>
-	         * <li>options.handle404</li>
-	         * <li>options.handle500</li>
+	         * <li>options.forceHash</li>
 	         * </ul>
+	         *
+	         * @fires backstate
+	         * @fires forwardstate
+	         * @fires popstate
 	         *
 	         */
 	        init: function ( options ) {
-	            var url = window.location.href;
-	            
+	            /**
+	             *
+	             * Ensure this first cache URL is clean as a whistle
+	             * @memberof PushState
+	             * @member _initUrl
+	             * @private
+	             *
+	             */
+	            this._initUrl = window.location.href.replace( window.location.hash, "" );
+	
+	            /**
+	             *
+	             * User options for usage
+	             * @memberof PushState
+	             * @member _options
+	             * @private
+	             *
+	             */
+	            this._options = (options || {});
+	
 	            /**
 	             *
 	             * Flag whether state is enabled
@@ -15638,7 +16026,7 @@
 	             *
 	             */
 	            this._enabled = false;
-	            
+	
 	            /**
 	             *
 	             * Flag when hash is changed by PushState
@@ -15648,8 +16036,8 @@
 	             * @private
 	             *
 	             */
-	            this._ishashpushed = false;
-	            
+	            this._ishashpushed = false;;
+	
 	            /**
 	             *
 	             * Unique ID ticker
@@ -15659,7 +16047,7 @@
 	             *
 	             */
 	            this._uid = 0;
-	            
+	
 	            /**
 	             *
 	             * Stored state objects
@@ -15669,17 +16057,7 @@
 	             *
 	             */
 	            this._states = {};
-	            
-	            /**
-	             *
-	             * Stored response objects
-	             * @memberof PushState
-	             * @member _responses
-	             * @private
-	             *
-	             */
-	            this._responses = {};
-	            
+	
 	            /**
 	             *
 	             * Event callbacks
@@ -15689,57 +16067,16 @@
 	             *
 	             */
 	            this._callbacks = {};
-	            
-	            /**
-	             *
-	             * Flag whether to use ajax
-	             * @memberof PushState
-	             * @member _async
-	             * @private
-	             *
-	             */
-	            this._async = ( options && options.async !== undefined ) ? options.async : true;
-	            
-	            /**
-	             *
-	             * Flag whether to use cached responses
-	             * @memberof PushState
-	             * @member _caching
-	             * @private
-	             *
-	             */
-	            this._caching = ( options && options.caching !== undefined ) ? options.caching : true;
-	            
-	            /**
-	             *
-	             * Flag whether to handle 404 pages
-	             * @memberof PushState
-	             * @member _handle404
-	             * @private
-	             *
-	             */
-	            this._handle404 = ( options && options.handle404 !== undefined ) ? options.handle404 : true;
-	            
-	            /**
-	             *
-	             * Flag whether to handle 500 pages
-	             * @memberof PushState
-	             * @member _handle500
-	             * @private
-	             *
-	             */
-	            this._handle500 = ( options && options.handle500 !== undefined ) ? options.handle500 : true;
-	            
+	
 	            // Set initial state
-	            this._states[ url ] = {
-	                uid: this.getUID(),
-	                cached: false
+	            this._states[ this._initUrl ] = {
+	                uid: this.getUID()
 	            };
-	    
-	            // Enable the popstate event
+	
+	            // Enable popstate management
 	            this._stateEnable();
 	        },
-	        
+	
 	        /**
 	         *
 	         * Bind a callback to an event
@@ -15754,14 +16091,14 @@
 	                if ( !this._callbacks[ event ] ) {
 	                    this._callbacks[ event ] = [];
 	                }
-	                
+	
 	                callback._pushstateID = this.getUID();
 	                callback._pushstateType = event;
-	                
+	
 	                this._callbacks[ event ].push( callback );
 	            }
 	        },
-	        
+	
 	        /**
 	         *
 	         * Unbind a callback to an event
@@ -15781,67 +16118,28 @@
 	                }
 	            }
 	        },
-	        
+	
 	        /**
 	         *
 	         * Push onto the History state
 	         * @memberof PushState
 	         * @method push
 	         * @param {string} url address to push to history
-	         * @param {function} callback function to call when done
-	         *
-	         * @fires beforestate
-	         * @fires afterstate
 	         *
 	         */
-	        push: function ( url, callback ) {
-	            var self = this;
-	            
-	            // Break on pushing current url
-	            if ( url === window.location.href && this._stateCached( url ) ) {
-	                callback( this._responses[ url ], 200 );
-	                
+	        push: function ( url ) {
+	            // Dont push current URL
+	            if ( url === window.location.href ) {
 	                return;
 	            }
-	            
-	            this._fire( "beforestate" );
-	            
-	            // Break on cached
-	            if ( this._stateCached( url ) ) {
-	                this._push( url );
-	                        
-	                callback( this._responses[ url ], 200 );
-	            
-	            // Push new state    
-	            } else {
-	                this._states[ url ] = {
-	                    uid: this.getUID(),
-	                    cached: false
-	                };
-	                
-	                if ( this._async ) {
-	                    this._getUrl( url, function ( response, status ) {
-	                        self._push( url );
-	        
-	                        self._fire( "afterstate", response, status );
-	                        
-	                        if ( typeof callback === "function" ) {
-	                            callback( response, status );
-	                        }
-	                    });
-	        
-	                } else {
-	                    this._push( url );
-	    
-	                    this._fire( "afterstate" );
-	                    
-	                    if ( typeof callback === "function" ) {
-	                        callback();
-	                    }
-	                }
-	            }
+	
+	            this._push( url );
+	
+	            this._states[ url ] = {
+	                uid: this.getUID()
+	            };
 	        },
-	        
+	
 	        /**
 	         *
 	         * Manually go back in history state
@@ -15853,10 +16151,10 @@
 	         */
 	        goBack: function () {
 	            window.history.back();
-	            
+	
 	            this._fire( "backstate" );
 	        },
-	        
+	
 	        /**
 	         *
 	         * Manually go forward in history state
@@ -15868,10 +16166,10 @@
 	         */
 	        goForward: function () {
 	            window.history.forward();
-	            
+	
 	            this._fire( "forwardstate" );
 	        },
-	        
+	
 	        /**
 	         *
 	         * Get a unique ID
@@ -15882,10 +16180,10 @@
 	         */
 	        getUID: function () {
 	            this._uid = (this._uid + 1);
-	            
+	
 	            return this._uid;
 	        },
-	        
+	
 	        /**
 	         *
 	         * Calls window.history.pushState
@@ -15896,96 +16194,30 @@
 	         *
 	         */
 	        _push: function ( url ) {
-	            if ( this._pushable ) {
+	            if ( this._pushable && !this._options.forceHash ) {
 	                window.history.pushState( this._states[ url ], "", url );
-	                
+	
 	            } else {
-	                this._ishashpushed = true;
-	                
-	                window.location.hash = url.replace( this._rHTTPs, "" );
-	            }
-	        },
-	        
-	        /**
-	         *
-	         * Check if state has been cached for a url
-	         * @memberof PushState
-	         * @method _stateCached
-	         * @param {string} url The url to check
-	         * @private
-	         *
-	         */
-	        _stateCached: function ( url ) {
-	            var ret = false;
-	            
-	            if ( this._caching && this._states[ url ] && this._states[ url ].cached && this._responses[ url ] ) {
-	                ret = true;
-	            }
-	            
-	            return ret;
-	        },
-	        
-	        /**
-	         *
-	         * Cache the response for a url
-	         * @memberof PushState
-	         * @method _cacheState
-	         * @param {string} url The url to cache for
-	         * @param {object} response The XMLHttpRequest response object
-	         * @private
-	         *
-	         */
-	        _cacheState: function ( url, response ) {
-	            if ( this._caching ) {
-	                this._states[ url ].cached = true;
-	                this._responses[ url ] = response;
-	            }
-	        },
-	        
-	        /**
-	         *
-	         * Request a url with an XMLHttpRequest
-	         * @memberof PushState
-	         * @method _getUrl
-	         * @param {string} url The url to request
-	         * @param {function} callback The function to call when done
-	         * @private
-	         *
-	         */
-	        _getUrl: function ( url, callback ) {
-	            var handler = function ( res, stat ) {
-	                    try {
-	                        // Cache if option enabled
-	                        self._cacheState( url, res );
-	                        
-	                        if ( typeof callback === "function" ) {
-	                            callback( res, (stat ? stat : undefined) );
-	                        }
-	                        
-	                    } catch ( error ) {}
-	                },
-	                xhr = new XMLHttpRequest(),
-	                self = this;
-	            
-	            xhr.open( "GET", url, true );
-	            
-	            xhr.onreadystatechange = function ( e ) {
-	                if ( this.readyState === 4 ) {
-	                    if ( this.status === 200 ) {
-	                        handler( this, 200 );
-	                        
-	                    } else if ( this.status === 404 && self._handle404 ) {
-	                        handler( this, 404 );
-	                        
-	                    } else if ( this.status === 500 && self._handle500 ) {
-	                        handler( this, 500 );
-	                    }
+	                // This replace ensures we get the following:
+	                // "/":         root
+	                // "/foo/bar/": uri path
+	                var hashUri = url.replace( window.location.origin, "" );
+	
+	                // Fix for root hash uri.
+	                // Ensure we dont get the following:
+	                // "/foo/bar/#/foo/bar/"
+	                // Rather we would get the following:
+	                // "/foo/bar/#/"
+	                if ( hashUri === window.location.pathname ) {
+	                    hashUri = "/";
 	                }
-	            };
-	            
-	            xhr.send();
+	
+	                this._ishashpushed = true;
+	
+	                window.location.hash = hashUri;
+	            }
 	        },
-	        
+	
 	        /**
 	         *
 	         * Fire an events callbacks
@@ -16003,7 +16235,7 @@
 	                }
 	            }
 	        },
-	        
+	
 	        /**
 	         *
 	         * Bind this instances state handler
@@ -16018,49 +16250,68 @@
 	            if ( this._enabled ) {
 	                return this;
 	            }
-	    
+	
 	            var self = this,
 	                handler = function () {
-	                    var url = window.location.href.replace( self._rHash, "/" );
-	                    
-	                    if ( self._stateCached( url ) ) {
-	                        self._fire( "popstate", url, self._responses[ url ] );
-	                        
-	                    } else {
-	                        self._getUrl( url, function ( response, status ) {
-	                            self._fire( "popstate", url, response, status );
-	                        });
+	                    var url = window.location.href,
+	                        roots = ["#/", "#", ""];
+	
+	                    // Ensure we clean out the hash for Router
+	                    // Example:
+	                    // Start:  http://localhost/foo/#/bar/
+	                    // Result: http://localhost/foo/bar/
+	                    if ( self._options.forceHash ) {
+	                        // Shave the hash from the end of the URL
+	                        url = url.replace( window.location.hash, "" );
+	
+	                        // Shave the hash root from the end of the URL
+	                        url = url.replace( window.location.pathname, "" );
+	
+	                        // Empty hash means we have gone back to root
+	                        if ( roots.indexOf( window.location.hash ) !== -1 ) {
+	                            // Append the hash root to the URL
+	                            url = (url + window.location.pathname);
+	
+	                        } else {
+	                            // Append the applied hash pathname to the URL
+	                            url = (url + window.location.hash.replace( "#", "" ));
+	                        }
 	                    }
+	
+	                    self._fire( "popstate", url, self._states[ url ] );
 	                };
-	    
+	
 	            this._enabled = true;
-	            
-	            if ( this._pushable ) {
+	
+	            if ( this._pushable && !this._options.forceHash ) {
 	                window.addEventListener( "popstate", function ( e ) {
 	                    handler();
-	                    
+	
 	                }, false );
-	                
+	
 	            } else if ( this._hashable ) {
+	                // For hashstate we should apply initial hash on page load
+	                this._push( this._initUrl );
+	
 	                window.addEventListener( "hashchange", function ( e ) {
 	                    if ( !self._ishashpushed ) {
 	                        handler();
-	                        
+	
 	                    } else {
 	                        self._ishashpushed = false;
 	                    }
-	                    
+	
 	                }, false );
 	            }
 	        }
 	    };
-	    
+	
 	    return PushState;
 	
 	});
 
 /***/ },
-/* 31 */
+/* 34 */
 /*!*****************************************************************************************!*\
   !*** ./~/properjs-pagecontroller/~/properjs-router/~/properjs-matchroute/MatchRoute.js ***!
   \*****************************************************************************************/
@@ -16085,7 +16336,7 @@
 	    
 	})(function () {
 	
-	    var paramalama = __webpack_require__( /*! paramalama */ 23 ),
+	    var paramalama = __webpack_require__( /*! paramalama */ 26 ),
 	
 	    /**
 	     *
@@ -16419,7 +16670,7 @@
 	});
 
 /***/ },
-/* 32 */
+/* 35 */
 /*!*************************************************!*\
   !*** ./~/properjs-matchelement/matchElement.js ***!
   \*************************************************/
@@ -16481,7 +16732,7 @@
 	});
 
 /***/ },
-/* 33 */
+/* 36 */
 /*!*******************************!*\
   !*** ./js_src/menus/index.js ***!
   \*******************************/
@@ -16502,7 +16753,7 @@
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _Menu = __webpack_require__(/*! ./Menu */ 34);
+	var _Menu = __webpack_require__(/*! ./Menu */ 37);
 	
 	var _Menu2 = _interopRequireDefault(_Menu);
 	
@@ -16608,7 +16859,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 34 */
+/* 37 */
 /*!******************************!*\
   !*** ./js_src/menus/Menu.js ***!
   \******************************/
@@ -16649,6 +16900,8 @@
 	        if (!instances[data.id]) {
 	            this.initialize($node, data);
 	        }
+	
+	        console.log("Menu", this);
 	
 	        return instances[data.id];
 	    }
@@ -16714,7 +16967,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 35 */
+/* 38 */
 /*!*********************************!*\
   !*** ./js_src/indexes/index.js ***!
   \*********************************/
@@ -16738,15 +16991,15 @@
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _IndexRoot = __webpack_require__(/*! ./IndexRoot */ 36);
+	var _IndexRoot = __webpack_require__(/*! ./IndexRoot */ 39);
 	
 	var _IndexRoot2 = _interopRequireDefault(_IndexRoot);
 	
-	var _projectsProject = __webpack_require__(/*! ../projects/Project */ 37);
+	var _projectsProject = __webpack_require__(/*! ../projects/Project */ 40);
 	
 	var _projectsProject2 = _interopRequireDefault(_projectsProject);
 	
-	var _overlay = __webpack_require__(/*! ../overlay */ 38);
+	var _overlay = __webpack_require__(/*! ../overlay */ 41);
 	
 	var _overlay2 = _interopRequireDefault(_overlay);
 	
@@ -16772,7 +17025,7 @@
 	     *
 	     */
 	    init: function init() {
-	        core.util.emitter.on("app--load-root", this.onLoadRootIndex.bind(this));
+	        core.emitter.on("app--load-root", this.onLoadRootIndex.bind(this));
 	
 	        core.log("indexes initialized");
 	    },
@@ -16914,7 +17167,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 36 */
+/* 39 */
 /*!*************************************!*\
   !*** ./js_src/indexes/IndexRoot.js ***!
   \*************************************/
@@ -16956,6 +17209,8 @@
 	            this.initialize($node, data);
 	        }
 	
+	        console.log("IndexRoot", this);
+	
 	        return instance;
 	    }
 	
@@ -16966,17 +17221,16 @@
 	    _createClass(IndexRoot, [{
 	        key: "initialize",
 	        value: function initialize($node, data) {
-	            var _this = this;
-	
 	            this.$node = $node;
 	            this.data = data;
 	            this.$target = core.dom.main.find(".js-main--" + this.data.target);
 	            this.$images = this.$node.find(".js-lazy-image");
 	
-	            core.images.handleImages(this.$images, function () {
-	                _this.$target.html(_this.$node);
+	            // Node must be in DOM for image size to work
+	            this.$target.html(this.$node);
 	
-	                core.util.emitter.fire("app--update-animate");
+	            core.images.handleImages(this.$images, function () {
+	                core.emitter.fire("app--update-animate");
 	            });
 	
 	            instance = this;
@@ -17003,7 +17257,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 37 */
+/* 40 */
 /*!************************************!*\
   !*** ./js_src/projects/Project.js ***!
   \************************************/
@@ -17027,7 +17281,7 @@
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _overlay = __webpack_require__(/*! ../overlay */ 38);
+	var _overlay = __webpack_require__(/*! ../overlay */ 41);
 	
 	var _overlay2 = _interopRequireDefault(_overlay);
 	
@@ -17086,7 +17340,7 @@
 	        value: function cycleAnimation() {
 	            this.onUpdateEmitter();
 	
-	            core.util.emitter.go(this.onUpdateEmitter.bind(this));
+	            core.emitter.go(this.onUpdateEmitter.bind(this));
 	        }
 	    }, {
 	        key: "updatePlates",
@@ -17120,7 +17374,7 @@
 	                core.dom.project.element.addClass("is-inactive");
 	
 	                setTimeout(function () {
-	                    core.util.emitter.fire("app--project-ended");
+	                    core.emitter.fire("app--project-ended");
 	                }, core.dom.project.elementTransitionDuration);
 	            }
 	        }
@@ -17168,7 +17422,7 @@
 	Project.close = function () {
 	    isActive = false;
 	
-	    core.util.emitter.stop();
+	    core.emitter.stop();
 	
 	    core.dom.project.element.removeClass("is-active is-inactive");
 	
@@ -17186,7 +17440,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 38 */
+/* 41 */
 /*!***************************!*\
   !*** ./js_src/overlay.js ***!
   \***************************/
@@ -17269,7 +17523,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 39 */
+/* 42 */
 /*!***********************************!*\
   !*** ./js_src/indexes/listing.js ***!
   \***********************************/
@@ -17289,7 +17543,7 @@
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _IndexFull = __webpack_require__(/*! ./IndexFull */ 40);
+	var _IndexFull = __webpack_require__(/*! ./IndexFull */ 43);
 	
 	var _IndexFull2 = _interopRequireDefault(_IndexFull);
 	
@@ -17395,7 +17649,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 40 */
+/* 43 */
 /*!*************************************!*\
   !*** ./js_src/indexes/IndexFull.js ***!
   \*************************************/
@@ -17423,18 +17677,22 @@
 	
 	var _js_libsJqueryDistJquery2 = _interopRequireDefault(_js_libsJqueryDistJquery);
 	
-	var _router = __webpack_require__(/*! ../router */ 27);
+	var _router = __webpack_require__(/*! ../router */ 30);
 	
 	var _router2 = _interopRequireDefault(_router);
 	
-	var _properjsTemplate = __webpack_require__(/*! properjs-template */ 41);
+	var _gallery = __webpack_require__(/*! ../gallery */ 44);
+	
+	var _gallery2 = _interopRequireDefault(_gallery);
+	
+	var _properjsTemplate = __webpack_require__(/*! properjs-template */ 46);
 	
 	var _properjsTemplate2 = _interopRequireDefault(_properjsTemplate);
 	
 	var instance = null;
-	var _gridTitleTpl = "<h4 class=\"h4\">{title}</h4>";
-	var _gridWrapTpl = "\n<div class=\"grid grid--index\"></div>\n";
-	var _gridItemTpl = "\n<div class=\"grid__item__small\">\n    <div class=\"grid__photo grid__photo--small js-listing-tile animate animate--fade js-animate\">\n        <figure class=\"figure\">\n            <img class=\"figure__image image js-lazy-image\" data-img-src=\"{assetUrl}\" data-variants=\"{systemDataVariants}\" data-original-size=\"{originalSize}\" />\n        </figure>\n    </div>\n</div>\n";
+	var _gridTitleTpl = "<div class=\"listing__title grid\"><h4 class=\"listing__title__text h4\">{title}</h4></div>";
+	var _gridWrapTpl = "\n<div class=\"listing__grid grid grid--index\"></div>\n";
+	var _gridItemTpl = "\n<div class=\"listing__tile grid__item__small js-listing-tile\">\n    <div class=\"grid__photo grid__photo--small animate animate--fade js-animate\">\n        <figure class=\"figure\">\n            <img class=\"figure__image image js-lazy-image\" data-img-src=\"{assetUrl}\" data-variants=\"{systemDataVariants}\" data-original-size=\"{originalSize}\" />\n        </figure>\n    </div>\n</div>\n";
 	
 	/**
 	 *
@@ -17454,6 +17712,8 @@
 	            this.initialize($node, data);
 	        }
 	
+	        console.log("IndexFull", this);
+	
 	        return instance;
 	    }
 	
@@ -17464,13 +17724,88 @@
 	    _createClass(IndexFull, [{
 	        key: "initialize",
 	        value: function initialize($node, data) {
-	            this.$node = $node;
 	            this.data = data;
+	            this.$node = $node;
+	            this.$tile = null;
+	            this.$image = null;
 	            this.$target = core.dom.main.find(".js-main--" + this.data.target);
 	
-	            _router2["default"].loadFullIndex(this.onLoadFullIndex.bind(this));
+	            this.bindEvents();
+	            this.loadIndex();
 	
 	            instance = this;
+	        }
+	    }, {
+	        key: "bindEvents",
+	        value: function bindEvents() {
+	            var _this = this;
+	
+	            this.$node.on("click", ".js-listing-tile", function (e) {
+	                _this.bindGallery((0, _js_libsJqueryDistJquery2["default"])(e.currentTarget));
+	            });
+	        }
+	    }, {
+	        key: "bindGallery",
+	        value: function bindGallery($elem) {
+	            var _this2 = this;
+	
+	            this.$tile = $elem;
+	            this.$image = this.$tile.find(core.config.lazyImageSelector);
+	
+	            _gallery2["default"].setImage(this.$image);
+	
+	            core.dom.doc.on("keydown", function (e) {
+	                var $tile = null;
+	                var $image = null;
+	
+	                // Arrow right
+	                if (e.keyCode === 39) {
+	                    $tile = _this2.$tile.next();
+	
+	                    // Arrow left
+	                } else if (e.keyCode === 37) {
+	                        $tile = _this2.$tile.prev();
+	
+	                        // ESC key
+	                    } else if (e.keyCode === 27) {
+	                            _this2.unbindGallery();
+	                            return false;
+	                        }
+	
+	                // Hook into projects here
+	                // Need to know if we are going from one project to another either way
+	                // Need to show project title if we are switching to a new project
+	
+	                // Tile is not null ?
+	                if ($tile) {
+	                    e.preventDefault();
+	
+	                    // Tile has an element
+	                    if ($tile.length) {
+	                        $image = $tile.find(core.config.lazyImageSelector);
+	
+	                        _this2.$tile = $tile;
+	                        _this2.$image = $image;
+	
+	                        _gallery2["default"].setImage($image);
+	                    }
+	                }
+	            });
+	        }
+	    }, {
+	        key: "unbindGallery",
+	        value: function unbindGallery() {
+	            this.$tile = null;
+	            this.$image = null;
+	
+	            _gallery2["default"].close();
+	
+	            core.dom.doc.off("keydown");
+	        }
+	    }, {
+	        key: "loadIndex",
+	        value: function loadIndex() {
+	            _router2["default"].loadFullIndex(this.onLoadFullIndex.bind(this));
 	        }
 	
 	        /**
@@ -17485,7 +17820,7 @@
 	    }, {
 	        key: "onLoadFullIndex",
 	        value: function onLoadFullIndex(json) {
-	            var _this = this;
+	            var _this3 = this;
 	
 	            json.collection.collections.forEach(function (collection) {
 	                var $title = (0, _js_libsJqueryDistJquery2["default"])((0, _properjsTemplate2["default"])(_gridTitleTpl.replace(/\n/g, ""), collection));
@@ -17493,16 +17828,26 @@
 	
 	                collection.items.forEach(function (item) {
 	                    $grid.append((0, _properjsTemplate2["default"])(_gridItemTpl.replace(/\n/g, ""), item));
+	
+	                    // @note:
+	                    // @todo: Keep this `systemDataVariants` condition in until we re-upload these 3 images
+	                    // /a-girl-named-georges/           diaplayIndex: 1
+	                    // /woolrich-made-in-usa/           displayIndex: 1
+	                    // /nike-running-free-designers/    displayIndex: 5
+	                    if (item.customContent && item.customContent.diptychImage && item.customContent.diptychImage.systemDataVariants) {
+	                        $grid.append((0, _properjsTemplate2["default"])(_gridItemTpl.replace(/\n/g, ""), item.customContent.diptychImage));
+	                    }
 	                });
 	
-	                _this.$node.append($title);
-	                _this.$node.append($grid);
+	                _this3.$node.append($title);
+	                _this3.$node.append($grid);
 	            });
 	
+	            // Node must be in DOM for image size to work
 	            this.$target.append(this.$node);
 	
 	            core.images.handleImages(this.$node.find(".js-lazy-image"), function () {
-	                core.util.emitter.fire("app--update-animate");
+	                core.emitter.fire("app--update-animate");
 	            });
 	        }
 	
@@ -17527,7 +17872,266 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 41 */
+/* 44 */
+/*!***************************!*\
+  !*** ./js_src/gallery.js ***!
+  \***************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+	
+	var _js_libsJqueryDistJquery = __webpack_require__(/*! js_libs/jquery/dist/jquery */ 1);
+	
+	var _js_libsJqueryDistJquery2 = _interopRequireDefault(_js_libsJqueryDistJquery);
+	
+	var _core = __webpack_require__(/*! ./core */ 4);
+	
+	var core = _interopRequireWildcard(_core);
+	
+	var _Menu = __webpack_require__(/*! ./Menu */ 45);
+	
+	var _Menu2 = _interopRequireDefault(_Menu);
+	
+	/**
+	 *
+	 * @public
+	 * @module gallery
+	 * @description Performs the branded load-in screen sequence.
+	 *
+	 */
+	var gallery = {
+	    /**
+	     *
+	     * @public
+	     * @method init
+	     * @memberof gallery
+	     * @description Initialize the gallery element.
+	     *
+	     */
+	    init: function init() {
+	        this.menu = new _Menu2["default"](core.dom.gallery.element);
+	    },
+	
+	    open: function open() {
+	        if (!this.menu.isActive()) {
+	            this.menu.open();
+	        }
+	    },
+	
+	    close: function close() {
+	        if (this.menu.isActive()) {
+	            this.menu.close();
+	        }
+	    },
+	
+	    setImage: function setImage($image) {
+	        var _this = this;
+	
+	        var data = $image.data();
+	
+	        core.dom.gallery.elementNode.empty();
+	
+	        this.open();
+	        this.$image = (0, _js_libsJqueryDistJquery2["default"])(new Image());
+	        this.$image.attr({
+	            "data-img-src": data.imgSrc,
+	            "data-variants": data.variants,
+	            "data-original-size": data.originalSize
+	        }).addClass("gallery__image figure__image image");
+	
+	        core.dom.gallery.elementNode.html(this.$image);
+	
+	        core.util.loadImages(this.$image, core.util.noop).on("done", function () {
+	            setTimeout(function () {
+	                _this.$image.addClass("is-active");
+	            }, 10);
+	        });
+	    }
+	};
+	
+	/******************************************************************************
+	 * Export
+	*******************************************************************************/
+	exports["default"] = gallery;
+	module.exports = exports["default"];
+
+/***/ },
+/* 45 */
+/*!************************!*\
+  !*** ./js_src/Menu.js ***!
+  \************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var _core = __webpack_require__(/*! ./core */ 4);
+	
+	var core = _interopRequireWildcard(_core);
+	
+	/**
+	 *
+	 * @public
+	 * @class Menu
+	 * @classdesc Handle normalized open/close for overlay menus.
+	 * @param {Hobo} $node The menu element
+	 *
+	 */
+	
+	var Menu = (function () {
+	    function Menu($node) {
+	        _classCallCheck(this, Menu);
+	
+	        this.$node = $node;
+	        this.tDuration = core.util.getTransitionDuration(this.$node[0]);
+	        this.isOpen = false;
+	        this.scrollPos = core.scroller.getScrollY();
+	
+	        this.$node.detach();
+	    }
+	
+	    /******************************************************************************
+	     * Export
+	    *******************************************************************************/
+	
+	    /**
+	     *
+	     * @public
+	     * @instance
+	     * @method open
+	     * @memberof menus.Menu
+	     * @description Open the menu.
+	     *
+	     */
+	
+	    _createClass(Menu, [{
+	        key: "open",
+	        value: function open() {
+	            var _this = this;
+	
+	            this.isOpen = true;
+	
+	            core.dom.html.addClass("is-menu-open");
+	            core.dom.body.append(this.$node);
+	
+	            // Handle scroll suppression
+	
+	            // 0.2 => Get the current scroll position
+	            this.scrollPos = core.scroller.getScrollY();
+	
+	            // 0.3 => Suppress the scrolls emitter
+	            core.scrolls.suppress(true);
+	
+	            // 0.4 => Broadcast the open menu
+	            core.emitter.fire("app--menu-opened");
+	
+	            setTimeout(function () {
+	                return _this.$node.addClass("is-active");
+	            }, 0);
+	            setTimeout(function () {
+	                core.dom.html.addClass("is-clipped");
+	                core.dom.body.addClass("is-clipped");
+	            }, this.tDuration * 2);
+	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @instance
+	         * @method close
+	         * @memberof menus.Menu
+	         * @description Close the menu.
+	         *
+	         */
+	    }, {
+	        key: "close",
+	        value: function close() {
+	            var _this2 = this;
+	
+	            this.isOpen = false;
+	
+	            this.$node.removeClass("is-active");
+	            core.dom.html.removeClass("is-clipped");
+	            core.dom.body.removeClass("is-clipped");
+	
+	            // Handle scroll suppression
+	
+	            // 0.1 => Reset the document scroll position
+	            core.dom.body[0].scrollTop = this.scrollPos;
+	
+	            // 0.2 => Un-suppress the scrolls emitter
+	            core.scrolls.suppress(false);
+	
+	            // 0.3 => Broadcast the closed menu
+	            core.emitter.fire("app--menu-closed");
+	
+	            setTimeout(function () {
+	                core.dom.html.removeClass("is-menu-open");
+	                _this2.$node.detach();
+	            }, this.tDuration * 2);
+	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @instance
+	         * @method toggle
+	         * @memberof menus.Menu
+	         * @description Open or Close the menu.
+	         *
+	         */
+	    }, {
+	        key: "toggle",
+	        value: function toggle() {
+	            if (this.isOpen) {
+	                this.close();
+	            } else {
+	                this.open();
+	            }
+	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @instance
+	         * @method isActive
+	         * @memberof menus.Menu
+	         * @description Check the state of the menu.
+	         * @returns {boolean}
+	         *
+	         */
+	    }, {
+	        key: "isActive",
+	        value: function isActive() {
+	            return this.isOpen;
+	        }
+	    }]);
+	
+	    return Menu;
+	})();
+	
+	exports["default"] = Menu;
+	module.exports = exports["default"];
+
+/***/ },
+/* 46 */
 /*!*****************************************!*\
   !*** ./~/properjs-template/template.js ***!
   \*****************************************/
@@ -17572,7 +18176,7 @@
 	});
 
 /***/ },
-/* 42 */
+/* 47 */
 /*!**********************************!*\
   !*** ./js_src/projects/index.js ***!
   \**********************************/
@@ -17593,11 +18197,11 @@
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _Project = __webpack_require__(/*! ./Project */ 37);
+	var _Project = __webpack_require__(/*! ./Project */ 40);
 	
 	var _Project2 = _interopRequireDefault(_Project);
 	
-	var _properjsImageloader = __webpack_require__(/*! properjs-imageloader */ 12);
+	var _properjsImageloader = __webpack_require__(/*! properjs-imageloader */ 9);
 	
 	var _properjsImageloader2 = _interopRequireDefault(_properjsImageloader);
 	
@@ -17654,8 +18258,8 @@
 	
 	        instance = new _Project2["default"]($_jsElement, data);
 	
-	        core.util.emitter.on("app--root", killProject);
-	        core.util.emitter.on("app--project-ended", killProject);
+	        core.emitter.on("app--root", killProject);
+	        core.emitter.on("app--project-ended", killProject);
 	    },
 	
 	    /**
@@ -17686,8 +18290,8 @@
 	            instance = null;
 	        }
 	
-	        core.util.emitter.off("app--root", killProject);
-	        core.util.emitter.off("app--project-ended", killProject);
+	        core.emitter.off("app--root", killProject);
+	        core.emitter.off("app--project-ended", killProject);
 	    },
 	
 	    /**
@@ -17722,7 +18326,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 43 */
+/* 48 */
 /*!***************************!*\
   !*** ./js_src/animate.js ***!
   \***************************/
@@ -17762,7 +18366,7 @@
 	    init: function init() {
 	        core.log("animate initialized");
 	
-	        core.util.emitter.on("app--update-animate", this.onUpdateAnimate.bind(this));
+	        core.emitter.on("app--update-animate", this.onUpdateAnimate.bind(this));
 	    },
 	
 	    /**
@@ -17789,8 +18393,8 @@
 	    onload: function onload() {
 	        _isActive = true;
 	
-	        core.util.emitter.on("app--scroll", updateAnimate);
-	        core.util.emitter.on("app--resize", updateAnimate);
+	        core.emitter.on("app--scroll", updateAnimate);
+	        core.emitter.on("app--resize", updateAnimate);
 	
 	        updateAnimate();
 	    },

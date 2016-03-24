@@ -14,3 +14,9 @@
         </h1>
     </div>
 </div>
+
+
+
+<div class="gallery js-gallery screen -text--center ghost">
+    <figure class="gallery__figure figure ghost__child js-gallery-node"></figure>
+</div>
