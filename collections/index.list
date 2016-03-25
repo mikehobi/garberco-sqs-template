@@ -3,7 +3,7 @@
         {.section collection}
             {.repeated section collections}
                 <div class="grid__item expander-bottom">
-                    <a href="{fullUrl}" class="grid__photo js-index-tile animate animate--fade js-animate" data-title="{title}">
+                    <a href="{fullUrl}" class="grid__photo js-index-tile animate animate--fade js-animate" data-title="{.if description}{description}{.or}{title}{.end}">
                         {.section mainImage}
                             {@|apply image.block}
                         {.end}

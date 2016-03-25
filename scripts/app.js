@@ -17708,7 +17708,7 @@
 	var _properjsTemplate2 = _interopRequireDefault(_properjsTemplate);
 	
 	var instance = null;
-	var _gridTitleTpl = "<div class=\"listing__title js-listing-title grid\"><h4 class=\"listing__title__text h4\">{title}</h4></div>";
+	var _gridTitleTpl = "<div class=\"listing__title js-listing-title grid\" data-title=\"{title}\"><h4 class=\"listing__title__text h4\">{text}</h4></div>";
 	var _gridWrapTpl = "\n<div class=\"listing__grid js-listing-project grid grid--index\"></div>\n";
 	var _gridItemTpl = "\n<div class=\"listing__tile grid__item__small js-listing-tile\">\n    <div class=\"grid__photo grid__photo--small animate animate--fade js-animate\">\n        <figure class=\"figure\">\n            <img class=\"figure__image image js-lazy-image\" data-img-src=\"{assetUrl}\" data-variants=\"{systemDataVariants}\" data-original-size=\"{originalSize}\" />\n        </figure>\n    </div>\n</div>\n";
 	
@@ -17824,7 +17824,7 @@
 	
 	                                    // Previous project has a title
 	                                    if ($title.length) {
-	                                        text = $title.text();
+	                                        text = $title.data("title");
 	                                    }
 	
 	                                    $title = $parent.prev();
@@ -17854,7 +17854,7 @@
 	            _gallery2["default"].empty();
 	
 	            if ($title.length) {
-	                _overlay2["default"].setTitle(text || $title.text());
+	                _overlay2["default"].setTitle(text || $title.data("title"));
 	
 	                _overlay2["default"].open();
 	
@@ -17905,7 +17905,7 @@
 	            var _this3 = this;
 	
 	            json.collection.collections.forEach(function (collection) {
-	                var $title = (0, _js_libsJqueryDistJquery2["default"])((0, _properjsTemplate2["default"])(_gridTitleTpl.replace(/\n/g, ""), collection));
+	                var $title = (0, _js_libsJqueryDistJquery2["default"])((0, _properjsTemplate2["default"])(_gridTitleTpl.replace(/\n/g, ""), { text: collection.title, title: collection.description || collection.title }));
 	                var $grid = (0, _js_libsJqueryDistJquery2["default"])(_gridWrapTpl.replace(/\n/g, ""));
 	
 	                collection.items.forEach(function (item) {
@@ -18575,4 +18575,4 @@
 
 /***/ }
 /******/ ]);
-//# sourceMappingURL=App.js.map
+//# sourceMappingURL=app.js.map
