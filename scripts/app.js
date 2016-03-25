@@ -17329,9 +17329,7 @@
 	        value: function onPreload() {
 	            core.dom.project.elementPane.html(this.$node);
 	
-	            if (_overlay2["default"].isActive()) {
-	                _overlay2["default"].close();
-	            }
+	            _overlay2["default"].close();
 	
 	            this.cycleAnimation();
 	        }
@@ -17486,6 +17484,10 @@
 	    },
 	
 	    open: function open() {
+	        if (_isActive) {
+	            return this;
+	        }
+	
 	        _isActive = true;
 	
 	        core.dom.html.addClass("is-overlay-active");
@@ -17497,6 +17499,12 @@
 	    },
 	
 	    close: function close() {
+	        var _this = this;
+	
+	        if (!_isActive) {
+	            return this;
+	        }
+	
 	        core.dom.overlay.element.removeClass("is-active");
 	
 	        setTimeout(function () {
@@ -17504,7 +17512,13 @@
 	
 	            core.dom.html.removeClass("is-overlay-active");
 	            core.dom.overlay.element.detach().removeClass("is-intro");
+	
+	            _this.empty();
 	        }, transTime);
+	    },
+	
+	    empty: function empty() {
+	        core.dom.overlay.elementTitle.empty();
 	    },
 	
 	    setTitle: function setTitle(text) {
@@ -17685,13 +17699,17 @@
 	
 	var _gallery2 = _interopRequireDefault(_gallery);
 	
+	var _overlay = __webpack_require__(/*! ../overlay */ 41);
+	
+	var _overlay2 = _interopRequireDefault(_overlay);
+	
 	var _properjsTemplate = __webpack_require__(/*! properjs-template */ 46);
 	
 	var _properjsTemplate2 = _interopRequireDefault(_properjsTemplate);
 	
 	var instance = null;
-	var _gridTitleTpl = "<div class=\"listing__title grid\"><h4 class=\"listing__title__text h4\">{title}</h4></div>";
-	var _gridWrapTpl = "\n<div class=\"listing__grid grid grid--index\"></div>\n";
+	var _gridTitleTpl = "<div class=\"listing__title js-listing-title grid\"><h4 class=\"listing__title__text h4\">{title}</h4></div>";
+	var _gridWrapTpl = "\n<div class=\"listing__grid js-listing-project grid grid--index\"></div>\n";
 	var _gridItemTpl = "\n<div class=\"listing__tile grid__item__small js-listing-tile\">\n    <div class=\"grid__photo grid__photo--small animate animate--fade js-animate\">\n        <figure class=\"figure\">\n            <img class=\"figure__image image js-lazy-image\" data-img-src=\"{assetUrl}\" data-variants=\"{systemDataVariants}\" data-original-size=\"{originalSize}\" />\n        </figure>\n    </div>\n</div>\n";
 	
 	/**
@@ -17755,48 +17773,112 @@
 	            _gallery2["default"].setImage(this.$image);
 	
 	            core.dom.doc.on("keydown", function (e) {
-	                var $tile = null;
-	                var $image = null;
+	                //e.preventDefault();
 	
-	                // Arrow right
-	                if (e.keyCode === 39) {
-	                    $tile = _this2.$tile.next();
+	                var text = null;
+	                var $title = null;
+	                var $parent = null;
+	                var $project = null;
+	                var $next = _this2.$tile.next();
+	                var $prev = _this2.$tile.prev();
 	
-	                    // Arrow left
-	                } else if (e.keyCode === 37) {
-	                        $tile = _this2.$tile.prev();
+	                // Escape key
+	                if (e.keyCode === 27) {
+	                    _this2.unbindGallery();
+	                    return false;
+	                }
 	
-	                        // ESC key
-	                    } else if (e.keyCode === 27) {
-	                            _this2.unbindGallery();
-	                            return false;
+	                // Currently on a Title screen
+	                // Title screen is using overlay module
+	                if (_this2.$tile.is(".js-listing-title")) {
+	                    // Arrow right
+	                    if (e.keyCode === 39) {
+	                        $project = _this2.$tile.next();
+	
+	                        _this2.nextProject($project, $project.find(".js-listing-tile").first());
+	
+	                        // Arrow left
+	                    } else if (e.keyCode === 37) {
+	                            $project = _this2.$tile.prev();
+	
+	                            _this2.nextProject($project, $project.find(".js-listing-tile").last());
 	                        }
 	
-	                // Hook into projects here
-	                // Need to know if we are going from one project to another either way
-	                // Need to show project title if we are switching to a new project
+	                    // Arrow right, has next tile
+	                } else if (e.keyCode === 39 && $next.length) {
+	                        _this2.nextTile($next);
 	
-	                // Tile is not null ?
-	                if ($tile) {
-	                    e.preventDefault();
+	                        // Arrow right, has no next tile
+	                    } else if (e.keyCode === 39 && !$next.length) {
+	                            _this2.nextTitle(_this2.$tile.parent().next());
 	
-	                    // Tile has an element
-	                    if ($tile.length) {
-	                        $image = $tile.find(core.config.lazyImageSelector);
+	                            // Arrow left, has prev tile
+	                        } else if (e.keyCode === 37 && $prev.length) {
+	                                _this2.nextTile($prev);
 	
-	                        _this2.$tile = $tile;
-	                        _this2.$image = $image;
+	                                // Arrow left, has not prev tile
+	                            } else if (e.keyCode === 37 && !$prev.length) {
+	                                    text = null;
+	                                    $parent = _this2.$tile.parent();
+	                                    $title = $parent.prev().prev().prev();
 	
-	                        _gallery2["default"].setImage($image);
-	                    }
-	                }
+	                                    // Previous project has a title
+	                                    if ($title.length) {
+	                                        text = $title.text();
+	                                    }
+	
+	                                    $title = $parent.prev();
+	
+	                                    _this2.nextTitle($title, text);
+	                                }
 	            });
+	        }
+	    }, {
+	        key: "nextProject",
+	        value: function nextProject($project, $tile) {
+	            if ($project.length) {
+	                // Tile?
+	                this.$tile = $tile;
+	
+	                // Image?
+	                this.$image = this.$tile.find(core.config.lazyImageSelector);
+	
+	                _gallery2["default"].setImage(this.$image);
+	
+	                _overlay2["default"].close();
+	            }
+	        }
+	    }, {
+	        key: "nextTitle",
+	        value: function nextTitle($title, text) {
+	            _gallery2["default"].empty();
+	
+	            if ($title.length) {
+	                _overlay2["default"].setTitle(text || $title.text());
+	
+	                _overlay2["default"].open();
+	
+	                this.$tile = $title;
+	            }
+	        }
+	    }, {
+	        key: "nextTile",
+	        value: function nextTile($tile) {
+	            // Tile?
+	            this.$tile = $tile;
+	
+	            // Image?
+	            this.$image = this.$tile.find(core.config.lazyImageSelector);
+	
+	            _gallery2["default"].setImage(this.$image);
 	        }
 	    }, {
 	        key: "unbindGallery",
 	        value: function unbindGallery() {
 	            this.$tile = null;
 	            this.$image = null;
+	
+	            _overlay2["default"].close();
 	
 	            _gallery2["default"].close();
 	
@@ -17932,13 +18014,16 @@
 	        }
 	    },
 	
+	    empty: function empty() {
+	        core.dom.gallery.elementNode.empty();
+	    },
+	
 	    setImage: function setImage($image) {
 	        var _this = this;
 	
 	        var data = $image.data();
 	
-	        core.dom.gallery.elementNode.empty();
-	
+	        this.empty();
 	        this.open();
 	        this.$image = (0, _js_libsJqueryDistJquery2["default"])(new Image());
 	        this.$image.attr({
