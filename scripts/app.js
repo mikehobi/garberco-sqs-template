@@ -14386,6 +14386,18 @@
 	
 	var _animate2 = _interopRequireDefault(_animate);
 	
+	var _overlay = __webpack_require__(/*! ./overlay */ 41);
+	
+	var _overlay2 = _interopRequireDefault(_overlay);
+	
+	var _gallery = __webpack_require__(/*! ./gallery */ 44);
+	
+	var _gallery2 = _interopRequireDefault(_gallery);
+	
+	var _projectsProject = __webpack_require__(/*! ./projects/Project */ 40);
+	
+	var _projectsProject2 = _interopRequireDefault(_projectsProject);
+	
 	/**
 	 *
 	 * @public
@@ -14403,8 +14415,6 @@
 	     *
 	     */
 	    init: function init() {
-	        var _this = this;
-	
 	        this.state = {};
 	        this.navData = core.dom.nav.data();
 	        this.pageData = core.dom.page.data();
@@ -14412,10 +14422,6 @@
 	        this.prepPage();
 	        this.bindEmptyHashLinks();
 	        this.initPageController();
-	
-	        core.emitter.on("app--project-ended", function () {
-	            _this.route(_this.root);
-	        });
 	
 	        core.log("router initialized");
 	    },
@@ -14526,9 +14532,7 @@
 	     *
 	     */
 	    initPageController: function initPageController() {
-	        this.controller = new _properjsPagecontroller2["default"]({
-	            transitionTime: 1
-	        });
+	        this.controller = new _properjsPagecontroller2["default"]({});
 	
 	        this.controller.setConfig(["*"]);
 	
@@ -14554,7 +14558,7 @@
 	     *
 	     */
 	    prepPage: function prepPage() {
-	        var _this2 = this;
+	        var _this = this;
 	
 	        this.root = this.pageData.type === "menu" ? "/" : window.location.pathname;
 	
@@ -14562,8 +14566,8 @@
 	            this.navData.appTree.forEach(function (indexItem) {
 	                if (indexItem.items) {
 	                    indexItem.items.forEach(function (collectionItem) {
-	                        if (collectionItem.collection.id === _this2.pageData.id) {
-	                            _this2.root = indexItem.collection.fullUrl;
+	                        if (collectionItem.collection.id === _this.pageData.id) {
+	                            _this.root = indexItem.collection.fullUrl;
 	                        }
 	                    });
 	                }
@@ -14573,8 +14577,15 @@
 	        }
 	
 	        core.dom.root[0].href = this.root;
+	
 	        core.dom.root.on("click", function () {
 	            core.emitter.fire("app--root");
+	        });
+	
+	        core.emitter.on("app--project-ended", function () {
+	            if (!_this.isPop) {
+	                _this.route(_this.root);
+	            }
 	        });
 	    },
 	
@@ -14592,13 +14603,51 @@
 	
 	        core.dom.html.removeClass("is-clipped");
 	        core.dom.body.removeClass("is-clipped");
+	
+	        window.addEventListener("popstate", this.handlePopstate.bind(this), false);
+	    },
+	
+	    handlePopstate: function handlePopstate() {
+	        this.isPop = true;
+	
+	        var $tile = null;
+	        var match = window.location.pathname.match(/^\/$|^\/about\/$|^\/index\/$/g);
+	
+	        // GarberCo?
+	        // About?
+	        // Index?
+	        if (match && match[0]) {
+	            match = match[0].replace(/\//g, "");
+	            match = match ? match : "garberco";
+	
+	            core.dom.main[0].id = "is-main--" + match;
+	
+	            // Project?
+	            if (_projectsProject2["default"].isActive()) {
+	                core.emitter.fire("app--project-ended");
+	            }
+	
+	            // Overlay?
+	            _overlay2["default"].close();
+	
+	            // Project?
+	        } else {
+	                $tile = (0, _js_libsJqueryDistJquery2["default"])(".js-index-tile[href*='" + window.location.pathname + "']");
+	                $tile.trigger("mouseenter");
+	                $tile.trigger("click");
+	            }
+	
+	        // Gallery?
+	        _gallery2["default"].close();
+	
+	        this.isPop = false;
 	    },
 	
 	    loadRootIndex: function loadRootIndex() {
-	        var _this3 = this;
+	        var _this2 = this;
 	
 	        core.api.collection(this.root, { format: "html" }, { dataType: "html" }).done(function (response) {
-	            var doc = _this3.parseDoc(response);
+	            var doc = _this2.parseDoc(response);
 	
 	            core.emitter.fire("app--load-root", doc.pageHtml);
 	        });
@@ -16901,8 +16950,6 @@
 	            this.initialize($node, data);
 	        }
 	
-	        console.log("Menu", this);
-	
 	        return instances[data.id];
 	    }
 	
@@ -17209,8 +17256,6 @@
 	            this.initialize($node, data);
 	        }
 	
-	        console.log("IndexRoot", this);
-	
 	        return instance;
 	    }
 	
@@ -17306,6 +17351,8 @@
 	        this.$plates = this.$node.find(".js-project-plate");
 	        this.$images = this.$node.find(".js-lazy-image");
 	        this.isEnded = false;
+	
+	        core.log("Project", this);
 	
 	        core.images.handleImages(this.$images, this.onPreload.bind(this));
 	    }
@@ -17729,8 +17776,6 @@
 	        if (!instance || instance && instance.data.id !== data.id) {
 	            this.initialize($node, data);
 	        }
-	
-	        console.log("IndexFull", this);
 	
 	        return instance;
 	    }
