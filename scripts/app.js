@@ -61,19 +61,19 @@
 	
 	var _js_libsJqueryDistJquery2 = _interopRequireDefault(_js_libsJqueryDistJquery);
 	
-	var _core = __webpack_require__(/*! ./core */ 4);
+	var _core = __webpack_require__(/*! ./core */ 2);
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _router = __webpack_require__(/*! ./router */ 30);
+	var _router = __webpack_require__(/*! ./router */ 28);
 	
 	var _router2 = _interopRequireDefault(_router);
 	
-	var _overlay = __webpack_require__(/*! ./overlay */ 41);
+	var _overlay = __webpack_require__(/*! ./overlay */ 39);
 	
 	var _overlay2 = _interopRequireDefault(_overlay);
 	
-	var _gallery = __webpack_require__(/*! ./gallery */ 44);
+	var _gallery = __webpack_require__(/*! ./gallery */ 42);
 	
 	var _gallery2 = _interopRequireDefault(_gallery);
 	
@@ -94,6 +94,7 @@
 	        this.overlay = _overlay2["default"];
 	        this.gallery = _gallery2["default"];
 	        this.analytics = new core.Analytics();
+	        this.$mainPanels = this.core.dom.header.find(".js-main-panel");
 	
 	        this.initModules();
 	        this.bindEvents();
@@ -109,6 +110,16 @@
 	     * Bootstrap
 	    *******************************************************************************/
 	
+	    /**
+	     *
+	     * @public
+	     * @instance
+	     * @method initModules
+	     * @memberof App
+	     * @description Initialize modules.
+	     *
+	     */
+	
 	    _createClass(App, [{
 	        key: "initModules",
 	        value: function initModules() {
@@ -119,6 +130,16 @@
 	            this.overlay.init(this);
 	            this.gallery.init(this);
 	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @instance
+	         * @method bindEvents
+	         * @memberof App
+	         * @description Bind top-level app events.
+	         *
+	         */
 	    }, {
 	        key: "bindEvents",
 	        value: function bindEvents() {
@@ -131,7 +152,7 @@
 	                var data = $controller.data();
 	                var $target = _this.core.dom.main.find(".js-main--" + data.target);
 	
-	                $target.siblings().removeClass("is-active");
+	                _this.$mainPanels.removeClass("is-active");
 	                $target.addClass("is-active");
 	
 	                _this.core.dom.main[0].id = data.target ? "is-main--" + data.target : "";
@@ -148,26 +169,6 @@
 
 /***/ },
 /* 1 */
-/*!***************************************!*\
-  !*** ./js_libs/jquery/dist/jquery.js ***!
-  \***************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function(global) {module.exports = global["$"] = __webpack_require__(/*! -!./~/expose-loader?jQuery!./js_libs/jquery/dist/jquery.js */ 2);
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
-
-/***/ },
-/* 2 */
-/*!****************************************************************!*\
-  !*** ./~/expose-loader?jQuery!./js_libs/jquery/dist/jquery.js ***!
-  \****************************************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function(global) {module.exports = global["jQuery"] = __webpack_require__(/*! -!./js_libs/jquery/dist/jquery.js */ 3);
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
-
-/***/ },
-/* 3 */
 /*!***************************************!*\
   !*** ./js_libs/jquery/dist/jquery.js ***!
   \***************************************/
@@ -7826,7 +7827,7 @@
 
 
 /***/ },
-/* 4 */
+/* 2 */
 /*!******************************!*\
   !*** ./js_src/core/index.js ***!
   \******************************/
@@ -7849,63 +7850,63 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 	
-	var _detect = __webpack_require__(/*! ./detect */ 5);
+	var _detect = __webpack_require__(/*! ./detect */ 3);
 	
 	var _detect2 = _interopRequireDefault(_detect);
 	
-	var _dom = __webpack_require__(/*! ./dom */ 6);
+	var _dom = __webpack_require__(/*! ./dom */ 4);
 	
 	var _dom2 = _interopRequireDefault(_dom);
 	
-	var _images = __webpack_require__(/*! ./images */ 13);
+	var _images = __webpack_require__(/*! ./images */ 11);
 	
 	var _images2 = _interopRequireDefault(_images);
 	
-	var _resizes = __webpack_require__(/*! ./resizes */ 17);
+	var _resizes = __webpack_require__(/*! ./resizes */ 15);
 	
 	var _resizes2 = _interopRequireDefault(_resizes);
 	
-	var _scrolls = __webpack_require__(/*! ./scrolls */ 22);
+	var _scrolls = __webpack_require__(/*! ./scrolls */ 20);
 	
 	var _scrolls2 = _interopRequireDefault(_scrolls);
 	
-	var _util = __webpack_require__(/*! ./util */ 7);
+	var _util = __webpack_require__(/*! ./util */ 5);
 	
 	var util = _interopRequireWildcard(_util);
 	
-	var _config = __webpack_require__(/*! ./config */ 10);
+	var _config = __webpack_require__(/*! ./config */ 8);
 	
 	var _config2 = _interopRequireDefault(_config);
 	
-	var _env = __webpack_require__(/*! ./env */ 12);
+	var _env = __webpack_require__(/*! ./env */ 10);
 	
 	var _env2 = _interopRequireDefault(_env);
 	
-	var _log = __webpack_require__(/*! ./log */ 11);
+	var _log = __webpack_require__(/*! ./log */ 9);
 	
 	var _log2 = _interopRequireDefault(_log);
 	
-	var _api = __webpack_require__(/*! ./api */ 25);
+	var _api = __webpack_require__(/*! ./api */ 23);
 	
 	var _api2 = _interopRequireDefault(_api);
 	
-	var _cache = __webpack_require__(/*! ./cache */ 27);
+	var _cache = __webpack_require__(/*! ./cache */ 25);
 	
 	var _cache2 = _interopRequireDefault(_cache);
 	
-	var _Analytics = __webpack_require__(/*! ./Analytics */ 29);
+	var _Analytics = __webpack_require__(/*! ./Analytics */ 27);
 	
 	var _Analytics2 = _interopRequireDefault(_Analytics);
 	
-	var _emitter = __webpack_require__(/*! ./emitter */ 14);
+	var _emitter = __webpack_require__(/*! ./emitter */ 12);
 	
 	var _emitter2 = _interopRequireDefault(_emitter);
 	
-	var _scroller = __webpack_require__(/*! ./scroller */ 23);
+	var _scroller = __webpack_require__(/*! ./scroller */ 21);
 	
 	var _scroller2 = _interopRequireDefault(_scroller);
 	
-	var _resizer = __webpack_require__(/*! ./resizer */ 18);
+	var _resizer = __webpack_require__(/*! ./resizer */ 16);
 	
 	var _resizer2 = _interopRequireDefault(_resizer);
 	
@@ -7926,7 +7927,7 @@
 	exports.resizer = _resizer2["default"];
 
 /***/ },
-/* 5 */
+/* 3 */
 /*!*******************************!*\
   !*** ./js_src/core/detect.js ***!
   \*******************************/
@@ -7940,11 +7941,11 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 	
-	var _dom = __webpack_require__(/*! ./dom */ 6);
+	var _dom = __webpack_require__(/*! ./dom */ 4);
 	
 	var _dom2 = _interopRequireDefault(_dom);
 	
-	var _log = __webpack_require__(/*! ./log */ 11);
+	var _log = __webpack_require__(/*! ./log */ 9);
 	
 	var _log2 = _interopRequireDefault(_log);
 	
@@ -8038,7 +8039,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 6 */
+/* 4 */
 /*!****************************!*\
   !*** ./js_src/core/dom.js ***!
   \****************************/
@@ -8058,7 +8059,7 @@
 	
 	var _js_libsJqueryDistJquery2 = _interopRequireDefault(_js_libsJqueryDistJquery);
 	
-	var _util = __webpack_require__(/*! ./util */ 7);
+	var _util = __webpack_require__(/*! ./util */ 5);
 	
 	var util = _interopRequireWildcard(_util);
 	
@@ -8202,7 +8203,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 7 */
+/* 5 */
 /*!*****************************!*\
   !*** ./js_src/core/util.js ***!
   \*****************************/
@@ -8228,23 +8229,23 @@
 	
 	var _js_libsJqueryDistJquery2 = _interopRequireDefault(_js_libsJqueryDistJquery);
 	
-	var _hammerjs = __webpack_require__(/*! hammerjs */ 8);
+	var _hammerjs = __webpack_require__(/*! hammerjs */ 6);
 	
 	var _hammerjs2 = _interopRequireDefault(_hammerjs);
 	
-	var _properjsImageloader = __webpack_require__(/*! properjs-imageloader */ 9);
+	var _properjsImageloader = __webpack_require__(/*! properjs-imageloader */ 7);
 	
 	var _properjsImageloader2 = _interopRequireDefault(_properjsImageloader);
 	
-	var _dom = __webpack_require__(/*! ./dom */ 6);
+	var _dom = __webpack_require__(/*! ./dom */ 4);
 	
 	var _dom2 = _interopRequireDefault(_dom);
 	
-	var _config = __webpack_require__(/*! ./config */ 10);
+	var _config = __webpack_require__(/*! ./config */ 8);
 	
 	var _config2 = _interopRequireDefault(_config);
 	
-	var _detect = __webpack_require__(/*! ./detect */ 5);
+	var _detect = __webpack_require__(/*! ./detect */ 3);
 	
 	var _detect2 = _interopRequireDefault(_detect);
 	
@@ -8587,6 +8588,70 @@
 	    return ret;
 	};
 	
+	/**
+	 *
+	 * @public
+	 * @method extendObject
+	 * @memberof util
+	 * @param {object} target The target object/array
+	 * @param {object} arrow The incoming object/array
+	 * @description Merge or clone objects and arrays
+	 * @returns {object}
+	 *
+	 */
+	var extendObject = function extendObject(target, arrow) {
+	    var i = null;
+	    var ret = target;
+	
+	    // Normalize arrow
+	    arrow = arrow || {};
+	
+	    // Merge Arrays
+	    // This is really just used as a `cloning` mechanism
+	    if (Array.isArray(arrow)) {
+	        i = arrow.length;
+	
+	        for (i; i--;) {
+	            ret[i] = arrow[i];
+	        }
+	
+	        // Merge Objects
+	        // This could `clone` as well, but is better for merging 2 objects
+	    } else {
+	            for (i in arrow) {
+	                if (arrow.hasOwnProperty(i)) {
+	                    ret[i] = arrow[i];
+	                }
+	            }
+	        }
+	
+	    return ret;
+	};
+	
+	/**
+	 *
+	 * @public
+	 * @method slugify
+	 * @memberof util
+	 * @param {string} str The string to slug
+	 * @description Slugify a string
+	 * @returns {string}
+	 *
+	 */
+	var slugify = function slugify(str) {
+	    str = str.toString().toLowerCase().trim()
+	    // Replace & with "and"
+	    .replace(/&/g, "-and-")
+	
+	    // Replace spaces, non-word characters and dashes with a single dash (-)
+	    .replace(/[\s\W-]+/g, "-")
+	
+	    // Replace leading trailing slashes with an empty string - nothing
+	    .replace(/^[-]+|[-]+$/g, "");
+	
+	    return str ? _config2["default"].homepageKey : str;
+	};
+	
 	/******************************************************************************
 	 * Export
 	*******************************************************************************/
@@ -8605,7 +8670,9 @@
 	    // Random
 	    px: px,
 	    noop: noop,
+	    slugify: slugify,
 	    translate3d: translate3d,
+	    extendObject: extendObject,
 	    getTransitionDuration: getTransitionDuration,
 	    getDefaultHammerOptions: getDefaultHammerOptions,
 	    getPageKey: getPageKey
@@ -8613,7 +8680,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 8 */
+/* 6 */
 /*!******************************!*\
   !*** ./~/hammerjs/hammer.js ***!
   \******************************/
@@ -11190,7 +11257,7 @@
 
 
 /***/ },
-/* 9 */
+/* 7 */
 /*!***********************************************!*\
   !*** ./~/properjs-imageloader/ImageLoader.js ***!
   \***********************************************/
@@ -11755,7 +11822,7 @@
 	});
 
 /***/ },
-/* 10 */
+/* 8 */
 /*!*******************************!*\
   !*** ./js_src/core/config.js ***!
   \*******************************/
@@ -11822,7 +11889,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 11 */
+/* 9 */
 /*!****************************!*\
   !*** ./js_src/core/log.js ***!
   \****************************/
@@ -11836,7 +11903,7 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 	
-	var _env = __webpack_require__(/*! ./env */ 12);
+	var _env = __webpack_require__(/*! ./env */ 10);
 	
 	var _env2 = _interopRequireDefault(_env);
 	
@@ -11864,7 +11931,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 12 */
+/* 10 */
 /*!****************************!*\
   !*** ./js_src/core/env.js ***!
   \****************************/
@@ -11934,7 +12001,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 13 */
+/* 11 */
 /*!*******************************!*\
   !*** ./js_src/core/images.js ***!
   \*******************************/
@@ -11950,31 +12017,31 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 	
-	var _dom = __webpack_require__(/*! ./dom */ 6);
+	var _dom = __webpack_require__(/*! ./dom */ 4);
 	
 	var _dom2 = _interopRequireDefault(_dom);
 	
-	var _util = __webpack_require__(/*! ./util */ 7);
+	var _util = __webpack_require__(/*! ./util */ 5);
 	
 	var util = _interopRequireWildcard(_util);
 	
-	var _log = __webpack_require__(/*! ./log */ 11);
+	var _log = __webpack_require__(/*! ./log */ 9);
 	
 	var _log2 = _interopRequireDefault(_log);
 	
-	var _config = __webpack_require__(/*! ./config */ 10);
+	var _config = __webpack_require__(/*! ./config */ 8);
 	
 	var _config2 = _interopRequireDefault(_config);
 	
-	var _emitter = __webpack_require__(/*! ./emitter */ 14);
+	var _emitter = __webpack_require__(/*! ./emitter */ 12);
 	
 	var _emitter2 = _interopRequireDefault(_emitter);
 	
-	var _properjsImageloader = __webpack_require__(/*! properjs-imageloader */ 9);
+	var _properjsImageloader = __webpack_require__(/*! properjs-imageloader */ 7);
 	
 	var _properjsImageloader2 = _interopRequireDefault(_properjsImageloader);
 	
-	var _ImageController = __webpack_require__(/*! ./ImageController */ 16);
+	var _ImageController = __webpack_require__(/*! ./ImageController */ 14);
 	
 	var _ImageController2 = _interopRequireDefault(_ImageController);
 	
@@ -12085,7 +12152,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 14 */
+/* 12 */
 /*!********************************!*\
   !*** ./js_src/core/emitter.js ***!
   \********************************/
@@ -12099,7 +12166,7 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 	
-	var _properjsController = __webpack_require__(/*! properjs-controller */ 15);
+	var _properjsController = __webpack_require__(/*! properjs-controller */ 13);
 	
 	var _properjsController2 = _interopRequireDefault(_properjsController);
 	
@@ -12119,7 +12186,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 15 */
+/* 13 */
 /*!*********************************************!*\
   !*** ./~/properjs-controller/Controller.js ***!
   \*********************************************/
@@ -12427,7 +12494,7 @@
 	});
 
 /***/ },
-/* 16 */
+/* 14 */
 /*!****************************************!*\
   !*** ./js_src/core/ImageController.js ***!
   \****************************************/
@@ -12451,15 +12518,15 @@
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var _util = __webpack_require__(/*! ./util */ 7);
+	var _util = __webpack_require__(/*! ./util */ 5);
 	
 	var util = _interopRequireWildcard(_util);
 	
-	var _log = __webpack_require__(/*! ./log */ 11);
+	var _log = __webpack_require__(/*! ./log */ 9);
 	
 	var _log2 = _interopRequireDefault(_log);
 	
-	var _properjsController = __webpack_require__(/*! properjs-controller */ 15);
+	var _properjsController = __webpack_require__(/*! properjs-controller */ 13);
 	
 	var _properjsController2 = _interopRequireDefault(_properjsController);
 	
@@ -12554,7 +12621,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 17 */
+/* 15 */
 /*!********************************!*\
   !*** ./js_src/core/resizes.js ***!
   \********************************/
@@ -12570,27 +12637,27 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 	
-	var _log = __webpack_require__(/*! ./log */ 11);
+	var _log = __webpack_require__(/*! ./log */ 9);
 	
 	var _log2 = _interopRequireDefault(_log);
 	
-	var _util = __webpack_require__(/*! ./util */ 7);
+	var _util = __webpack_require__(/*! ./util */ 5);
 	
 	var util = _interopRequireWildcard(_util);
 	
-	var _emitter = __webpack_require__(/*! ./emitter */ 14);
+	var _emitter = __webpack_require__(/*! ./emitter */ 12);
 	
 	var _emitter2 = _interopRequireDefault(_emitter);
 	
-	var _resizer = __webpack_require__(/*! ./resizer */ 18);
+	var _resizer = __webpack_require__(/*! ./resizer */ 16);
 	
 	var _resizer2 = _interopRequireDefault(_resizer);
 	
-	var _properjsThrottle = __webpack_require__(/*! properjs-throttle */ 20);
+	var _properjsThrottle = __webpack_require__(/*! properjs-throttle */ 18);
 	
 	var _properjsThrottle2 = _interopRequireDefault(_properjsThrottle);
 	
-	var _properjsDebounce = __webpack_require__(/*! properjs-debounce */ 21);
+	var _properjsDebounce = __webpack_require__(/*! properjs-debounce */ 19);
 	
 	var _properjsDebounce2 = _interopRequireDefault(_properjsDebounce);
 	
@@ -12658,7 +12725,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 18 */
+/* 16 */
 /*!********************************!*\
   !*** ./js_src/core/resizer.js ***!
   \********************************/
@@ -12672,7 +12739,7 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 	
-	var _properjsResizecontroller = __webpack_require__(/*! properjs-resizecontroller */ 19);
+	var _properjsResizecontroller = __webpack_require__(/*! properjs-resizecontroller */ 17);
 	
 	var _properjsResizecontroller2 = _interopRequireDefault(_properjsResizecontroller);
 	
@@ -12692,7 +12759,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 19 */
+/* 17 */
 /*!*********************************************************!*\
   !*** ./~/properjs-resizecontroller/ResizeController.js ***!
   \*********************************************************/
@@ -12718,7 +12785,7 @@
 	    
 	})(function () {
 	
-	    var Controller = __webpack_require__( /*! properjs-controller */ 15 ),
+	    var Controller = __webpack_require__( /*! properjs-controller */ 13 ),
 	
 	        // Orientation?
 	        _hasOrientation = ("orientation" in window),
@@ -12901,7 +12968,7 @@
 	});
 
 /***/ },
-/* 20 */
+/* 18 */
 /*!*****************************************!*\
   !*** ./~/properjs-throttle/throttle.js ***!
   \*****************************************/
@@ -12960,7 +13027,7 @@
 	});
 
 /***/ },
-/* 21 */
+/* 19 */
 /*!*****************************************!*\
   !*** ./~/properjs-debounce/debounce.js ***!
   \*****************************************/
@@ -13031,7 +13098,7 @@
 	});
 
 /***/ },
-/* 22 */
+/* 20 */
 /*!********************************!*\
   !*** ./js_src/core/scrolls.js ***!
   \********************************/
@@ -13045,23 +13112,23 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 	
-	var _dom = __webpack_require__(/*! ./dom */ 6);
+	var _dom = __webpack_require__(/*! ./dom */ 4);
 	
 	var _dom2 = _interopRequireDefault(_dom);
 	
-	var _log = __webpack_require__(/*! ./log */ 11);
+	var _log = __webpack_require__(/*! ./log */ 9);
 	
 	var _log2 = _interopRequireDefault(_log);
 	
-	var _detect = __webpack_require__(/*! ./detect */ 5);
+	var _detect = __webpack_require__(/*! ./detect */ 3);
 	
 	var _detect2 = _interopRequireDefault(_detect);
 	
-	var _emitter = __webpack_require__(/*! ./emitter */ 14);
+	var _emitter = __webpack_require__(/*! ./emitter */ 12);
 	
 	var _emitter2 = _interopRequireDefault(_emitter);
 	
-	var _scroller = __webpack_require__(/*! ./scroller */ 23);
+	var _scroller = __webpack_require__(/*! ./scroller */ 21);
 	
 	var _scroller2 = _interopRequireDefault(_scroller);
 	
@@ -13294,7 +13361,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 23 */
+/* 21 */
 /*!*********************************!*\
   !*** ./js_src/core/scroller.js ***!
   \*********************************/
@@ -13308,7 +13375,7 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 	
-	var _properjsScrollcontroller = __webpack_require__(/*! properjs-scrollcontroller */ 24);
+	var _properjsScrollcontroller = __webpack_require__(/*! properjs-scrollcontroller */ 22);
 	
 	var _properjsScrollcontroller2 = _interopRequireDefault(_properjsScrollcontroller);
 	
@@ -13328,7 +13395,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 24 */
+/* 22 */
 /*!*********************************************************!*\
   !*** ./~/properjs-scrollcontroller/ScrollController.js ***!
   \*********************************************************/
@@ -13354,7 +13421,7 @@
 	    
 	})(function () {
 	
-	    var Controller = __webpack_require__( /*! properjs-controller */ 15 ),
+	    var Controller = __webpack_require__( /*! properjs-controller */ 13 ),
 	        
 	        // Current scroll position
 	        _currentY = null,
@@ -13506,7 +13573,7 @@
 	});
 
 /***/ },
-/* 25 */
+/* 23 */
 /*!****************************!*\
   !*** ./js_src/core/api.js ***!
   \****************************/
@@ -13518,17 +13585,21 @@
 	    value: true
 	});
 	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 	
 	var _js_libsJqueryDistJquery = __webpack_require__(/*! js_libs/jquery/dist/jquery */ 1);
 	
 	var _js_libsJqueryDistJquery2 = _interopRequireDefault(_js_libsJqueryDistJquery);
 	
-	var _paramalama = __webpack_require__(/*! paramalama */ 26);
+	var _paramalama = __webpack_require__(/*! paramalama */ 24);
 	
 	var _paramalama2 = _interopRequireDefault(_paramalama);
 	
-	//import config from "./config";
+	var _util = __webpack_require__(/*! ./util */ 5);
+	
+	var util = _interopRequireWildcard(_util);
 	
 	var _rSlash = /^\/|\/$/g;
 	
@@ -13544,7 +13615,7 @@
 	     *
 	     * @public
 	     * @member data
-	     * @memberof api
+	     * @memberof core.api
 	     * @description URLs this little api needs to use.
 	     *
 	     */
@@ -13559,7 +13630,7 @@
 	     *
 	     * @public
 	     * @member dataType
-	     * @memberof api
+	     * @memberof core.api
 	     * @description Default dataType for the `request` api method.
 	     *
 	     */
@@ -13569,7 +13640,7 @@
 	     *
 	     * @public
 	     * @member format
-	     * @memberof api
+	     * @memberof core.api
 	     * @description Default format for the `request` api method.
 	     *
 	     */
@@ -13579,7 +13650,7 @@
 	     *
 	     * @public
 	     * @member method
-	     * @memberof api
+	     * @memberof core.api
 	     * @description Default method for the `request` api method.
 	     *
 	     */
@@ -13588,23 +13659,9 @@
 	    /**
 	     *
 	     * @public
-	     * @method urify
-	     * @param {string} uri The collection uri
-	     * @memberof api
-	     * @description Ensures a leading/trailing slash.
-	     * @returns {string}
-	     *
-	     */
-	    urify: function urify(uri) {
-	        return ["/", uri.replace(_rSlash, ""), "/"].join("");
-	    },
-	
-	    /**
-	     *
-	     * @public
 	     * @method endpoint
 	     * @param {string} uri The collection uri
-	     * @memberof api
+	     * @memberof core.api
 	     * @description Creates the fullUrl from a collection uri.
 	     * @returns {string}
 	     *
@@ -13618,7 +13675,7 @@
 	     * @public
 	     * @method apipoint
 	     * @param {string} uri The API uri
-	     * @memberof api
+	     * @memberof core.api
 	     * @description Creates the fullUrl from an API uri.
 	     * @returns {string}
 	     *
@@ -13634,17 +13691,17 @@
 	     * @param {string} url The API URL
 	     * @param {object} params Merge params to send
 	     * @param {object} options Merge config to pass to $.ajax()
-	     * @memberof api
+	     * @memberof core.api
 	     * @description Creates the fullUrl from an API uri.
 	     * @returns {object}
 	     *
 	     */
 	    request: function request(url, params, options) {
-	        var data = _js_libsJqueryDistJquery2["default"].extend({
-	            format: this.format
-	            //nocache: true
+	        var data = util.extendObject({
+	            format: this.format,
+	            nocache: true
 	        }, params);
-	        var opts = _js_libsJqueryDistJquery2["default"].extend({
+	        var opts = util.extendObject({
 	            url: url,
 	            data: data,
 	            dataType: this.dataType,
@@ -13657,113 +13714,57 @@
 	    /**
 	     *
 	     * @public
-	     * @method index
-	     * @param {string} uri The index uri
-	     * @param {object} params Merge params to send
-	     * @param {object} options Merge options to send
-	     * @memberof api
-	     * @description Retrieves collections from a given index.
-	     * @returns {object}
-	     *
-	     */
-	    index: function index(uri, params, options) {
-	        var i = 0;
-	        var def = new _js_libsJqueryDistJquery2["default"].Deferred();
-	        var colls = [];
-	        var handle = function handle(data) {
-	            for (i = data.collections.length; i--;) {
-	                colls.push(data.collections[i].urlId);
-	            }
-	
-	            api.collections(colls, params, options).done(function (items) {
-	                return def.resolve(items);
-	            });
-	        };
-	
-	        this.request(this.endpoint(uri)).done(function (data) {
-	            handle(data.collection);
-	        }).fail(function (xhr, status, error) {
-	            return def.reject(error);
-	        });
-	
-	        return def;
-	    },
-	
-	    /**
-	     *
-	     * @public
 	     * @method collection
 	     * @param {string} uri The collection uri
 	     * @param {object} params Merge params to send
 	     * @param {object} options Merge options to send
-	     * @memberof api
+	     * @memberof core.api
 	     * @description Retrieves items from a given collection.
-	     * @returns {object}
+	     *              Returned Promise resolves with a data {object}
+	     * @returns {Promise}
 	     *
 	     */
 	    collection: function collection(uri, params, options) {
-	        var collection = {};
-	        var def = new _js_libsJqueryDistJquery2["default"].Deferred();
-	        var seg = uri.split("?")[0];
+	        var _this = this;
 	
-	        params = _js_libsJqueryDistJquery2["default"].extend(params || {}, (0, _paramalama2["default"])(uri));
+	        return new Promise(function (resolve, reject) {
+	            var collection = {};
+	            var seg = uri.split("?")[0];
 	
-	        this.request(this.endpoint(seg), params, options).done(function (data) {
-	            // Resolve with `responseText`
-	            if (typeof data === "string") {
-	                def.resolve(data);
-	            } else {
-	                // Collection?
-	                collection = {
-	                    collection: data.collection,
-	                    item: data.item || null,
-	                    items: data.items || null,
-	                    pagination: data.pagination || null
-	                };
+	            // This clones for us - non-mutable
+	            params = util.extendObject({}, params);
 	
-	                def.resolve(data.items || data.item ? collection : null);
+	            // Merges any query string params from URI
+	            params = util.extendObject(params, (0, _paramalama2["default"])(uri));
+	
+	            // Tackle the `+` issue with taxonomies
+	            if (params.tag) {
+	                params.tag = params.tag.replace(/\+/g, " ");
 	            }
-	        }).fail(function (xhr, status, error) {
-	            def.reject(error);
+	
+	            if (params.category) {
+	                params.category = params.category.replace(/\+/g, " ");
+	            }
+	
+	            _this.request(_this.endpoint(seg), params, options).done(function (data) {
+	                // Resolve with `responseText`
+	                if (typeof data === "string") {
+	                    resolve(data);
+	                } else {
+	                    // Collection?
+	                    collection = {
+	                        collection: data.collection,
+	                        item: data.item || null,
+	                        items: data.items || null,
+	                        pagination: data.pagination || null
+	                    };
+	
+	                    resolve(collection);
+	                }
+	            }).fail(function (error) {
+	                reject(error);
+	            });
 	        });
-	
-	        return def;
-	    },
-	
-	    /**
-	     *
-	     * @public
-	     * @method collections
-	     * @param {array} uris The collection uris to query for
-	     * @param {object} params Merge params to send
-	     * @param {object} options Merge options to send
-	     * @memberof api
-	     * @description Retrieves items from a given set of collection.
-	     * @returns {object}
-	     *
-	     */
-	    collections: function collections(uris, params, options) {
-	        var curr = 0;
-	        var i = uris.length;
-	        var items = {};
-	        var def = new _js_libsJqueryDistJquery2["default"].Deferred();
-	        var func = function func(uri, data) {
-	            curr++;
-	
-	            if (data) {
-	                items[uri] = data;
-	            }
-	
-	            if (curr === uris.length) {
-	                def.resolve(items);
-	            }
-	        };
-	
-	        for (i; i--;) {
-	            this.collection(uris[i], params, options).done(func.bind(null, uris[i]));
-	        }
-	
-	        return def;
 	    }
 	};
 	
@@ -13774,7 +13775,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 26 */
+/* 24 */
 /*!************************************!*\
   !*** ./~/paramalama/paramalama.js ***!
   \************************************/
@@ -13843,7 +13844,7 @@
 
 
 /***/ },
-/* 27 */
+/* 25 */
 /*!******************************!*\
   !*** ./js_src/core/cache.js ***!
   \******************************/
@@ -13857,7 +13858,7 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 	
-	var _Store = __webpack_require__(/*! ./Store */ 28);
+	var _Store = __webpack_require__(/*! ./Store */ 26);
 	
 	var _Store2 = _interopRequireDefault(_Store);
 	
@@ -13875,7 +13876,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 28 */
+/* 26 */
 /*!******************************!*\
   !*** ./js_src/core/Store.js ***!
   \******************************/
@@ -13893,17 +13894,13 @@
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	var _js_libsJqueryDistJquery = __webpack_require__(/*! js_libs/jquery/dist/jquery */ 1);
-	
-	var _js_libsJqueryDistJquery2 = _interopRequireDefault(_js_libsJqueryDistJquery);
-	
-	var _log = __webpack_require__(/*! ./log */ 11);
+	var _log = __webpack_require__(/*! ./log */ 9);
 	
 	var _log2 = _interopRequireDefault(_log);
 	
-	var _config = __webpack_require__(/*! ./config */ 10);
+	var _util = __webpack_require__(/*! ./util */ 5);
 	
-	var _config2 = _interopRequireDefault(_config);
+	var _util2 = _interopRequireDefault(_util);
 	
 	// Singleton
 	var _instance = null;
@@ -14014,26 +14011,6 @@
 	         *
 	         * @public
 	         * @instance
-	         * @method slug
-	         * @param {string} uri The string to slugify
-	         * @memberof Store
-	         * @description Slug a uri string
-	         * @returns {string}
-	         *
-	         */
-	    }, {
-	        key: "slug",
-	        value: function slug(uri) {
-	            uri = uri.replace(/^\/|\/$/g, "").replace(/\/|\?|\&|=|\s/g, "-").toLowerCase();
-	            uri = uri === "" ? _config2["default"].homepageKey : uri;
-	
-	            return uri;
-	        }
-	
-	        /**
-	         *
-	         * @public
-	         * @instance
 	         * @method set
 	         * @param {string} id The index key
 	         * @param {mixed} val The value to store
@@ -14044,7 +14021,7 @@
 	    }, {
 	        key: "set",
 	        value: function set(id, val) {
-	            id = this.slug(id);
+	            id = _util2["default"].slugify(id);
 	
 	            _cache[id] = val;
 	
@@ -14065,7 +14042,7 @@
 	    }, {
 	        key: "get",
 	        value: function get(id) {
-	            id = id && this.slug(id);
+	            id = id && _util2["default"].slugify(id);
 	
 	            return id ? this.getValue(_cache[id]) : _cache;
 	        }
@@ -14084,7 +14061,7 @@
 	    }, {
 	        key: "getValue",
 	        value: function getValue(val) {
-	            return typeof val === "string" ? String(val) : val ? _js_libsJqueryDistJquery2["default"].extend(_js_libsJqueryDistJquery2["default"].isArray(val) ? [] : {}, val) : null;
+	            return typeof val === "string" ? String(val) : val ? _util2["default"].extendObject(Array.isArray(val) ? [] : {}, val) : null;
 	        }
 	
 	        /**
@@ -14127,7 +14104,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 29 */
+/* 27 */
 /*!**********************************!*\
   !*** ./js_src/core/Analytics.js ***!
   \**********************************/
@@ -14148,19 +14125,19 @@
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	var _log = __webpack_require__(/*! ./log */ 11);
+	var _log = __webpack_require__(/*! ./log */ 9);
 	
 	var _log2 = _interopRequireDefault(_log);
 	
-	var _util = __webpack_require__(/*! ./util */ 7);
+	var _util = __webpack_require__(/*! ./util */ 5);
 	
 	var util = _interopRequireWildcard(_util);
 	
-	var _cache = __webpack_require__(/*! ./cache */ 27);
+	var _cache = __webpack_require__(/*! ./cache */ 25);
 	
 	var _cache2 = _interopRequireDefault(_cache);
 	
-	var _emitter = __webpack_require__(/*! ./emitter */ 14);
+	var _emitter = __webpack_require__(/*! ./emitter */ 12);
 	
 	var _emitter2 = _interopRequireDefault(_emitter);
 	
@@ -14338,7 +14315,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 30 */
+/* 28 */
 /*!**************************!*\
   !*** ./js_src/router.js ***!
   \**************************/
@@ -14354,7 +14331,7 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 	
-	var _properjsPagecontroller = __webpack_require__(/*! properjs-pagecontroller */ 31);
+	var _properjsPagecontroller = __webpack_require__(/*! properjs-pagecontroller */ 29);
 	
 	var _properjsPagecontroller2 = _interopRequireDefault(_properjsPagecontroller);
 	
@@ -14362,39 +14339,39 @@
 	
 	var _js_libsJqueryDistJquery2 = _interopRequireDefault(_js_libsJqueryDistJquery);
 	
-	var _core = __webpack_require__(/*! ./core */ 4);
+	var _core = __webpack_require__(/*! ./core */ 2);
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _menus = __webpack_require__(/*! ./menus */ 36);
+	var _menus = __webpack_require__(/*! ./menus */ 34);
 	
 	var _menus2 = _interopRequireDefault(_menus);
 	
-	var _indexes = __webpack_require__(/*! ./indexes */ 38);
+	var _indexes = __webpack_require__(/*! ./indexes */ 36);
 	
 	var _indexes2 = _interopRequireDefault(_indexes);
 	
-	var _indexesListing = __webpack_require__(/*! ./indexes/listing */ 42);
+	var _indexesListing = __webpack_require__(/*! ./indexes/listing */ 40);
 	
 	var _indexesListing2 = _interopRequireDefault(_indexesListing);
 	
-	var _projects = __webpack_require__(/*! ./projects */ 47);
+	var _projects = __webpack_require__(/*! ./projects */ 45);
 	
 	var _projects2 = _interopRequireDefault(_projects);
 	
-	var _animate = __webpack_require__(/*! ./animate */ 48);
+	var _animate = __webpack_require__(/*! ./animate */ 46);
 	
 	var _animate2 = _interopRequireDefault(_animate);
 	
-	var _overlay = __webpack_require__(/*! ./overlay */ 41);
+	var _overlay = __webpack_require__(/*! ./overlay */ 39);
 	
 	var _overlay2 = _interopRequireDefault(_overlay);
 	
-	var _gallery = __webpack_require__(/*! ./gallery */ 44);
+	var _gallery = __webpack_require__(/*! ./gallery */ 42);
 	
 	var _gallery2 = _interopRequireDefault(_gallery);
 	
-	var _projectsProject = __webpack_require__(/*! ./projects/Project */ 40);
+	var _projectsProject = __webpack_require__(/*! ./projects/Project */ 38);
 	
 	var _projectsProject2 = _interopRequireDefault(_projectsProject);
 	
@@ -14536,11 +14513,8 @@
 	
 	        this.controller.setConfig(["*"]);
 	
-	        this.controller.setModules([_menus2["default"], _indexes2["default"], _indexesListing2["default"], _animate2["default"], _projects2["default"]
-	        //core.images
-	        ]);
+	        this.controller.setModules([_menus2["default"], _indexes2["default"], _indexesListing2["default"], _animate2["default"], _projects2["default"]]);
 	
-	        //this.controller.on( "page-controller-router-samepage", () => {} );
 	        this.controller.on("page-controller-router-transition-out", this.changePageOut.bind(this));
 	        this.controller.on("page-controller-router-refresh-document", this.changeContent.bind(this));
 	        this.controller.on("page-controller-router-transition-in", this.changePageIn.bind(this));
@@ -14607,6 +14581,14 @@
 	        window.addEventListener("popstate", this.handlePopstate.bind(this), false);
 	    },
 	
+	    /**
+	     *
+	     * @public
+	     * @method handlePopstate
+	     * @memberof router
+	     * @description Process actions to take on popstate.
+	     *
+	     */
 	    handlePopstate: function handlePopstate() {
 	        this.isPop = true;
 	
@@ -14643,18 +14625,35 @@
 	        this.isPop = false;
 	    },
 	
+	    /**
+	     *
+	     * @public
+	     * @method loadRootIndex
+	     * @memberof router
+	     * @description Load the parent Index for the current collection.
+	     *
+	     */
 	    loadRootIndex: function loadRootIndex() {
 	        var _this2 = this;
 	
-	        core.api.collection(this.root, { format: "html" }, { dataType: "html" }).done(function (response) {
+	        core.api.collection(this.root, { format: "html" }, { dataType: "html" }).then(function (response) {
 	            var doc = _this2.parseDoc(response);
 	
 	            core.emitter.fire("app--load-root", doc.pageHtml);
 	        });
 	    },
 	
+	    /**
+	     *
+	     * @public
+	     * @method loadFullIndex
+	     * @param {function} cb The callback to fire
+	     * @memberof router
+	     * @description Load the parent Index JSON to render full Index view.
+	     *
+	     */
 	    loadFullIndex: function loadFullIndex(cb) {
-	        core.api.collection(this.root, { format: "json" }, { dataType: "json" }).done(cb);
+	        core.api.collection(this.root, { format: "json" }, { dataType: "json" }).then(cb);
 	    },
 	
 	    /**
@@ -14750,7 +14749,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 31 */
+/* 29 */
 /*!*****************************************************!*\
   !*** ./~/properjs-pagecontroller/PageController.js ***!
   \*****************************************************/
@@ -14783,8 +14782,8 @@
 	})(function () {
 	
 	    // Useful stuff
-	    var Router = __webpack_require__( /*! properjs-router */ 32 ),
-	        Controller = __webpack_require__( /*! properjs-controller */ 15 ),
+	    var Router = __webpack_require__( /*! properjs-router */ 30 ),
+	        Controller = __webpack_require__( /*! properjs-controller */ 13 ),
 	
 	        _router = null,
 	        _config = [],
@@ -15281,7 +15280,7 @@
 	});
 
 /***/ },
-/* 32 */
+/* 30 */
 /*!***************************************************************!*\
   !*** ./~/properjs-pagecontroller/~/properjs-router/Router.js ***!
   \***************************************************************/
@@ -15306,9 +15305,9 @@
 	
 	})(function () {
 	
-	    var PushState = __webpack_require__( /*! properjs-pushstate */ 33 ),
-	        MatchRoute = __webpack_require__( /*! properjs-matchroute */ 34 ),
-	        matchElement = __webpack_require__( /*! properjs-matchelement */ 35 ),
+	    var PushState = __webpack_require__( /*! properjs-pushstate */ 31 ),
+	        MatchRoute = __webpack_require__( /*! properjs-matchroute */ 32 ),
+	        matchElement = __webpack_require__( /*! properjs-matchelement */ 33 ),
 	        _initDelay = 200,
 	        _triggerEl;
 	
@@ -15963,7 +15962,7 @@
 	});
 
 /***/ },
-/* 33 */
+/* 31 */
 /*!***************************************************************************************!*\
   !*** ./~/properjs-pagecontroller/~/properjs-router/~/properjs-pushstate/PushState.js ***!
   \***************************************************************************************/
@@ -16360,7 +16359,7 @@
 	});
 
 /***/ },
-/* 34 */
+/* 32 */
 /*!*****************************************************************************************!*\
   !*** ./~/properjs-pagecontroller/~/properjs-router/~/properjs-matchroute/MatchRoute.js ***!
   \*****************************************************************************************/
@@ -16385,7 +16384,7 @@
 	    
 	})(function () {
 	
-	    var paramalama = __webpack_require__( /*! paramalama */ 26 ),
+	    var paramalama = __webpack_require__( /*! paramalama */ 24 ),
 	
 	    /**
 	     *
@@ -16719,7 +16718,7 @@
 	});
 
 /***/ },
-/* 35 */
+/* 33 */
 /*!*************************************************!*\
   !*** ./~/properjs-matchelement/matchElement.js ***!
   \*************************************************/
@@ -16781,7 +16780,7 @@
 	});
 
 /***/ },
-/* 36 */
+/* 34 */
 /*!*******************************!*\
   !*** ./js_src/menus/index.js ***!
   \*******************************/
@@ -16798,11 +16797,11 @@
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
 	
-	var _core = __webpack_require__(/*! ../core */ 4);
+	var _core = __webpack_require__(/*! ../core */ 2);
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _Menu = __webpack_require__(/*! ./Menu */ 37);
+	var _Menu = __webpack_require__(/*! ./Menu */ 35);
 	
 	var _Menu2 = _interopRequireDefault(_Menu);
 	
@@ -16908,7 +16907,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 37 */
+/* 35 */
 /*!******************************!*\
   !*** ./js_src/menus/Menu.js ***!
   \******************************/
@@ -16926,7 +16925,7 @@
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	var _core = __webpack_require__(/*! ../core */ 4);
+	var _core = __webpack_require__(/*! ../core */ 2);
 	
 	var core = _interopRequireWildcard(_core);
 	
@@ -16938,7 +16937,8 @@
 	 * @class Menu
 	 * @param {jQuery} $node The element
 	 * @param {object} data The datas
-	 * @classdesc Handle an index.
+	 * @classdesc Handle a menu view.
+	 * @memberof menus
 	 *
 	 */
 	
@@ -16956,6 +16956,18 @@
 	    /******************************************************************************
 	     * Export
 	    *******************************************************************************/
+	
+	    /**
+	     *
+	     * @public
+	     * @instance
+	     * @method initialize
+	     * @param {jQuery} $node The element
+	     * @param {object} data The datas
+	     * @memberof menus.Menu
+	     * @description Perform instance bootstrap actions.
+	     *
+	     */
 	
 	    _createClass(Menu, [{
 	        key: "initialize",
@@ -16977,8 +16989,8 @@
 	         * @public
 	         * @instance
 	         * @method onPreload
-	         * @memberof IndexClass
-	         * @description Handle loaded index grid.
+	         * @memberof menus.Menu
+	         * @description Handle preloaded images.
 	         *
 	         */
 	    }, {
@@ -16986,7 +16998,7 @@
 	        value: function onPreload() {
 	            var _this = this;
 	
-	            this.$target.html(this.$node);
+	            this.$target.append(this.$node);
 	
 	            setTimeout(function () {
 	                _this.$anim.addClass("is-active");
@@ -16998,7 +17010,7 @@
 	         * @public
 	         * @instance
 	         * @method destroy
-	         * @memberof Menu
+	         * @memberof menus.Menu
 	         * @description Undo event bindings for this instance.
 	         *
 	         */
@@ -17014,7 +17026,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 38 */
+/* 36 */
 /*!*********************************!*\
   !*** ./js_src/indexes/index.js ***!
   \*********************************/
@@ -17034,19 +17046,19 @@
 	
 	var _js_libsJqueryDistJquery2 = _interopRequireDefault(_js_libsJqueryDistJquery);
 	
-	var _core = __webpack_require__(/*! ../core */ 4);
+	var _core = __webpack_require__(/*! ../core */ 2);
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _IndexRoot = __webpack_require__(/*! ./IndexRoot */ 39);
+	var _IndexRoot = __webpack_require__(/*! ./IndexRoot */ 37);
 	
 	var _IndexRoot2 = _interopRequireDefault(_IndexRoot);
 	
-	var _projectsProject = __webpack_require__(/*! ../projects/Project */ 40);
+	var _projectsProject = __webpack_require__(/*! ../projects/Project */ 38);
 	
 	var _projectsProject2 = _interopRequireDefault(_projectsProject);
 	
-	var _overlay = __webpack_require__(/*! ../overlay */ 41);
+	var _overlay = __webpack_require__(/*! ../overlay */ 39);
 	
 	var _overlay2 = _interopRequireDefault(_overlay);
 	
@@ -17190,9 +17202,7 @@
 	
 	    _overlay2["default"].setTitle($tile.data("title"));
 	
-	    if (!_overlay2["default"].isActive()) {
-	        _overlay2["default"].open();
-	    }
+	    _overlay2["default"].open();
 	};
 	
 	var onMouseLeave = function onMouseLeave() {
@@ -17214,7 +17224,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 39 */
+/* 37 */
 /*!*************************************!*\
   !*** ./js_src/indexes/IndexRoot.js ***!
   \*************************************/
@@ -17232,7 +17242,7 @@
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	var _core = __webpack_require__(/*! ../core */ 4);
+	var _core = __webpack_require__(/*! ../core */ 2);
 	
 	var core = _interopRequireWildcard(_core);
 	
@@ -17245,6 +17255,7 @@
 	 * @param {jQuery} $node The element
 	 * @param {object} data The datas
 	 * @classdesc Handle an index as a Singleton(ish).
+	 * @memberof indexes
 	 *
 	 */
 	
@@ -17263,6 +17274,18 @@
 	     * Export
 	    *******************************************************************************/
 	
+	    /**
+	     *
+	     * @public
+	     * @instance
+	     * @method initialize
+	     * @param {jQuery} $node The element
+	     * @param {object} data The datas
+	     * @memberof indexes.IndexRoot
+	     * @description Perform instance bootstrap actions.
+	     *
+	     */
+	
 	    _createClass(IndexRoot, [{
 	        key: "initialize",
 	        value: function initialize($node, data) {
@@ -17272,7 +17295,7 @@
 	            this.$images = this.$node.find(".js-lazy-image");
 	
 	            // Node must be in DOM for image size to work
-	            this.$target.html(this.$node);
+	            this.$target.append(this.$node);
 	
 	            core.images.handleImages(this.$images, function () {
 	                core.emitter.fire("app--update-animate");
@@ -17286,7 +17309,7 @@
 	         * @public
 	         * @instance
 	         * @method destroy
-	         * @memberof IndexRoot
+	         * @memberof indexes.IndexRoot
 	         * @description Undo event bindings for this instance.
 	         *
 	         */
@@ -17302,7 +17325,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 40 */
+/* 38 */
 /*!************************************!*\
   !*** ./js_src/projects/Project.js ***!
   \************************************/
@@ -17322,11 +17345,11 @@
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	var _core = __webpack_require__(/*! ../core */ 4);
+	var _core = __webpack_require__(/*! ../core */ 2);
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _overlay = __webpack_require__(/*! ../overlay */ 41);
+	var _overlay = __webpack_require__(/*! ../overlay */ 39);
 	
 	var _overlay2 = _interopRequireDefault(_overlay);
 	
@@ -17339,6 +17362,7 @@
 	 * @param {jQuery} $node The element
 	 * @param {object} data The datas
 	 * @classdesc Handle an index.
+	 * @memberof projects
 	 *
 	 */
 	
@@ -17357,29 +17381,46 @@
 	        core.images.handleImages(this.$images, this.onPreload.bind(this));
 	    }
 	
-	    /******************************************************************************
-	     * Static
-	    *******************************************************************************/
+	    /**
+	     *
+	     * @public
+	     * @static
+	     * @method isActive
+	     * @memberof projects.Project
+	     * @description Test if a project is active.
+	     * @returns {boolean}
+	     *
+	     */
 	
 	    /**
 	     *
 	     * @public
 	     * @instance
 	     * @method onPreload
-	     * @memberof Project
-	     * @description Handle loaded index grid.
+	     * @memberof projects.Project
+	     * @description Handle loaded project images.
 	     *
 	     */
 	
 	    _createClass(Project, [{
 	        key: "onPreload",
 	        value: function onPreload() {
-	            core.dom.project.elementPane.html(this.$node);
+	            core.dom.project.elementPane.append(this.$node);
 	
 	            _overlay2["default"].close();
 	
 	            this.cycleAnimation();
 	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @instance
+	         * @method cycleAnimation
+	         * @memberof projects.Project
+	         * @description Run raf cycle to handle animations.
+	         *
+	         */
 	    }, {
 	        key: "cycleAnimation",
 	        value: function cycleAnimation() {
@@ -17387,6 +17428,16 @@
 	
 	            core.emitter.go(this.onUpdateEmitter.bind(this));
 	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @instance
+	         * @method updatePlates
+	         * @memberof projects.Project
+	         * @description Update active plates for the project.
+	         *
+	         */
 	    }, {
 	        key: "updatePlates",
 	        value: function updatePlates() {
@@ -17403,6 +17454,16 @@
 	                }
 	            }
 	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @instance
+	         * @method updatePosition
+	         * @memberof projects.Project
+	         * @description Determine when to teardown a project.
+	         *
+	         */
 	    }, {
 	        key: "updatePosition",
 	        value: function updatePosition() {
@@ -17423,6 +17484,16 @@
 	                }, core.dom.project.elementTransitionDuration);
 	            }
 	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @instance
+	         * @method onUpdateEmitter
+	         * @memberof projects.Project
+	         * @description Handle the raf cycle.
+	         *
+	         */
 	    }, {
 	        key: "onUpdateEmitter",
 	        value: function onUpdateEmitter() {
@@ -17435,7 +17506,7 @@
 	         * @public
 	         * @instance
 	         * @method destroy
-	         * @memberof Project
+	         * @memberof projects.Project
 	         * @description Undo event bindings for this instance.
 	         *
 	         */
@@ -17453,6 +17524,15 @@
 	    return isActive;
 	};
 	
+	/**
+	 *
+	 * @public
+	 * @static
+	 * @method open
+	 * @memberof projects.Project
+	 * @description Open the project view element.
+	 *
+	 */
 	Project.open = function () {
 	    isActive = true;
 	
@@ -17464,6 +17544,15 @@
 	    }, 10);
 	};
 	
+	/**
+	 *
+	 * @public
+	 * @static
+	 * @method close
+	 * @memberof projects.Project
+	 * @description Close the project view element.
+	 *
+	 */
 	Project.close = function () {
 	    isActive = false;
 	
@@ -17474,7 +17563,7 @@
 	    setTimeout(function () {
 	        core.dom.html.removeClass("is-project");
 	        core.dom.project.element.detach();
-	        core.dom.project.elementPane.empty();
+	        core.dom.project.elementPane[0].innerHTML = "";
 	    }, core.dom.project.elementTransitionDuration);
 	};
 	
@@ -17485,7 +17574,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 41 */
+/* 39 */
 /*!***************************!*\
   !*** ./js_src/overlay.js ***!
   \***************************/
@@ -17499,11 +17588,11 @@
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
 	
-	var _core = __webpack_require__(/*! ./core */ 4);
+	var _core = __webpack_require__(/*! ./core */ 2);
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _isActive = false;
+	var isActive = false;
 	var transTime = core.util.getTransitionDuration(core.dom.overlay.element[0]);
 	
 	/**
@@ -17524,18 +17613,27 @@
 	     */
 	    init: function init() {
 	        if (core.dom.overlay.element.is(".is-active")) {
-	            _isActive = true;
+	            isActive = true;
 	        } else {
 	            core.dom.overlay.element.detach();
 	        }
 	    },
 	
+	    /**
+	     *
+	     * @public
+	     * @method open
+	     * @memberof overlay
+	     * @description Open the overlay.
+	     * @returns {@this}
+	     *
+	     */
 	    open: function open() {
-	        if (_isActive) {
+	        if (isActive) {
 	            return this;
 	        }
 	
-	        _isActive = true;
+	        isActive = true;
 	
 	        core.dom.html.addClass("is-overlay-active");
 	        core.dom.body.append(core.dom.overlay.element);
@@ -17545,17 +17643,26 @@
 	        }, 10);
 	    },
 	
+	    /**
+	     *
+	     * @public
+	     * @method close
+	     * @memberof overlay
+	     * @description Close the overlay.
+	     * @returns {@this}
+	     *
+	     */
 	    close: function close() {
 	        var _this = this;
 	
-	        if (!_isActive) {
+	        if (!isActive) {
 	            return this;
 	        }
 	
 	        core.dom.overlay.element.removeClass("is-active");
 	
 	        setTimeout(function () {
-	            _isActive = false;
+	            isActive = false;
 	
 	            core.dom.html.removeClass("is-overlay-active");
 	            core.dom.overlay.element.detach().removeClass("is-intro");
@@ -17564,16 +17671,29 @@
 	        }, transTime);
 	    },
 	
+	    /**
+	     *
+	     * @public
+	     * @method empty
+	     * @memberof overlay
+	     * @description Empty the overlay.
+	     *
+	     */
 	    empty: function empty() {
-	        core.dom.overlay.elementTitle.empty();
+	        core.dom.overlay.elementTitle[0].innerHTML = "";
 	    },
 	
+	    /**
+	     *
+	     * @public
+	     * @method setTitle
+	     * @param {string} text The text/html to set.
+	     * @memberof overlay
+	     * @description Add text to the overlay.
+	     *
+	     */
 	    setTitle: function setTitle(text) {
-	        core.dom.overlay.elementTitle.html(text);
-	    },
-	
-	    isActive: function isActive() {
-	        return _isActive;
+	        core.dom.overlay.elementTitle[0].innerHTML = text;
 	    }
 	};
 	
@@ -17584,7 +17704,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 42 */
+/* 40 */
 /*!***********************************!*\
   !*** ./js_src/indexes/listing.js ***!
   \***********************************/
@@ -17600,11 +17720,11 @@
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
 	
-	var _core = __webpack_require__(/*! ../core */ 4);
+	var _core = __webpack_require__(/*! ../core */ 2);
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _IndexFull = __webpack_require__(/*! ./IndexFull */ 43);
+	var _IndexFull = __webpack_require__(/*! ./IndexFull */ 41);
 	
 	var _IndexFull2 = _interopRequireDefault(_IndexFull);
 	
@@ -17710,7 +17830,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 43 */
+/* 41 */
 /*!*************************************!*\
   !*** ./js_src/indexes/IndexFull.js ***!
   \*************************************/
@@ -17730,7 +17850,7 @@
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	var _core = __webpack_require__(/*! ../core */ 4);
+	var _core = __webpack_require__(/*! ../core */ 2);
 	
 	var core = _interopRequireWildcard(_core);
 	
@@ -17738,19 +17858,19 @@
 	
 	var _js_libsJqueryDistJquery2 = _interopRequireDefault(_js_libsJqueryDistJquery);
 	
-	var _router = __webpack_require__(/*! ../router */ 30);
+	var _router = __webpack_require__(/*! ../router */ 28);
 	
 	var _router2 = _interopRequireDefault(_router);
 	
-	var _gallery = __webpack_require__(/*! ../gallery */ 44);
+	var _gallery = __webpack_require__(/*! ../gallery */ 42);
 	
 	var _gallery2 = _interopRequireDefault(_gallery);
 	
-	var _overlay = __webpack_require__(/*! ../overlay */ 41);
+	var _overlay = __webpack_require__(/*! ../overlay */ 39);
 	
 	var _overlay2 = _interopRequireDefault(_overlay);
 	
-	var _properjsTemplate = __webpack_require__(/*! properjs-template */ 46);
+	var _properjsTemplate = __webpack_require__(/*! properjs-template */ 44);
 	
 	var _properjsTemplate2 = _interopRequireDefault(_properjsTemplate);
 	
@@ -17766,6 +17886,7 @@
 	 * @param {jQuery} $node The element
 	 * @param {object} data The datas
 	 * @classdesc Handle an index as a Singleton(ish).
+	 * @memberof indexes
 	 *
 	 */
 	
@@ -17784,6 +17905,18 @@
 	     * Export
 	    *******************************************************************************/
 	
+	    /**
+	     *
+	     * @public
+	     * @instance
+	     * @method initialize
+	     * @param {jQuery} $node The element
+	     * @param {object} data The datas
+	     * @memberof indexes.IndexFull
+	     * @description Perform instance bootstrap actions.
+	     *
+	     */
+	
 	    _createClass(IndexFull, [{
 	        key: "initialize",
 	        value: function initialize($node, data) {
@@ -17798,6 +17931,16 @@
 	
 	            instance = this;
 	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @instance
+	         * @method bindEvents
+	         * @memberof indexes.IndexFull
+	         * @description Bind instance events.
+	         *
+	         */
 	    }, {
 	        key: "bindEvents",
 	        value: function bindEvents() {
@@ -17807,6 +17950,17 @@
 	                _this.bindGallery((0, _js_libsJqueryDistJquery2["default"])(e.currentTarget));
 	            });
 	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @instance
+	         * @method bindGallery
+	         * @param {jQuery} $elem The tile image that was clicked
+	         * @memberof indexes.IndexFull
+	         * @description Bind active gallery view.
+	         *
+	         */
 	    }, {
 	        key: "bindGallery",
 	        value: function bindGallery($elem) {
@@ -17878,6 +18032,40 @@
 	                                }
 	            });
 	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @instance
+	         * @method unbindGallery
+	         * @memberof indexes.IndexFull
+	         * @description Un-bind active gallery view.
+	         *
+	         */
+	    }, {
+	        key: "unbindGallery",
+	        value: function unbindGallery() {
+	            this.$tile = null;
+	            this.$image = null;
+	
+	            _overlay2["default"].close();
+	
+	            _gallery2["default"].close();
+	
+	            core.dom.doc.off("keydown");
+	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @instance
+	         * @method nextProject
+	         * @param {jQuery} $project The project grid
+	         * @param {jQuery} $tile The tile image to load in gallery
+	         * @memberof indexes.IndexFull
+	         * @description Transition to a tile in a new project scope.
+	         *
+	         */
 	    }, {
 	        key: "nextProject",
 	        value: function nextProject($project, $tile) {
@@ -17893,6 +18081,18 @@
 	                _overlay2["default"].close();
 	            }
 	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @instance
+	         * @method nextTitle
+	         * @param {jQuery} $title The title element
+	         * @param {string} text The optional text for the title to display
+	         * @memberof indexes.IndexFull
+	         * @description Transition to the title of the next project.
+	         *
+	         */
 	    }, {
 	        key: "nextTitle",
 	        value: function nextTitle($title, text) {
@@ -17906,6 +18106,17 @@
 	                this.$tile = $title;
 	            }
 	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @instance
+	         * @method nextTile
+	         * @param {jQuery} $tile The tile element
+	         * @memberof indexes.IndexFull
+	         * @description Transition to the next tile in a project.
+	         *
+	         */
 	    }, {
 	        key: "nextTile",
 	        value: function nextTile($tile) {
@@ -17917,18 +18128,16 @@
 	
 	            _gallery2["default"].setImage(this.$image);
 	        }
-	    }, {
-	        key: "unbindGallery",
-	        value: function unbindGallery() {
-	            this.$tile = null;
-	            this.$image = null;
 	
-	            _overlay2["default"].close();
-	
-	            _gallery2["default"].close();
-	
-	            core.dom.doc.off("keydown");
-	        }
+	        /**
+	         *
+	         * @public
+	         * @instance
+	         * @method loadIndex
+	         * @memberof indexes.IndexFull
+	         * @description Load the full Index JSON to build the UI.
+	         *
+	         */
 	    }, {
 	        key: "loadIndex",
 	        value: function loadIndex() {
@@ -17940,7 +18149,7 @@
 	         * @public
 	         * @method onLoadFullIndex
 	         * @param {object} json The collection json
-	         * @memberof menus
+	         * @memberof indexes.IndexFull
 	         * @description Receive full collections data for an index.
 	         *
 	         */
@@ -17983,13 +18192,15 @@
 	         * @public
 	         * @instance
 	         * @method destroy
-	         * @memberof IndexFull
+	         * @memberof indexes.IndexFull
 	         * @description Undo event bindings for this instance.
 	         *
 	         */
 	    }, {
 	        key: "destroy",
-	        value: function destroy() {}
+	        value: function destroy() {
+	            core.dom.doc.off("keydown");
+	        }
 	    }]);
 	
 	    return IndexFull;
@@ -17999,7 +18210,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 44 */
+/* 42 */
 /*!***************************!*\
   !*** ./js_src/gallery.js ***!
   \***************************/
@@ -18019,11 +18230,11 @@
 	
 	var _js_libsJqueryDistJquery2 = _interopRequireDefault(_js_libsJqueryDistJquery);
 	
-	var _core = __webpack_require__(/*! ./core */ 4);
+	var _core = __webpack_require__(/*! ./core */ 2);
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _Menu = __webpack_require__(/*! ./Menu */ 45);
+	var _Menu = __webpack_require__(/*! ./Menu */ 43);
 	
 	var _Menu2 = _interopRequireDefault(_Menu);
 	
@@ -18031,7 +18242,7 @@
 	 *
 	 * @public
 	 * @module gallery
-	 * @description Performs the branded load-in screen sequence.
+	 * @description Handles single view images.
 	 *
 	 */
 	var gallery = {
@@ -18047,22 +18258,55 @@
 	        this.menu = new _Menu2["default"](core.dom.gallery.element);
 	    },
 	
+	    /**
+	     *
+	     * @public
+	     * @method open
+	     * @memberof gallery
+	     * @description Open the gallery.
+	     *
+	     */
 	    open: function open() {
 	        if (!this.menu.isActive()) {
 	            this.menu.open();
 	        }
 	    },
 	
+	    /**
+	     *
+	     * @public
+	     * @method close
+	     * @memberof gallery
+	     * @description Close the gallery.
+	     *
+	     */
 	    close: function close() {
 	        if (this.menu.isActive()) {
 	            this.menu.close();
 	        }
 	    },
 	
+	    /**
+	     *
+	     * @public
+	     * @method empty
+	     * @memberof gallery
+	     * @description Empty the gallery.
+	     *
+	     */
 	    empty: function empty() {
-	        core.dom.gallery.elementNode.empty();
+	        core.dom.gallery.elementNode[0].innerHTML = "";
 	    },
 	
+	    /**
+	     *
+	     * @public
+	     * @method setImage
+	     * @param {jQuery} $image The image to create a full view of.
+	     * @memberof gallery
+	     * @description Apply an image to the gallery view.
+	     *
+	     */
 	    setImage: function setImage($image) {
 	        var _this = this;
 	
@@ -18077,7 +18321,7 @@
 	            "data-original-size": data.originalSize
 	        }).addClass("gallery__image figure__image image");
 	
-	        core.dom.gallery.elementNode.html(this.$image);
+	        core.dom.gallery.elementNode.append(this.$image);
 	
 	        core.util.loadImages(this.$image, core.util.noop).on("done", function () {
 	            setTimeout(function () {
@@ -18094,7 +18338,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 45 */
+/* 43 */
 /*!************************!*\
   !*** ./js_src/Menu.js ***!
   \************************/
@@ -18112,7 +18356,7 @@
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	var _core = __webpack_require__(/*! ./core */ 4);
+	var _core = __webpack_require__(/*! ./core */ 2);
 	
 	var core = _interopRequireWildcard(_core);
 	
@@ -18261,7 +18505,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 46 */
+/* 44 */
 /*!*****************************************!*\
   !*** ./~/properjs-template/template.js ***!
   \*****************************************/
@@ -18306,7 +18550,7 @@
 	});
 
 /***/ },
-/* 47 */
+/* 45 */
 /*!**********************************!*\
   !*** ./js_src/projects/index.js ***!
   \**********************************/
@@ -18323,15 +18567,15 @@
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
 	
-	var _core = __webpack_require__(/*! ../core */ 4);
+	var _core = __webpack_require__(/*! ../core */ 2);
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _Project = __webpack_require__(/*! ./Project */ 40);
+	var _Project = __webpack_require__(/*! ./Project */ 38);
 	
 	var _Project2 = _interopRequireDefault(_Project);
 	
-	var _properjsImageloader = __webpack_require__(/*! properjs-imageloader */ 9);
+	var _properjsImageloader = __webpack_require__(/*! properjs-imageloader */ 7);
 	
 	var _properjsImageloader2 = _interopRequireDefault(_properjsImageloader);
 	
@@ -18440,6 +18684,14 @@
 	    }
 	};
 	
+	/**
+	 *
+	 * @private
+	 * @method killProject
+	 * @memberof projects
+	 * @description Destroy a project instance.
+	 *
+	 */
 	var killProject = function killProject() {
 	    if (instance) {
 	        instance.destroy();
@@ -18456,7 +18708,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 48 */
+/* 46 */
 /*!***************************!*\
   !*** ./js_src/animate.js ***!
   \***************************/
@@ -18470,7 +18722,7 @@
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
 	
-	var _core = __webpack_require__(/*! ./core */ 4);
+	var _core = __webpack_require__(/*! ./core */ 2);
 	
 	var core = _interopRequireWildcard(_core);
 	
