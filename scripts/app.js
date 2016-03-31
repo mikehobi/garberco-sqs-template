@@ -61,19 +61,19 @@
 	
 	var _js_libsJqueryDistJquery2 = _interopRequireDefault(_js_libsJqueryDistJquery);
 	
-	var _core = __webpack_require__(/*! ./core */ 2);
+	var _core = __webpack_require__(/*! ./core */ 4);
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _router = __webpack_require__(/*! ./router */ 28);
+	var _router = __webpack_require__(/*! ./router */ 30);
 	
 	var _router2 = _interopRequireDefault(_router);
 	
-	var _overlay = __webpack_require__(/*! ./overlay */ 39);
+	var _overlay = __webpack_require__(/*! ./overlay */ 41);
 	
 	var _overlay2 = _interopRequireDefault(_overlay);
 	
-	var _gallery = __webpack_require__(/*! ./gallery */ 42);
+	var _gallery = __webpack_require__(/*! ./gallery */ 44);
 	
 	var _gallery2 = _interopRequireDefault(_gallery);
 	
@@ -169,6 +169,26 @@
 
 /***/ },
 /* 1 */
+/*!***************************************!*\
+  !*** ./js_libs/jquery/dist/jquery.js ***!
+  \***************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(global) {module.exports = global["$"] = __webpack_require__(/*! -!./~/expose-loader?jQuery!./js_libs/jquery/dist/jquery.js */ 2);
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
+
+/***/ },
+/* 2 */
+/*!****************************************************************!*\
+  !*** ./~/expose-loader?jQuery!./js_libs/jquery/dist/jquery.js ***!
+  \****************************************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(global) {module.exports = global["jQuery"] = __webpack_require__(/*! -!./js_libs/jquery/dist/jquery.js */ 3);
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
+
+/***/ },
+/* 3 */
 /*!***************************************!*\
   !*** ./js_libs/jquery/dist/jquery.js ***!
   \***************************************/
@@ -7827,7 +7847,7 @@
 
 
 /***/ },
-/* 2 */
+/* 4 */
 /*!******************************!*\
   !*** ./js_src/core/index.js ***!
   \******************************/
@@ -7850,63 +7870,63 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 	
-	var _detect = __webpack_require__(/*! ./detect */ 3);
+	var _detect = __webpack_require__(/*! ./detect */ 5);
 	
 	var _detect2 = _interopRequireDefault(_detect);
 	
-	var _dom = __webpack_require__(/*! ./dom */ 4);
+	var _dom = __webpack_require__(/*! ./dom */ 6);
 	
 	var _dom2 = _interopRequireDefault(_dom);
 	
-	var _images = __webpack_require__(/*! ./images */ 11);
+	var _images = __webpack_require__(/*! ./images */ 13);
 	
 	var _images2 = _interopRequireDefault(_images);
 	
-	var _resizes = __webpack_require__(/*! ./resizes */ 15);
+	var _resizes = __webpack_require__(/*! ./resizes */ 17);
 	
 	var _resizes2 = _interopRequireDefault(_resizes);
 	
-	var _scrolls = __webpack_require__(/*! ./scrolls */ 20);
+	var _scrolls = __webpack_require__(/*! ./scrolls */ 22);
 	
 	var _scrolls2 = _interopRequireDefault(_scrolls);
 	
-	var _util = __webpack_require__(/*! ./util */ 5);
+	var _util = __webpack_require__(/*! ./util */ 7);
 	
 	var util = _interopRequireWildcard(_util);
 	
-	var _config = __webpack_require__(/*! ./config */ 8);
+	var _config = __webpack_require__(/*! ./config */ 10);
 	
 	var _config2 = _interopRequireDefault(_config);
 	
-	var _env = __webpack_require__(/*! ./env */ 10);
+	var _env = __webpack_require__(/*! ./env */ 12);
 	
 	var _env2 = _interopRequireDefault(_env);
 	
-	var _log = __webpack_require__(/*! ./log */ 9);
+	var _log = __webpack_require__(/*! ./log */ 11);
 	
 	var _log2 = _interopRequireDefault(_log);
 	
-	var _api = __webpack_require__(/*! ./api */ 23);
+	var _api = __webpack_require__(/*! ./api */ 25);
 	
 	var _api2 = _interopRequireDefault(_api);
 	
-	var _cache = __webpack_require__(/*! ./cache */ 25);
+	var _cache = __webpack_require__(/*! ./cache */ 27);
 	
 	var _cache2 = _interopRequireDefault(_cache);
 	
-	var _Analytics = __webpack_require__(/*! ./Analytics */ 27);
+	var _Analytics = __webpack_require__(/*! ./Analytics */ 29);
 	
 	var _Analytics2 = _interopRequireDefault(_Analytics);
 	
-	var _emitter = __webpack_require__(/*! ./emitter */ 12);
+	var _emitter = __webpack_require__(/*! ./emitter */ 14);
 	
 	var _emitter2 = _interopRequireDefault(_emitter);
 	
-	var _scroller = __webpack_require__(/*! ./scroller */ 21);
+	var _scroller = __webpack_require__(/*! ./scroller */ 23);
 	
 	var _scroller2 = _interopRequireDefault(_scroller);
 	
-	var _resizer = __webpack_require__(/*! ./resizer */ 16);
+	var _resizer = __webpack_require__(/*! ./resizer */ 18);
 	
 	var _resizer2 = _interopRequireDefault(_resizer);
 	
@@ -7927,7 +7947,7 @@
 	exports.resizer = _resizer2["default"];
 
 /***/ },
-/* 3 */
+/* 5 */
 /*!*******************************!*\
   !*** ./js_src/core/detect.js ***!
   \*******************************/
@@ -7941,11 +7961,11 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 	
-	var _dom = __webpack_require__(/*! ./dom */ 4);
+	var _dom = __webpack_require__(/*! ./dom */ 6);
 	
 	var _dom2 = _interopRequireDefault(_dom);
 	
-	var _log = __webpack_require__(/*! ./log */ 9);
+	var _log = __webpack_require__(/*! ./log */ 11);
 	
 	var _log2 = _interopRequireDefault(_log);
 	
@@ -8039,7 +8059,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 4 */
+/* 6 */
 /*!****************************!*\
   !*** ./js_src/core/dom.js ***!
   \****************************/
@@ -8059,7 +8079,7 @@
 	
 	var _js_libsJqueryDistJquery2 = _interopRequireDefault(_js_libsJqueryDistJquery);
 	
-	var _util = __webpack_require__(/*! ./util */ 5);
+	var _util = __webpack_require__(/*! ./util */ 7);
 	
 	var util = _interopRequireWildcard(_util);
 	
@@ -8203,7 +8223,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 5 */
+/* 7 */
 /*!*****************************!*\
   !*** ./js_src/core/util.js ***!
   \*****************************/
@@ -8229,23 +8249,23 @@
 	
 	var _js_libsJqueryDistJquery2 = _interopRequireDefault(_js_libsJqueryDistJquery);
 	
-	var _hammerjs = __webpack_require__(/*! hammerjs */ 6);
+	var _hammerjs = __webpack_require__(/*! hammerjs */ 8);
 	
 	var _hammerjs2 = _interopRequireDefault(_hammerjs);
 	
-	var _properjsImageloader = __webpack_require__(/*! properjs-imageloader */ 7);
+	var _properjsImageloader = __webpack_require__(/*! properjs-imageloader */ 9);
 	
 	var _properjsImageloader2 = _interopRequireDefault(_properjsImageloader);
 	
-	var _dom = __webpack_require__(/*! ./dom */ 4);
+	var _dom = __webpack_require__(/*! ./dom */ 6);
 	
 	var _dom2 = _interopRequireDefault(_dom);
 	
-	var _config = __webpack_require__(/*! ./config */ 8);
+	var _config = __webpack_require__(/*! ./config */ 10);
 	
 	var _config2 = _interopRequireDefault(_config);
 	
-	var _detect = __webpack_require__(/*! ./detect */ 3);
+	var _detect = __webpack_require__(/*! ./detect */ 5);
 	
 	var _detect2 = _interopRequireDefault(_detect);
 	
@@ -8680,7 +8700,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 6 */
+/* 8 */
 /*!******************************!*\
   !*** ./~/hammerjs/hammer.js ***!
   \******************************/
@@ -11257,7 +11277,7 @@
 
 
 /***/ },
-/* 7 */
+/* 9 */
 /*!***********************************************!*\
   !*** ./~/properjs-imageloader/ImageLoader.js ***!
   \***********************************************/
@@ -11822,7 +11842,7 @@
 	});
 
 /***/ },
-/* 8 */
+/* 10 */
 /*!*******************************!*\
   !*** ./js_src/core/config.js ***!
   \*******************************/
@@ -11889,7 +11909,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 9 */
+/* 11 */
 /*!****************************!*\
   !*** ./js_src/core/log.js ***!
   \****************************/
@@ -11903,7 +11923,7 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 	
-	var _env = __webpack_require__(/*! ./env */ 10);
+	var _env = __webpack_require__(/*! ./env */ 12);
 	
 	var _env2 = _interopRequireDefault(_env);
 	
@@ -11931,7 +11951,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 10 */
+/* 12 */
 /*!****************************!*\
   !*** ./js_src/core/env.js ***!
   \****************************/
@@ -12001,7 +12021,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 11 */
+/* 13 */
 /*!*******************************!*\
   !*** ./js_src/core/images.js ***!
   \*******************************/
@@ -12017,31 +12037,31 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 	
-	var _dom = __webpack_require__(/*! ./dom */ 4);
+	var _dom = __webpack_require__(/*! ./dom */ 6);
 	
 	var _dom2 = _interopRequireDefault(_dom);
 	
-	var _util = __webpack_require__(/*! ./util */ 5);
+	var _util = __webpack_require__(/*! ./util */ 7);
 	
 	var util = _interopRequireWildcard(_util);
 	
-	var _log = __webpack_require__(/*! ./log */ 9);
+	var _log = __webpack_require__(/*! ./log */ 11);
 	
 	var _log2 = _interopRequireDefault(_log);
 	
-	var _config = __webpack_require__(/*! ./config */ 8);
+	var _config = __webpack_require__(/*! ./config */ 10);
 	
 	var _config2 = _interopRequireDefault(_config);
 	
-	var _emitter = __webpack_require__(/*! ./emitter */ 12);
+	var _emitter = __webpack_require__(/*! ./emitter */ 14);
 	
 	var _emitter2 = _interopRequireDefault(_emitter);
 	
-	var _properjsImageloader = __webpack_require__(/*! properjs-imageloader */ 7);
+	var _properjsImageloader = __webpack_require__(/*! properjs-imageloader */ 9);
 	
 	var _properjsImageloader2 = _interopRequireDefault(_properjsImageloader);
 	
-	var _ImageController = __webpack_require__(/*! ./ImageController */ 14);
+	var _ImageController = __webpack_require__(/*! ./ImageController */ 16);
 	
 	var _ImageController2 = _interopRequireDefault(_ImageController);
 	
@@ -12152,7 +12172,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 12 */
+/* 14 */
 /*!********************************!*\
   !*** ./js_src/core/emitter.js ***!
   \********************************/
@@ -12166,7 +12186,7 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 	
-	var _properjsController = __webpack_require__(/*! properjs-controller */ 13);
+	var _properjsController = __webpack_require__(/*! properjs-controller */ 15);
 	
 	var _properjsController2 = _interopRequireDefault(_properjsController);
 	
@@ -12186,7 +12206,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 13 */
+/* 15 */
 /*!*********************************************!*\
   !*** ./~/properjs-controller/Controller.js ***!
   \*********************************************/
@@ -12494,7 +12514,7 @@
 	});
 
 /***/ },
-/* 14 */
+/* 16 */
 /*!****************************************!*\
   !*** ./js_src/core/ImageController.js ***!
   \****************************************/
@@ -12518,15 +12538,15 @@
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var _util = __webpack_require__(/*! ./util */ 5);
+	var _util = __webpack_require__(/*! ./util */ 7);
 	
 	var util = _interopRequireWildcard(_util);
 	
-	var _log = __webpack_require__(/*! ./log */ 9);
+	var _log = __webpack_require__(/*! ./log */ 11);
 	
 	var _log2 = _interopRequireDefault(_log);
 	
-	var _properjsController = __webpack_require__(/*! properjs-controller */ 13);
+	var _properjsController = __webpack_require__(/*! properjs-controller */ 15);
 	
 	var _properjsController2 = _interopRequireDefault(_properjsController);
 	
@@ -12621,7 +12641,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 15 */
+/* 17 */
 /*!********************************!*\
   !*** ./js_src/core/resizes.js ***!
   \********************************/
@@ -12637,27 +12657,27 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 	
-	var _log = __webpack_require__(/*! ./log */ 9);
+	var _log = __webpack_require__(/*! ./log */ 11);
 	
 	var _log2 = _interopRequireDefault(_log);
 	
-	var _util = __webpack_require__(/*! ./util */ 5);
+	var _util = __webpack_require__(/*! ./util */ 7);
 	
 	var util = _interopRequireWildcard(_util);
 	
-	var _emitter = __webpack_require__(/*! ./emitter */ 12);
+	var _emitter = __webpack_require__(/*! ./emitter */ 14);
 	
 	var _emitter2 = _interopRequireDefault(_emitter);
 	
-	var _resizer = __webpack_require__(/*! ./resizer */ 16);
+	var _resizer = __webpack_require__(/*! ./resizer */ 18);
 	
 	var _resizer2 = _interopRequireDefault(_resizer);
 	
-	var _properjsThrottle = __webpack_require__(/*! properjs-throttle */ 18);
+	var _properjsThrottle = __webpack_require__(/*! properjs-throttle */ 20);
 	
 	var _properjsThrottle2 = _interopRequireDefault(_properjsThrottle);
 	
-	var _properjsDebounce = __webpack_require__(/*! properjs-debounce */ 19);
+	var _properjsDebounce = __webpack_require__(/*! properjs-debounce */ 21);
 	
 	var _properjsDebounce2 = _interopRequireDefault(_properjsDebounce);
 	
@@ -12725,7 +12745,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 16 */
+/* 18 */
 /*!********************************!*\
   !*** ./js_src/core/resizer.js ***!
   \********************************/
@@ -12739,7 +12759,7 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 	
-	var _properjsResizecontroller = __webpack_require__(/*! properjs-resizecontroller */ 17);
+	var _properjsResizecontroller = __webpack_require__(/*! properjs-resizecontroller */ 19);
 	
 	var _properjsResizecontroller2 = _interopRequireDefault(_properjsResizecontroller);
 	
@@ -12759,7 +12779,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 17 */
+/* 19 */
 /*!*********************************************************!*\
   !*** ./~/properjs-resizecontroller/ResizeController.js ***!
   \*********************************************************/
@@ -12785,7 +12805,7 @@
 	    
 	})(function () {
 	
-	    var Controller = __webpack_require__( /*! properjs-controller */ 13 ),
+	    var Controller = __webpack_require__( /*! properjs-controller */ 15 ),
 	
 	        // Orientation?
 	        _hasOrientation = ("orientation" in window),
@@ -12968,7 +12988,7 @@
 	});
 
 /***/ },
-/* 18 */
+/* 20 */
 /*!*****************************************!*\
   !*** ./~/properjs-throttle/throttle.js ***!
   \*****************************************/
@@ -13027,7 +13047,7 @@
 	});
 
 /***/ },
-/* 19 */
+/* 21 */
 /*!*****************************************!*\
   !*** ./~/properjs-debounce/debounce.js ***!
   \*****************************************/
@@ -13098,7 +13118,7 @@
 	});
 
 /***/ },
-/* 20 */
+/* 22 */
 /*!********************************!*\
   !*** ./js_src/core/scrolls.js ***!
   \********************************/
@@ -13112,23 +13132,23 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 	
-	var _dom = __webpack_require__(/*! ./dom */ 4);
+	var _dom = __webpack_require__(/*! ./dom */ 6);
 	
 	var _dom2 = _interopRequireDefault(_dom);
 	
-	var _log = __webpack_require__(/*! ./log */ 9);
+	var _log = __webpack_require__(/*! ./log */ 11);
 	
 	var _log2 = _interopRequireDefault(_log);
 	
-	var _detect = __webpack_require__(/*! ./detect */ 3);
+	var _detect = __webpack_require__(/*! ./detect */ 5);
 	
 	var _detect2 = _interopRequireDefault(_detect);
 	
-	var _emitter = __webpack_require__(/*! ./emitter */ 12);
+	var _emitter = __webpack_require__(/*! ./emitter */ 14);
 	
 	var _emitter2 = _interopRequireDefault(_emitter);
 	
-	var _scroller = __webpack_require__(/*! ./scroller */ 21);
+	var _scroller = __webpack_require__(/*! ./scroller */ 23);
 	
 	var _scroller2 = _interopRequireDefault(_scroller);
 	
@@ -13361,7 +13381,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 21 */
+/* 23 */
 /*!*********************************!*\
   !*** ./js_src/core/scroller.js ***!
   \*********************************/
@@ -13375,7 +13395,7 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 	
-	var _properjsScrollcontroller = __webpack_require__(/*! properjs-scrollcontroller */ 22);
+	var _properjsScrollcontroller = __webpack_require__(/*! properjs-scrollcontroller */ 24);
 	
 	var _properjsScrollcontroller2 = _interopRequireDefault(_properjsScrollcontroller);
 	
@@ -13395,7 +13415,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 22 */
+/* 24 */
 /*!*********************************************************!*\
   !*** ./~/properjs-scrollcontroller/ScrollController.js ***!
   \*********************************************************/
@@ -13421,7 +13441,7 @@
 	    
 	})(function () {
 	
-	    var Controller = __webpack_require__( /*! properjs-controller */ 13 ),
+	    var Controller = __webpack_require__( /*! properjs-controller */ 15 ),
 	        
 	        // Current scroll position
 	        _currentY = null,
@@ -13573,7 +13593,7 @@
 	});
 
 /***/ },
-/* 23 */
+/* 25 */
 /*!****************************!*\
   !*** ./js_src/core/api.js ***!
   \****************************/
@@ -13593,11 +13613,11 @@
 	
 	var _js_libsJqueryDistJquery2 = _interopRequireDefault(_js_libsJqueryDistJquery);
 	
-	var _paramalama = __webpack_require__(/*! paramalama */ 24);
+	var _paramalama = __webpack_require__(/*! paramalama */ 26);
 	
 	var _paramalama2 = _interopRequireDefault(_paramalama);
 	
-	var _util = __webpack_require__(/*! ./util */ 5);
+	var _util = __webpack_require__(/*! ./util */ 7);
 	
 	var util = _interopRequireWildcard(_util);
 	
@@ -13775,7 +13795,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 24 */
+/* 26 */
 /*!************************************!*\
   !*** ./~/paramalama/paramalama.js ***!
   \************************************/
@@ -13844,7 +13864,7 @@
 
 
 /***/ },
-/* 25 */
+/* 27 */
 /*!******************************!*\
   !*** ./js_src/core/cache.js ***!
   \******************************/
@@ -13858,7 +13878,7 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 	
-	var _Store = __webpack_require__(/*! ./Store */ 26);
+	var _Store = __webpack_require__(/*! ./Store */ 28);
 	
 	var _Store2 = _interopRequireDefault(_Store);
 	
@@ -13876,7 +13896,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 26 */
+/* 28 */
 /*!******************************!*\
   !*** ./js_src/core/Store.js ***!
   \******************************/
@@ -13894,11 +13914,11 @@
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	var _log = __webpack_require__(/*! ./log */ 9);
+	var _log = __webpack_require__(/*! ./log */ 11);
 	
 	var _log2 = _interopRequireDefault(_log);
 	
-	var _util = __webpack_require__(/*! ./util */ 5);
+	var _util = __webpack_require__(/*! ./util */ 7);
 	
 	var _util2 = _interopRequireDefault(_util);
 	
@@ -14104,7 +14124,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 27 */
+/* 29 */
 /*!**********************************!*\
   !*** ./js_src/core/Analytics.js ***!
   \**********************************/
@@ -14125,19 +14145,19 @@
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	var _log = __webpack_require__(/*! ./log */ 9);
+	var _log = __webpack_require__(/*! ./log */ 11);
 	
 	var _log2 = _interopRequireDefault(_log);
 	
-	var _util = __webpack_require__(/*! ./util */ 5);
+	var _util = __webpack_require__(/*! ./util */ 7);
 	
 	var util = _interopRequireWildcard(_util);
 	
-	var _cache = __webpack_require__(/*! ./cache */ 25);
+	var _cache = __webpack_require__(/*! ./cache */ 27);
 	
 	var _cache2 = _interopRequireDefault(_cache);
 	
-	var _emitter = __webpack_require__(/*! ./emitter */ 12);
+	var _emitter = __webpack_require__(/*! ./emitter */ 14);
 	
 	var _emitter2 = _interopRequireDefault(_emitter);
 	
@@ -14315,7 +14335,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 28 */
+/* 30 */
 /*!**************************!*\
   !*** ./js_src/router.js ***!
   \**************************/
@@ -14331,7 +14351,7 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 	
-	var _properjsPagecontroller = __webpack_require__(/*! properjs-pagecontroller */ 29);
+	var _properjsPagecontroller = __webpack_require__(/*! properjs-pagecontroller */ 31);
 	
 	var _properjsPagecontroller2 = _interopRequireDefault(_properjsPagecontroller);
 	
@@ -14339,39 +14359,39 @@
 	
 	var _js_libsJqueryDistJquery2 = _interopRequireDefault(_js_libsJqueryDistJquery);
 	
-	var _core = __webpack_require__(/*! ./core */ 2);
+	var _core = __webpack_require__(/*! ./core */ 4);
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _menus = __webpack_require__(/*! ./menus */ 34);
+	var _menus = __webpack_require__(/*! ./menus */ 36);
 	
 	var _menus2 = _interopRequireDefault(_menus);
 	
-	var _indexes = __webpack_require__(/*! ./indexes */ 36);
+	var _indexes = __webpack_require__(/*! ./indexes */ 38);
 	
 	var _indexes2 = _interopRequireDefault(_indexes);
 	
-	var _indexesListing = __webpack_require__(/*! ./indexes/listing */ 40);
+	var _indexesListing = __webpack_require__(/*! ./indexes/listing */ 42);
 	
 	var _indexesListing2 = _interopRequireDefault(_indexesListing);
 	
-	var _projects = __webpack_require__(/*! ./projects */ 45);
+	var _projects = __webpack_require__(/*! ./projects */ 47);
 	
 	var _projects2 = _interopRequireDefault(_projects);
 	
-	var _animate = __webpack_require__(/*! ./animate */ 46);
+	var _animate = __webpack_require__(/*! ./animate */ 48);
 	
 	var _animate2 = _interopRequireDefault(_animate);
 	
-	var _overlay = __webpack_require__(/*! ./overlay */ 39);
+	var _overlay = __webpack_require__(/*! ./overlay */ 41);
 	
 	var _overlay2 = _interopRequireDefault(_overlay);
 	
-	var _gallery = __webpack_require__(/*! ./gallery */ 42);
+	var _gallery = __webpack_require__(/*! ./gallery */ 44);
 	
 	var _gallery2 = _interopRequireDefault(_gallery);
 	
-	var _projectsProject = __webpack_require__(/*! ./projects/Project */ 38);
+	var _projectsProject = __webpack_require__(/*! ./projects/Project */ 40);
 	
 	var _projectsProject2 = _interopRequireDefault(_projectsProject);
 	
@@ -14749,7 +14769,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 29 */
+/* 31 */
 /*!*****************************************************!*\
   !*** ./~/properjs-pagecontroller/PageController.js ***!
   \*****************************************************/
@@ -14782,8 +14802,8 @@
 	})(function () {
 	
 	    // Useful stuff
-	    var Router = __webpack_require__( /*! properjs-router */ 30 ),
-	        Controller = __webpack_require__( /*! properjs-controller */ 13 ),
+	    var Router = __webpack_require__( /*! properjs-router */ 32 ),
+	        Controller = __webpack_require__( /*! properjs-controller */ 15 ),
 	
 	        _router = null,
 	        _config = [],
@@ -15280,7 +15300,7 @@
 	});
 
 /***/ },
-/* 30 */
+/* 32 */
 /*!***************************************************************!*\
   !*** ./~/properjs-pagecontroller/~/properjs-router/Router.js ***!
   \***************************************************************/
@@ -15305,9 +15325,9 @@
 	
 	})(function () {
 	
-	    var PushState = __webpack_require__( /*! properjs-pushstate */ 31 ),
-	        MatchRoute = __webpack_require__( /*! properjs-matchroute */ 32 ),
-	        matchElement = __webpack_require__( /*! properjs-matchelement */ 33 ),
+	    var PushState = __webpack_require__( /*! properjs-pushstate */ 33 ),
+	        MatchRoute = __webpack_require__( /*! properjs-matchroute */ 34 ),
+	        matchElement = __webpack_require__( /*! properjs-matchelement */ 35 ),
 	        _initDelay = 200,
 	        _triggerEl;
 	
@@ -15962,7 +15982,7 @@
 	});
 
 /***/ },
-/* 31 */
+/* 33 */
 /*!***************************************************************************************!*\
   !*** ./~/properjs-pagecontroller/~/properjs-router/~/properjs-pushstate/PushState.js ***!
   \***************************************************************************************/
@@ -16359,7 +16379,7 @@
 	});
 
 /***/ },
-/* 32 */
+/* 34 */
 /*!*****************************************************************************************!*\
   !*** ./~/properjs-pagecontroller/~/properjs-router/~/properjs-matchroute/MatchRoute.js ***!
   \*****************************************************************************************/
@@ -16384,7 +16404,7 @@
 	    
 	})(function () {
 	
-	    var paramalama = __webpack_require__( /*! paramalama */ 24 ),
+	    var paramalama = __webpack_require__( /*! paramalama */ 26 ),
 	
 	    /**
 	     *
@@ -16718,7 +16738,7 @@
 	});
 
 /***/ },
-/* 33 */
+/* 35 */
 /*!*************************************************!*\
   !*** ./~/properjs-matchelement/matchElement.js ***!
   \*************************************************/
@@ -16780,7 +16800,7 @@
 	});
 
 /***/ },
-/* 34 */
+/* 36 */
 /*!*******************************!*\
   !*** ./js_src/menus/index.js ***!
   \*******************************/
@@ -16797,11 +16817,11 @@
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
 	
-	var _core = __webpack_require__(/*! ../core */ 2);
+	var _core = __webpack_require__(/*! ../core */ 4);
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _Menu = __webpack_require__(/*! ./Menu */ 35);
+	var _Menu = __webpack_require__(/*! ./Menu */ 37);
 	
 	var _Menu2 = _interopRequireDefault(_Menu);
 	
@@ -16907,7 +16927,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 35 */
+/* 37 */
 /*!******************************!*\
   !*** ./js_src/menus/Menu.js ***!
   \******************************/
@@ -16925,7 +16945,7 @@
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	var _core = __webpack_require__(/*! ../core */ 2);
+	var _core = __webpack_require__(/*! ../core */ 4);
 	
 	var core = _interopRequireWildcard(_core);
 	
@@ -17026,7 +17046,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 36 */
+/* 38 */
 /*!*********************************!*\
   !*** ./js_src/indexes/index.js ***!
   \*********************************/
@@ -17046,19 +17066,19 @@
 	
 	var _js_libsJqueryDistJquery2 = _interopRequireDefault(_js_libsJqueryDistJquery);
 	
-	var _core = __webpack_require__(/*! ../core */ 2);
+	var _core = __webpack_require__(/*! ../core */ 4);
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _IndexRoot = __webpack_require__(/*! ./IndexRoot */ 37);
+	var _IndexRoot = __webpack_require__(/*! ./IndexRoot */ 39);
 	
 	var _IndexRoot2 = _interopRequireDefault(_IndexRoot);
 	
-	var _projectsProject = __webpack_require__(/*! ../projects/Project */ 38);
+	var _projectsProject = __webpack_require__(/*! ../projects/Project */ 40);
 	
 	var _projectsProject2 = _interopRequireDefault(_projectsProject);
 	
-	var _overlay = __webpack_require__(/*! ../overlay */ 39);
+	var _overlay = __webpack_require__(/*! ../overlay */ 41);
 	
 	var _overlay2 = _interopRequireDefault(_overlay);
 	
@@ -17224,7 +17244,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 37 */
+/* 39 */
 /*!*************************************!*\
   !*** ./js_src/indexes/IndexRoot.js ***!
   \*************************************/
@@ -17242,7 +17262,7 @@
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	var _core = __webpack_require__(/*! ../core */ 2);
+	var _core = __webpack_require__(/*! ../core */ 4);
 	
 	var core = _interopRequireWildcard(_core);
 	
@@ -17325,7 +17345,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 38 */
+/* 40 */
 /*!************************************!*\
   !*** ./js_src/projects/Project.js ***!
   \************************************/
@@ -17345,11 +17365,11 @@
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	var _core = __webpack_require__(/*! ../core */ 2);
+	var _core = __webpack_require__(/*! ../core */ 4);
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _overlay = __webpack_require__(/*! ../overlay */ 39);
+	var _overlay = __webpack_require__(/*! ../overlay */ 41);
 	
 	var _overlay2 = _interopRequireDefault(_overlay);
 	
@@ -17378,6 +17398,9 @@
 	
 	        core.log("Project", this);
 	
+	        // Node must be in DOM for image size to work
+	        core.dom.project.elementPane.append(this.$node);
+	
 	        core.images.handleImages(this.$images, this.onPreload.bind(this));
 	    }
 	
@@ -17405,8 +17428,6 @@
 	    _createClass(Project, [{
 	        key: "onPreload",
 	        value: function onPreload() {
-	            core.dom.project.elementPane.append(this.$node);
-	
 	            _overlay2["default"].close();
 	
 	            this.cycleAnimation();
@@ -17574,7 +17595,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 39 */
+/* 41 */
 /*!***************************!*\
   !*** ./js_src/overlay.js ***!
   \***************************/
@@ -17588,7 +17609,7 @@
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
 	
-	var _core = __webpack_require__(/*! ./core */ 2);
+	var _core = __webpack_require__(/*! ./core */ 4);
 	
 	var core = _interopRequireWildcard(_core);
 	
@@ -17704,7 +17725,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 40 */
+/* 42 */
 /*!***********************************!*\
   !*** ./js_src/indexes/listing.js ***!
   \***********************************/
@@ -17720,11 +17741,11 @@
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
 	
-	var _core = __webpack_require__(/*! ../core */ 2);
+	var _core = __webpack_require__(/*! ../core */ 4);
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _IndexFull = __webpack_require__(/*! ./IndexFull */ 41);
+	var _IndexFull = __webpack_require__(/*! ./IndexFull */ 43);
 	
 	var _IndexFull2 = _interopRequireDefault(_IndexFull);
 	
@@ -17830,7 +17851,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 41 */
+/* 43 */
 /*!*************************************!*\
   !*** ./js_src/indexes/IndexFull.js ***!
   \*************************************/
@@ -17850,7 +17871,7 @@
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	var _core = __webpack_require__(/*! ../core */ 2);
+	var _core = __webpack_require__(/*! ../core */ 4);
 	
 	var core = _interopRequireWildcard(_core);
 	
@@ -17858,19 +17879,19 @@
 	
 	var _js_libsJqueryDistJquery2 = _interopRequireDefault(_js_libsJqueryDistJquery);
 	
-	var _router = __webpack_require__(/*! ../router */ 28);
+	var _router = __webpack_require__(/*! ../router */ 30);
 	
 	var _router2 = _interopRequireDefault(_router);
 	
-	var _gallery = __webpack_require__(/*! ../gallery */ 42);
+	var _gallery = __webpack_require__(/*! ../gallery */ 44);
 	
 	var _gallery2 = _interopRequireDefault(_gallery);
 	
-	var _overlay = __webpack_require__(/*! ../overlay */ 39);
+	var _overlay = __webpack_require__(/*! ../overlay */ 41);
 	
 	var _overlay2 = _interopRequireDefault(_overlay);
 	
-	var _properjsTemplate = __webpack_require__(/*! properjs-template */ 44);
+	var _properjsTemplate = __webpack_require__(/*! properjs-template */ 46);
 	
 	var _properjsTemplate2 = _interopRequireDefault(_properjsTemplate);
 	
@@ -18210,7 +18231,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 42 */
+/* 44 */
 /*!***************************!*\
   !*** ./js_src/gallery.js ***!
   \***************************/
@@ -18230,11 +18251,11 @@
 	
 	var _js_libsJqueryDistJquery2 = _interopRequireDefault(_js_libsJqueryDistJquery);
 	
-	var _core = __webpack_require__(/*! ./core */ 2);
+	var _core = __webpack_require__(/*! ./core */ 4);
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _Menu = __webpack_require__(/*! ./Menu */ 43);
+	var _Menu = __webpack_require__(/*! ./Menu */ 45);
 	
 	var _Menu2 = _interopRequireDefault(_Menu);
 	
@@ -18338,7 +18359,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 43 */
+/* 45 */
 /*!************************!*\
   !*** ./js_src/Menu.js ***!
   \************************/
@@ -18356,7 +18377,7 @@
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	var _core = __webpack_require__(/*! ./core */ 2);
+	var _core = __webpack_require__(/*! ./core */ 4);
 	
 	var core = _interopRequireWildcard(_core);
 	
@@ -18505,7 +18526,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 44 */
+/* 46 */
 /*!*****************************************!*\
   !*** ./~/properjs-template/template.js ***!
   \*****************************************/
@@ -18550,7 +18571,7 @@
 	});
 
 /***/ },
-/* 45 */
+/* 47 */
 /*!**********************************!*\
   !*** ./js_src/projects/index.js ***!
   \**********************************/
@@ -18567,15 +18588,15 @@
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
 	
-	var _core = __webpack_require__(/*! ../core */ 2);
+	var _core = __webpack_require__(/*! ../core */ 4);
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _Project = __webpack_require__(/*! ./Project */ 38);
+	var _Project = __webpack_require__(/*! ./Project */ 40);
 	
 	var _Project2 = _interopRequireDefault(_Project);
 	
-	var _properjsImageloader = __webpack_require__(/*! properjs-imageloader */ 7);
+	var _properjsImageloader = __webpack_require__(/*! properjs-imageloader */ 9);
 	
 	var _properjsImageloader2 = _interopRequireDefault(_properjsImageloader);
 	
@@ -18708,7 +18729,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 46 */
+/* 48 */
 /*!***************************!*\
   !*** ./js_src/animate.js ***!
   \***************************/
@@ -18722,7 +18743,7 @@
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
 	
-	var _core = __webpack_require__(/*! ./core */ 2);
+	var _core = __webpack_require__(/*! ./core */ 4);
 	
 	var core = _interopRequireWildcard(_core);
 	
