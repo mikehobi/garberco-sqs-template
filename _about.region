@@ -1,5 +1,5 @@
-<div class="page js-page" data-type="menu" data-id="{collection.id}">
-    <section class="about menu menu--about js-menu wrapper -topper" data-target="about" data-id="{collection.id}">
+<div class="page js-page" data-type="offcanvas" data-id="{collection.id}">
+    <section class="about js-about wrapper -topper" data-target="about" data-id="{collection.id}">
         <div class="animate animate--fade js-animate-in">
             <h2 class="about__desc h2">{collection.description}</h2>
             <div class="expander-top">
