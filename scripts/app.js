@@ -17618,7 +17618,7 @@
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var isActive = false;
+	var _isActive = false;
 	var transTime = core.util.getTransitionDuration(core.dom.overlay.element[0]);
 	
 	/**
@@ -17639,7 +17639,7 @@
 	     */
 	    init: function init() {
 	        if (core.dom.overlay.element.is(".is-active")) {
-	            isActive = true;
+	            _isActive = true;
 	        } else {
 	            core.dom.overlay.element.detach();
 	        }
@@ -17655,11 +17655,11 @@
 	     *
 	     */
 	    open: function open() {
-	        if (isActive) {
+	        if (_isActive) {
 	            return this;
 	        }
 	
-	        isActive = true;
+	        _isActive = true;
 	
 	        core.dom.html.addClass("is-overlay-active");
 	        core.dom.body.append(core.dom.overlay.element);
@@ -17681,14 +17681,14 @@
 	    close: function close() {
 	        var _this = this;
 	
-	        if (!isActive) {
+	        if (!_isActive) {
 	            return this;
 	        }
 	
 	        core.dom.overlay.element.removeClass("is-active");
 	
 	        setTimeout(function () {
-	            isActive = false;
+	            _isActive = false;
 	
 	            core.dom.html.removeClass("is-overlay-active");
 	            core.dom.overlay.element.detach().removeClass("is-intro");
@@ -17720,6 +17720,10 @@
 	     */
 	    setTitle: function setTitle(text) {
 	        core.dom.overlay.elementTitle[0].innerHTML = text;
+	    },
+	
+	    isActive: function isActive() {
+	        return _isActive;
 	    }
 	};
 	
@@ -18027,73 +18031,19 @@
 	    }, {
 	        key: "bindGallery",
 	        value: function bindGallery($elem) {
-	            var _this2 = this;
-	
 	            this.$tile = $elem;
 	            this.$image = this.$tile.find(core.config.lazyImageSelector);
 	
+	            this._onKeyDown = this.onKeyDown.bind(this);
+	            this._onGalleryImage = this.onGalleryImage.bind(this);
+	            this._onGalleryBack = this.onGalleryBack.bind(this);
+	
 	            _gallery2["default"].setImage(this.$image);
 	
-	            core.dom.doc.on("keydown", function (e) {
-	                //e.preventDefault();
+	            core.emitter.on("app--gallery-image", this._onGalleryImage);
+	            core.emitter.on("app--gallery-background", this._onGalleryBack);
 	
-	                var text = null;
-	                var $title = null;
-	                var $parent = null;
-	                var $project = null;
-	                var $next = _this2.$tile.next();
-	                var $prev = _this2.$tile.prev();
-	
-	                // Escape key
-	                if (e.keyCode === 27) {
-	                    _this2.unbindGallery();
-	                    return false;
-	                }
-	
-	                // Currently on a Title screen
-	                // Title screen is using overlay module
-	                if (_this2.$tile.is(".js-listing-title")) {
-	                    // Arrow right
-	                    if (e.keyCode === 39) {
-	                        $project = _this2.$tile.next();
-	
-	                        _this2.nextProject($project, $project.find(".js-listing-tile").first());
-	
-	                        // Arrow left
-	                    } else if (e.keyCode === 37) {
-	                            $project = _this2.$tile.prev();
-	
-	                            _this2.nextProject($project, $project.find(".js-listing-tile").last());
-	                        }
-	
-	                    // Arrow right, has next tile
-	                } else if (e.keyCode === 39 && $next.length) {
-	                        _this2.nextTile($next);
-	
-	                        // Arrow right, has no next tile
-	                    } else if (e.keyCode === 39 && !$next.length) {
-	                            _this2.nextTitle(_this2.$tile.parent().next());
-	
-	                            // Arrow left, has prev tile
-	                        } else if (e.keyCode === 37 && $prev.length) {
-	                                _this2.nextTile($prev);
-	
-	                                // Arrow left, has not prev tile
-	                            } else if (e.keyCode === 37 && !$prev.length) {
-	                                    text = null;
-	                                    $parent = _this2.$tile.parent();
-	                                    $title = $parent.prev().prev().prev();
-	
-	                                    // Previous project has a title
-	                                    if ($title.length) {
-	                                        text = $title.data("title");
-	                                    }
-	
-	                                    $title = $parent.prev();
-	
-	                                    _this2.nextTitle($title, text);
-	                                }
-	            });
+	            core.dom.doc.on("keydown", this._onKeyDown);
 	        }
 	
 	        /**
@@ -18112,10 +18062,11 @@
 	            this.$image = null;
 	
 	            _overlay2["default"].close();
-	
 	            _gallery2["default"].close();
 	
-	            core.dom.doc.off("keydown");
+	            core.dom.doc.off("keydown", this._onKeyDown);
+	            core.emitter.off("app--gallery-image", this._onGalleryImage);
+	            core.emitter.off("app--gallery-background", this._onGalleryBack);
 	        }
 	
 	        /**
@@ -18219,7 +18170,7 @@
 	    }, {
 	        key: "onLoadFullIndex",
 	        value: function onLoadFullIndex(json) {
-	            var _this3 = this;
+	            var _this2 = this;
 	
 	            json.collection.collections.forEach(function (collection) {
 	                var $title = (0, _js_libsJqueryDistJquery2["default"])((0, _properjsTemplate2["default"])(_gridTitleTpl.replace(/\n/g, ""), { text: collection.title, title: collection.description || collection.title }));
@@ -18238,8 +18189,8 @@
 	                    }
 	                });
 	
-	                _this3.$node.append($title);
-	                _this3.$node.append($grid);
+	                _this2.$node.append($title);
+	                _this2.$node.append($grid);
 	            });
 	
 	            // Node must be in DOM for image size to work
@@ -18247,8 +18198,80 @@
 	            this.$anims = this.$node.find(".js-animate");
 	
 	            core.images.handleImages(this.$node.find(".js-lazy-image"), function () {
-	                _this3.cycleAnimation();
+	                _this2.cycleAnimation();
 	            });
+	        }
+	    }, {
+	        key: "onGalleryImage",
+	        value: function onGalleryImage() {
+	            this.onKeyDown({
+	                keyCode: 39
+	            });
+	        }
+	    }, {
+	        key: "onGalleryBack",
+	        value: function onGalleryBack() {
+	            this.unbindGallery();
+	        }
+	    }, {
+	        key: "onKeyDown",
+	        value: function onKeyDown(e) {
+	            var text = null;
+	            var $title = null;
+	            var $parent = null;
+	            var $project = null;
+	            var $next = this.$tile.next();
+	            var $prev = this.$tile.prev();
+	
+	            // Escape key
+	            if (e.keyCode === 27) {
+	                this.unbindGallery();
+	                return false;
+	            }
+	
+	            // Currently on a Title screen
+	            // Title screen is using overlay module
+	            if (this.$tile.is(".js-listing-title")) {
+	                // Arrow right
+	                if (e.keyCode === 39) {
+	                    $project = this.$tile.next();
+	
+	                    this.nextProject($project, $project.find(".js-listing-tile").first());
+	
+	                    // Arrow left
+	                } else if (e.keyCode === 37) {
+	                        $project = this.$tile.prev();
+	
+	                        this.nextProject($project, $project.find(".js-listing-tile").last());
+	                    }
+	
+	                // Arrow right, has next tile
+	            } else if (e.keyCode === 39 && $next.length) {
+	                    this.nextTile($next);
+	
+	                    // Arrow right, has no next tile
+	                } else if (e.keyCode === 39 && !$next.length) {
+	                        this.nextTitle(this.$tile.parent().next());
+	
+	                        // Arrow left, has prev tile
+	                    } else if (e.keyCode === 37 && $prev.length) {
+	                            this.nextTile($prev);
+	
+	                            // Arrow left, has not prev tile
+	                        } else if (e.keyCode === 37 && !$prev.length) {
+	                                text = null;
+	                                $parent = this.$tile.parent();
+	                                $title = $parent.prev().prev().prev();
+	
+	                                // Previous project has a title
+	                                if ($title.length) {
+	                                    text = $title.data("title");
+	                                }
+	
+	                                $title = $parent.prev();
+	
+	                                this.nextTitle($title, text);
+	                            }
 	        }
 	
 	        /**
@@ -18302,6 +18325,14 @@
 	
 	var _Menu2 = _interopRequireDefault(_Menu);
 	
+	var _properjsDebounce = __webpack_require__(/*! properjs-debounce */ 21);
+	
+	var _properjsDebounce2 = _interopRequireDefault(_properjsDebounce);
+	
+	var _overlay = __webpack_require__(/*! ./overlay */ 41);
+	
+	var _overlay2 = _interopRequireDefault(_overlay);
+	
 	/**
 	 *
 	 * @public
@@ -18320,6 +18351,16 @@
 	     */
 	    init: function init() {
 	        this.menu = new _Menu2["default"](core.dom.gallery.element);
+	
+	        core.dom.gallery.element.on("click", (0, _properjsDebounce2["default"])(this.onClick.bind(this), 200, true));
+	    },
+	
+	    onClick: function onClick(e) {
+	        if (e.target === this.$image[0] || !this.isLoaded || _overlay2["default"].isActive()) {
+	            core.emitter.fire("app--gallery-image");
+	        } else {
+	            core.emitter.fire("app--gallery-background");
+	        }
 	    },
 	
 	    /**
@@ -18376,6 +18417,7 @@
 	
 	        var data = $image.data();
 	
+	        this.isLoaded = false;
 	        this.empty();
 	        this.open();
 	        this.$image = (0, _js_libsJqueryDistJquery2["default"])(new Image());
@@ -18388,9 +18430,8 @@
 	        core.dom.gallery.elementNode.append(this.$image);
 	
 	        core.util.loadImages(this.$image, core.util.noop).on("done", function () {
-	            setTimeout(function () {
-	                _this.$image.addClass("is-active");
-	            }, 10);
+	            _this.isLoaded = true;
+	            _this.$image.addClass("is-active");
 	        });
 	    }
 	};
@@ -18484,6 +18525,7 @@
 	                return _this.$node.addClass("is-active");
 	            }, 0);
 	            setTimeout(function () {
+	                _this.$node.addClass("is-active-events");
 	                core.dom.html.addClass("is-clipped");
 	                core.dom.body.addClass("is-clipped");
 	            }, this.tDuration * 2);
@@ -18503,8 +18545,6 @@
 	        value: function close() {
 	            var _this2 = this;
 	
-	            this.isOpen = false;
-	
 	            this.$node.removeClass("is-active");
 	            core.dom.html.removeClass("is-clipped");
 	            core.dom.body.removeClass("is-clipped");
@@ -18521,6 +18561,7 @@
 	            core.emitter.fire("app--menu-closed");
 	
 	            setTimeout(function () {
+	                _this2.isOpen = false;
 	                core.dom.html.removeClass("is-menu-open");
 	                _this2.$node.detach();
 	            }, this.tDuration * 2);
