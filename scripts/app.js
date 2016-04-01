@@ -16880,6 +16880,8 @@
 	   *
 	   */
 	  onload: function onload() {
+	    core.dom.html.addClass("is-offcanvas");
+	
 	    if (!instance) {
 	      var data = $_jsElement.data();
 	
@@ -16972,8 +16974,6 @@
 	        if (!instance) {
 	            this.initialize($node, data);
 	        }
-	
-	        core.dom.html.addClass("is-offcanvas");
 	
 	        return instance;
 	    }
@@ -17906,7 +17906,7 @@
 	var _properjsTemplate2 = _interopRequireDefault(_properjsTemplate);
 	
 	var instance = null;
-	var _gridTitleTpl = "<div class=\"listing__title js-listing-title\" data-title=\"{title}\"><h4 class=\"listing__title__text h4\">{text}</h4></div>";
+	var _gridTitleTpl = "<div class=\"listing__title js-listing-title\" data-title=\"{title}\"><h3 class=\"listing__title__text h3\">{text}</h3></div>";
 	var _gridWrapTpl = "<div class=\"listing__grid js-listing-project grid grid--index\"></div>";
 	var _gridItemTpl = "\n<div class=\"listing__tile grid__item__small js-listing-tile\">\n    <div class=\"grid__photo grid__photo--small animate animate--fade js-animate\">\n        <figure class=\"figure\">\n            <img class=\"figure__image image js-lazy-image\" data-img-src=\"{assetUrl}\" data-variants=\"{systemDataVariants}\" data-original-size=\"{originalSize}\" />\n        </figure>\n    </div>\n</div>\n";
 	

@@ -8,6 +8,7 @@
                             {@|apply image.block}
                         {.end}
                     </a>
+                    <h3 class="grid__title h3">{.if description}{description}{.or}{title}{.end}</h3>
                 </div>
             {.end}
         {.end}
