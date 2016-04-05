@@ -180,7 +180,7 @@
 	
 	            this.core.dom.main[0].id = "is-main--" + data.target;
 	
-	            if (/garberco/.test(data.target)) {
+	            if (data.target === this.core.config.rootUrlId) {
 	                this.core.dom.html.removeClass("is-neverflow");
 	            } else {
 	                this.core.dom.html.addClass("is-neverflow");
@@ -5863,6 +5863,16 @@
 	  /**
 	   *
 	   * @public
+	   * @member rootUrlId
+	   * @memberof config
+	   * @description The urlId for "/".
+	   *
+	   */
+	  rootUrlId: "garberco",
+	
+	  /**
+	   *
+	   * @public
 	   * @member homepageKey
 	   * @memberof config
 	   * @description The cache key to use for homepage.
@@ -8623,6 +8633,12 @@
 	
 	            core.dom.main[0].id = "is-main--" + match;
 	
+	            // GarberCo?
+	            if (match === core.config.rootUrlId) {
+	                core.dom.html.removeClass("is-offcanvas");
+	                core.dom.html.removeClass("is-neverflow");
+	            }
+	
 	            // Project?
 	            if (_projectsProject2["default"].isActive()) {
 	                core.emitter.fire("app--project-ended");
@@ -11134,9 +11150,9 @@
 	        instance = new _IndexRoot2["default"]($_jsElement, data);
 	
 	        core.dom.body.on("click", ".js-index-tile", onTileClick);
-	        core.dom.body.on("mouseenter", ".js-index-tile", onMouseEnter);
-	        core.dom.body.on("mousemove", ".js-index-tile", onMouseEnter);
-	        core.dom.body.on("mouseleave", ".js-index-tile", onMouseLeave);
+	        core.dom.body.on("mouseenter", ".js-index-tile img", onMouseEnter);
+	        core.dom.body.on("mousemove", ".js-index-tile img", onMouseEnter);
+	        core.dom.body.on("mouseleave", ".js-index-tile img", onMouseLeave);
 	    },
 	
 	    /**
@@ -11206,6 +11222,12 @@
 	var onTileClick = function onTileClick(e) {
 	    e.preventDefault();
 	
+	    var $tile = (0, _js_libsHoboDistHoboBuild2["default"])(this).closest(".js-index-tile");
+	
+	    _overlay2["default"].setTitle($tile.data("title"));
+	
+	    _overlay2["default"].open();
+	
 	    _projectsProject2["default"].open();
 	};
 	
@@ -11216,7 +11238,7 @@
 	        return;
 	    }
 	
-	    var $tile = (0, _js_libsHoboDistHoboBuild2["default"])(this);
+	    var $tile = (0, _js_libsHoboDistHoboBuild2["default"])(this).closest(".js-index-tile");
 	
 	    _overlay2["default"].setTitle($tile.data("title"));
 	
@@ -11555,7 +11577,7 @@
 	Project.open = function () {
 	    isActive = true;
 	
-	    core.dom.html.addClass("is-project");
+	    core.dom.html.addClass("is-offcanvas");
 	    core.dom.body.append(core.dom.project.element);
 	
 	    setTimeout(function () {
@@ -11580,7 +11602,7 @@
 	    core.dom.project.element.removeClass("is-active is-inactive");
 	
 	    setTimeout(function () {
-	        core.dom.html.removeClass("is-project");
+	        core.dom.html.removeClass("is-offcanvas");
 	        core.dom.project.element.detach();
 	        core.dom.project.elementPane[0].innerHTML = "";
 	    }, core.dom.project.elementTransitionDuration);
@@ -11960,6 +11982,16 @@
 	
 	            instance = this;
 	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @instance
+	         * @method cycleAnimation
+	         * @memberof indexes.IndexFull
+	         * @description Start the animation cycle for the listing.
+	         *
+	         */
 	    }, {
 	        key: "cycleAnimation",
 	        value: function cycleAnimation() {
@@ -12201,6 +12233,16 @@
 	                _this2.cycleAnimation();
 	            });
 	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @instance
+	         * @method onGalleryImage
+	         * @memberof indexes.IndexFull
+	         * @description Trigger gallery arrow key right.
+	         *
+	         */
 	    }, {
 	        key: "onGalleryImage",
 	        value: function onGalleryImage() {
@@ -12208,11 +12250,33 @@
 	                keyCode: 39
 	            });
 	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @instance
+	         * @method onGalleryBack
+	         * @memberof indexes.IndexFull
+	         * @description Trigger gallery unbinding.
+	         *
+	         */
 	    }, {
 	        key: "onGalleryBack",
 	        value: function onGalleryBack() {
 	            this.unbindGallery();
 	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @instance
+	         * @method onKeyDown
+	         * @param {object} e The Event object
+	         * @memberof indexes.IndexFull
+	         * @description Handle key events when gallery is open.
+	         * @returns {boolean}
+	         *
+	         */
 	    }, {
 	        key: "onKeyDown",
 	        value: function onKeyDown(e) {
