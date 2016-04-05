@@ -1,20 +1,18 @@
 <nav class="nav nav--header header js-header -text--center">
     {.repeated section items}
-        {.section externalLink}
-            <a class="header__nav header__nav--{title|slugify} js-root js-controller js-controller--{title|slugify} h3 -column" href="{url}" data-target="{title|slugify}">
-                <img class="logo" src="/assets/svgs/GarberCo.svg" />
-            </a>
-        {.end}
         {.section collection}
-            <a class="header__nav header__nav--{urlId} js-controller js-controller--{urlId} h3 -column" href="{fullUrl}" data-target="{urlId}">{navigationTitle}</a>
+            <a class="header__nav header__nav--{urlId} js-controller js-controller--{urlId} {.if homepage}js-root{.end} h3 -column" href="{fullUrl}" data-target="{urlId}">
+                {.if homepage}
+                    <img class="logo" src="/assets/svgs/GarberCo.svg" />
+                {.or}
+                    {navigationTitle}
+                {.end}
+            </a>
         {.end}
     {.end}
 </nav>
 <main class="main js-main" id="{.repeated section items}{.if folderActive || active}is-main--{collection.urlId}{.end}{.end}">
     {.repeated section items}
-        {.if externalLink}
-            <section class="main__panel main__panel--{externalLink.title|slugify} js-main-panel js-main--{externalLink.title|slugify} {.if folderActive || active}is-active{.end}"></section>
-        {.end}
         {.if collection}
             <section class="main__panel main__panel--{collection.urlId} js-main-panel js-main--{collection.urlId} {.if folderActive || active}is-active{.end}"></section>
         {.end}
