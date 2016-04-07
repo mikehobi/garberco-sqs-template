@@ -180,11 +180,7 @@
 	
 	            this.core.dom.main[0].id = "is-main--" + data.target;
 	
-	            if (data.target === this.core.config.rootUrlId) {
-	                this.core.dom.html.removeClass("is-neverflow");
-	            } else {
-	                this.core.dom.html.addClass("is-neverflow");
-	            }
+	            //window.scrollTo( 0, 0 );
 	        }
 	    }]);
 	
@@ -8563,20 +8559,30 @@
 	    prepPage: function prepPage() {
 	        var _this = this;
 	
-	        this.root = this.pageData.type === "offcanvas" ? "/" : window.location.pathname;
+	        this.root = null;
 	
+	        // Index?
+	        // Indexes will already have the root gridwall loaded
+	        // Offcanvas/Project paths will need to manually load the root index
 	        if (this.pageData.type !== "index") {
-	            this.navData.appTree.forEach(function (indexItem) {
-	                if (indexItem.items) {
-	                    indexItem.items.forEach(function (collectionItem) {
-	                        if (collectionItem.collection.id === _this.pageData.id) {
-	                            _this.root = indexItem.collection.fullUrl;
-	                        }
-	                    });
-	                }
-	            });
+	            if (this.pageData.type === "offcanvas") {
+	                this.root = "/";
+	            } else {
+	                this.navData.appTree.forEach(function (indexItem) {
+	                    if (indexItem.items) {
+	                        indexItem.items.forEach(function (collectionItem) {
+	                            if (collectionItem.collection.id === _this.pageData.id) {
+	                                _this.root = indexItem.collection.fullUrl;
+	                            }
+	                        });
+	                    }
+	                });
+	            }
 	
+	            this.root = this.root || "/";
 	            this.loadRootIndex();
+	        } else {
+	            this.root = window.location.pathname;
 	        }
 	
 	        core.dom.root[0].href = this.root;
@@ -8636,7 +8642,7 @@
 	            // GarberCo?
 	            if (match === core.config.rootUrlId) {
 	                core.dom.html.removeClass("is-offcanvas");
-	                core.dom.html.removeClass("is-neverflow");
+	                //core.dom.html.removeClass( "is-neverflow" );
 	            }
 	
 	            // Project?
