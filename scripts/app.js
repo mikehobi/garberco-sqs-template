@@ -2150,7 +2150,8 @@
 	   */
 	  overlay: {
 	    element: $_jsOverlay,
-	    elementTitle: $_jsOverlay.find(".js-overlay-title")
+	    elementTitle: $_jsOverlay.find(".js-overlay-title"),
+	    elementTransitionDuration: util.getTransitionDuration($_jsOverlay[0])
 	  },
 	
 	  /**
@@ -6062,10 +6063,6 @@
 	
 	var _emitter2 = _interopRequireDefault(_emitter);
 	
-	var _properjsImageloader = __webpack_require__(/*! properjs-imageloader */ 35);
-	
-	var _properjsImageloader2 = _interopRequireDefault(_properjsImageloader);
-	
 	var _ImageController = __webpack_require__(/*! ./ImageController */ 42);
 	
 	var _ImageController2 = _interopRequireDefault(_ImageController);
@@ -6122,9 +6119,7 @@
 	     * @description Method performs unloading actions for this module.
 	     *
 	     */
-	    unload: function unload() {
-	        _properjsImageloader2["default"].killInstances();
-	    },
+	    unload: function unload() {},
 	
 	    /**
 	     *
@@ -8384,10 +8379,6 @@
 	
 	var _projects2 = _interopRequireDefault(_projects);
 	
-	var _animate = __webpack_require__(/*! ./animate */ 74);
-	
-	var _animate2 = _interopRequireDefault(_animate);
-	
 	var _overlay = __webpack_require__(/*! ./overlay */ 67);
 	
 	var _overlay2 = _interopRequireDefault(_overlay);
@@ -8538,7 +8529,7 @@
 	
 	        this.controller.setConfig(["*"]);
 	
-	        this.controller.setModules([_about2["default"], _indexes2["default"], _indexesListing2["default"], _animate2["default"], _projects2["default"]]);
+	        this.controller.setModules([_about2["default"], _indexes2["default"], _indexesListing2["default"], _projects2["default"]]);
 	
 	        this.controller.on("page-controller-router-transition-out", this.changePageOut.bind(this));
 	        this.controller.on("page-controller-router-refresh-document", this.changeContent.bind(this));
@@ -10831,7 +10822,7 @@
 	"use strict";
 	
 	Object.defineProperty(exports, "__esModule", {
-	  value: true
+	    value: true
 	});
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
@@ -10857,87 +10848,97 @@
 	 *
 	 */
 	var about = {
-	  /**
-	   *
-	   * @public
-	   * @method init
-	   * @memberof about
-	   * @description Method runs once when window loads.
-	   *
-	   */
-	  init: function init() {
-	    core.emitter.on("app--root", function () {
-	      core.dom.html.removeClass("is-offcanvas");
-	    });
+	    /**
+	     *
+	     * @public
+	     * @method init
+	     * @memberof about
+	     * @description Method runs once when window loads.
+	     *
+	     */
+	    init: function init() {
+	        core.emitter.on("app--root", function () {
+	            core.dom.html.removeClass("is-offcanvas");
 	
-	    core.log("about initialized");
-	  },
+	            if (instance) {
+	                instance.teardown();
+	            }
+	        });
 	
-	  /**
-	   *
-	   * @public
-	   * @method isActive
-	   * @memberof about
-	   * @description Method informs PageController of active status.
-	   * @returns {boolean}
-	   *
-	   */
-	  isActive: function isActive() {
-	    return this.getElements() > 0;
-	  },
+	        core.log("about initialized");
+	    },
 	
-	  /**
-	   *
-	   * @public
-	   * @method onload
-	   * @memberof about
-	   * @description Method performs onloading actions for this module.
-	   *
-	   */
-	  onload: function onload() {
-	    core.dom.html.addClass("is-offcanvas");
+	    /**
+	     *
+	     * @public
+	     * @method isActive
+	     * @memberof about
+	     * @description Method informs PageController of active status.
+	     * @returns {boolean}
+	     *
+	     */
+	    isActive: function isActive() {
+	        return this.getElements() > 0;
+	    },
 	
-	    if (!instance) {
-	      var data = $_jsElement.data();
+	    /**
+	     *
+	     * @public
+	     * @method onload
+	     * @memberof about
+	     * @description Method performs onloading actions for this module.
+	     *
+	     */
+	    onload: function onload() {
+	        core.emitter.fire("app--offcanvas");
 	
-	      instance = new _About2["default"]($_jsElement, data);
+	        core.dom.html.addClass("is-offcanvas");
+	
+	        if (!instance) {
+	            var data = $_jsElement.data();
+	
+	            instance = new _About2["default"]($_jsElement, data);
+	        }
+	
+	        core.log("about onload");
+	    },
+	
+	    /**
+	     *
+	     * @public
+	     * @method unload
+	     * @memberof about
+	     * @description Method performs unloading actions for this module.
+	     *
+	     */
+	    unload: function unload() {
+	        core.log("about unload");
+	    },
+	
+	    /**
+	     *
+	     * @public
+	     * @method teardown
+	     * @memberof about
+	     * @description Method performs cleanup after this module. Remmoves events, null vars etc...
+	     *
+	     */
+	    teardown: function teardown() {},
+	
+	    /**
+	     *
+	     * @public
+	     * @method getElements
+	     * @memberof about
+	     * @description Method queries DOM for this modules node.
+	     * @returns {number}
+	     *
+	     */
+	    getElements: function getElements() {
+	        $_jsElement = core.dom.page.find(".js-about");
+	
+	        return $_jsElement.length;
 	    }
-	  },
-	
-	  /**
-	   *
-	   * @public
-	   * @method unload
-	   * @memberof about
-	   * @description Method performs unloading actions for this module.
-	   *
-	   */
-	  unload: function unload() {},
-	
-	  /**
-	   *
-	   * @public
-	   * @method teardown
-	   * @memberof about
-	   * @description Method performs cleanup after this module. Remmoves events, null vars etc...
-	   *
-	   */
-	  teardown: function teardown() {},
-	
-	  /**
-	   *
-	   * @public
-	   * @method getElements
-	   * @memberof about
-	   * @description Method queries DOM for this modules node.
-	   * @returns {number}
-	   *
-	   */
-	  getElements: function getElements() {
-	    $_jsElement = core.dom.page.find(".js-about");
-	
-	    return $_jsElement.length;
-	  }
 	};
 	
 	/******************************************************************************
@@ -11049,14 +11050,16 @@
 	         *
 	         * @public
 	         * @instance
-	         * @method destroy
+	         * @method teardown
 	         * @memberof menus.About
 	         * @description Undo event bindings for this instance.
 	         *
 	         */
 	    }, {
-	        key: "destroy",
-	        value: function destroy() {}
+	        key: "teardown",
+	        value: function teardown() {
+	            core.log("About teardown");
+	        }
 	    }]);
 	
 	    return About;
@@ -11094,18 +11097,8 @@
 	
 	var _IndexRoot2 = _interopRequireDefault(_IndexRoot);
 	
-	var _projectsProject = __webpack_require__(/*! ../projects/Project */ 66);
-	
-	var _projectsProject2 = _interopRequireDefault(_projectsProject);
-	
-	var _overlay = __webpack_require__(/*! ../overlay */ 67);
-	
-	var _overlay2 = _interopRequireDefault(_overlay);
-	
 	var $_jsElement = null;
 	var instance = null;
-	var timeoutId = null;
-	var timeoutDelay = core.util.getTransitionDuration(core.dom.overlay.element[0]);
 	
 	/**
 	 *
@@ -11124,7 +11117,19 @@
 	     *
 	     */
 	    init: function init() {
-	        core.emitter.on("app--load-root", this.onLoadRootIndex.bind(this));
+	        var _this = this;
+	
+	        core.emitter.on("app--offcanvas", function () {
+	            if (instance) {
+	                instance.teardown();
+	            }
+	        });
+	
+	        core.emitter.on("app--load-root", function (root) {
+	            $_jsElement = (0, _js_libsHoboDistHoboBuild2["default"])(root);
+	
+	            _this.onload();
+	        });
 	
 	        core.log("indexes initialized");
 	    },
@@ -11151,14 +11156,15 @@
 	     *
 	     */
 	    onload: function onload() {
-	        var data = $_jsElement.data();
+	        if (!instance) {
+	            var data = $_jsElement.data();
 	
-	        instance = new _IndexRoot2["default"]($_jsElement, data);
+	            instance = new _IndexRoot2["default"]($_jsElement, data);
+	        } else {
+	            instance.cycleAnimation();
+	        }
 	
-	        core.dom.body.on("click", ".js-index-tile", onTileClick);
-	        core.dom.body.on("mouseenter", ".js-index-tile img", onMouseEnter);
-	        core.dom.body.on("mousemove", ".js-index-tile img", onMouseEnter);
-	        core.dom.body.on("mouseleave", ".js-index-tile img", onMouseLeave);
+	        core.log("indexes onload");
 	    },
 	
 	    /**
@@ -11170,7 +11176,7 @@
 	     *
 	     */
 	    unload: function unload() {
-	        this.teardown();
+	        core.log("indexes unload");
 	    },
 	
 	    /**
@@ -11181,19 +11187,7 @@
 	     * @description Method performs cleanup after this module. Remmoves events, null vars etc...
 	     *
 	     */
-	    teardown: function teardown() {
-	        $_jsElement = null;
-	
-	        if (instance) {
-	            instance.destroy();
-	            instance = null;
-	        }
-	
-	        core.dom.body.off("click", onTileClick);
-	        core.dom.body.off("mouseenter", onMouseEnter);
-	        core.dom.body.off("mousemove", onMouseEnter);
-	        core.dom.body.off("mouseleave", onMouseLeave);
-	    },
+	    teardown: function teardown() {},
 	
 	    /**
 	     *
@@ -11208,59 +11202,7 @@
 	        $_jsElement = core.dom.page.find(".js-index");
 	
 	        return $_jsElement.length;
-	    },
-	
-	    onLoadRootIndex: function onLoadRootIndex(root) {
-	        $_jsElement = (0, _js_libsHoboDistHoboBuild2["default"])(root);
-	
-	        this.onload();
 	    }
-	};
-	
-	var clearTimeoutById = function clearTimeoutById(id) {
-	    try {
-	        clearTimeout(id);
-	    } catch (error) {
-	        core.log("warn", error);
-	    }
-	};
-	
-	var onTileClick = function onTileClick(e) {
-	    e.preventDefault();
-	
-	    var $tile = (0, _js_libsHoboDistHoboBuild2["default"])(this).closest(".js-index-tile");
-	
-	    _overlay2["default"].setTitle($tile.data("title"));
-	
-	    _overlay2["default"].open();
-	
-	    _projectsProject2["default"].open();
-	};
-	
-	var onMouseEnter = function onMouseEnter() /* e */{
-	    clearTimeoutById(timeoutId);
-	
-	    if (_projectsProject2["default"].isActive()) {
-	        return;
-	    }
-	
-	    var $tile = (0, _js_libsHoboDistHoboBuild2["default"])(this).closest(".js-index-tile");
-	
-	    _overlay2["default"].setTitle($tile.data("title"));
-	
-	    _overlay2["default"].open();
-	};
-	
-	var onMouseLeave = function onMouseLeave() {
-	    if (_projectsProject2["default"].isActive()) {
-	        return;
-	    }
-	
-	    timeoutId = setTimeout(function () {
-	        if (!_projectsProject2["default"].isActive()) {
-	            _overlay2["default"].close();
-	        }
-	    }, timeoutDelay);
 	};
 	
 	/******************************************************************************
@@ -11286,11 +11228,25 @@
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
 	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var _js_libsHoboDistHoboBuild = __webpack_require__(/*! js_libs/hobo/dist/hobo.build */ 1);
+	
+	var _js_libsHoboDistHoboBuild2 = _interopRequireDefault(_js_libsHoboDistHoboBuild);
 	
 	var _core = __webpack_require__(/*! ../core */ 30);
 	
 	var core = _interopRequireWildcard(_core);
+	
+	var _projectsProject = __webpack_require__(/*! ../projects/Project */ 66);
+	
+	var _projectsProject2 = _interopRequireDefault(_projectsProject);
+	
+	var _overlay = __webpack_require__(/*! ../overlay */ 67);
+	
+	var _overlay2 = _interopRequireDefault(_overlay);
 	
 	var instance = null;
 	
@@ -11339,13 +11295,11 @@
 	            this.data = data;
 	            this.$target = core.dom.main.find(".js-main--" + this.data.target);
 	            this.$images = this.$node.find(".js-lazy-image");
+	            this.timeoutId = null;
+	            this.timeoutDelay = core.dom.overlay.elementTransitionDuration;
 	
-	            // Node must be in DOM for image size to work
-	            this.$target.append(this.$node);
-	
-	            core.images.handleImages(this.$images, function () {
-	                core.emitter.fire("app--update-animate");
-	            });
+	            this.bindEvents();
+	            this.loadIndex();
 	
 	            instance = this;
 	        }
@@ -11354,14 +11308,180 @@
 	         *
 	         * @public
 	         * @instance
-	         * @method destroy
+	         * @method cycleAnimation
+	         * @memberof indexes.IndexRoot
+	         * @description Start the animation cycle for the listing.
+	         *
+	         */
+	    }, {
+	        key: "cycleAnimation",
+	        value: function cycleAnimation() {
+	            // Fresh query for js- animatable elements each time
+	            this.$anims = this.$node.find(".js-animate");
+	
+	            core.emitter.stop();
+	            core.emitter.go(this.updateAnimate.bind(this));
+	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @instance
+	         * @method updateAnimate
+	         * @memberof indexes.IndexRoot
+	         * @description Update active photos for index.
+	         *
+	         */
+	    }, {
+	        key: "updateAnimate",
+	        value: function updateAnimate() {
+	            var $anim = null;
+	            var i = this.$anims.length;
+	
+	            for (i; i--;) {
+	                $anim = this.$anims.eq(i);
+	
+	                if (core.util.isElementInViewport($anim[0])) {
+	                    $anim.addClass("is-active");
+	                } else {
+	                    $anim.removeClass("is-active");
+	                }
+	            }
+	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @instance
+	         * @method bindEvents
+	         * @memberof indexes.IndexRoot
+	         * @description Bind event handlers for this instance.
+	         *
+	         */
+	    }, {
+	        key: "bindEvents",
+	        value: function bindEvents() {
+	            core.dom.body.on("click", ".js-index-tile", this.onTileClick.bind(this));
+	            core.dom.body.on("mouseenter", ".js-index-tile img", this.onMouseEnter.bind(this));
+	            core.dom.body.on("mousemove", ".js-index-tile img", this.onMouseEnter.bind(this));
+	            core.dom.body.on("mouseleave", ".js-index-tile img", this.onMouseLeave.bind(this));
+	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @instance
+	         * @method loadIndex
+	         * @memberof indexes.IndexRoot
+	         * @description Handle loading process for this instance.
+	         *
+	         */
+	    }, {
+	        key: "loadIndex",
+	        value: function loadIndex() {
+	            var _this = this;
+	
+	            // Node must be in DOM for image size to work
+	            this.$target.append(this.$node);
+	
+	            core.images.handleImages(this.$images, function () {
+	                _this.cycleAnimation();
+	            });
+	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @instance
+	         * @method onTileClick
+	         * @param {object} e The Event object
+	         * @memberof indexes.IndexRoot
+	         * @description Handle project grid tile clicks - loads a new Project.
+	         *
+	         */
+	    }, {
+	        key: "onTileClick",
+	        value: function onTileClick(e) {
+	            e.preventDefault();
+	
+	            var $tile = (0, _js_libsHoboDistHoboBuild2["default"])(e.target).closest(".js-index-tile");
+	
+	            _overlay2["default"].setTitle($tile.data("title"));
+	
+	            _overlay2["default"].open();
+	
+	            _projectsProject2["default"].open();
+	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @instance
+	         * @method onMouseEnter
+	         * @param {object} e The Event object
+	         * @memberof indexes.IndexRoot
+	         * @description Handle showing title on mouse enter grid tile.
+	         *
+	         */
+	    }, {
+	        key: "onMouseEnter",
+	        value: function onMouseEnter(e) {
+	            try {
+	                clearTimeout(this.timeoutId);
+	            } catch (error) {
+	                core.log("warn", error);
+	            }
+	
+	            if (_projectsProject2["default"].isActive()) {
+	                return;
+	            }
+	
+	            var $tile = (0, _js_libsHoboDistHoboBuild2["default"])(e.target).closest(".js-index-tile");
+	
+	            _overlay2["default"].setTitle($tile.data("title"));
+	
+	            _overlay2["default"].open();
+	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @instance
+	         * @method onMouseLeave
+	         * @memberof indexes.IndexRoot
+	         * @description Handle removing title on mouse leave grid tile.
+	         *
+	         */
+	    }, {
+	        key: "onMouseLeave",
+	        value: function onMouseLeave() {
+	            if (_projectsProject2["default"].isActive()) {
+	                return;
+	            }
+	
+	            this.timeoutId = setTimeout(function () {
+	                if (!_projectsProject2["default"].isActive()) {
+	                    _overlay2["default"].close();
+	                }
+	            }, this.timeoutDelay);
+	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @instance
+	         * @method teardown
 	         * @memberof indexes.IndexRoot
 	         * @description Undo event bindings for this instance.
 	         *
 	         */
 	    }, {
-	        key: "destroy",
-	        value: function destroy() {}
+	        key: "teardown",
+	        value: function teardown() {
+	            core.emitter.stop();
+	
+	            core.log("IndexRoot teardown");
+	        }
 	    }]);
 	
 	    return IndexRoot;
@@ -11473,6 +11593,7 @@
 	        value: function cycleAnimation() {
 	            this.onUpdateEmitter();
 	
+	            core.emitter.stop();
 	            core.emitter.go(this.onUpdateEmitter.bind(this));
 	        }
 	
@@ -11552,14 +11673,14 @@
 	         *
 	         * @public
 	         * @instance
-	         * @method destroy
+	         * @method teardown
 	         * @memberof projects.Project
 	         * @description Undo event bindings for this instance.
 	         *
 	         */
 	    }, {
-	        key: "destroy",
-	        value: function destroy() {
+	        key: "teardown",
+	        value: function teardown() {
 	            Project.close();
 	        }
 	    }]);
@@ -11803,7 +11924,7 @@
 	            core.dom.html.removeClass("is-offcanvas");
 	
 	            if (instance) {
-	                instance.destroy();
+	                instance.teardown();
 	            }
 	        });
 	
@@ -11832,6 +11953,8 @@
 	     *
 	     */
 	    onload: function onload() {
+	        core.emitter.fire("app--offcanvas");
+	
 	        core.dom.html.addClass("is-offcanvas");
 	
 	        if (!instance) {
@@ -11841,6 +11964,8 @@
 	        } else {
 	            instance.cycleAnimation();
 	        }
+	
+	        core.log("listing onload");
 	    },
 	
 	    /**
@@ -11851,7 +11976,9 @@
 	     * @description Method performs unloading actions for this module.
 	     *
 	     */
-	    unload: function unload() {},
+	    unload: function unload() {
+	        core.log("listing unload");
+	    },
 	
 	    /**
 	     *
@@ -12001,6 +12128,10 @@
 	    }, {
 	        key: "cycleAnimation",
 	        value: function cycleAnimation() {
+	            // Fresh query for js- animatable elements each time
+	            this.$anims = this.$node.find(".js-animate");
+	
+	            core.emitter.stop();
 	            core.emitter.go(this.updateAnimate.bind(this));
 	        }
 	
@@ -12217,11 +12348,6 @@
 	                collection.items.forEach(function (item) {
 	                    $grid.append((0, _properjsTemplate2["default"])(_gridItemTpl.replace(/\n/g, ""), item));
 	
-	                    // @note:
-	                    // @todo: Keep this `systemDataVariants` condition in until we re-upload these 3 images
-	                    // /a-girl-named-georges/           diaplayIndex: 1
-	                    // /woolrich-made-in-usa/           displayIndex: 1
-	                    // /nike-running-free-designers/    displayIndex: 5
 	                    if (item.customContent && item.customContent.diptychImage && item.customContent.diptychImage.systemDataVariants) {
 	                        $grid.append((0, _properjsTemplate2["default"])(_gridItemTpl.replace(/\n/g, ""), item.customContent.diptychImage));
 	                    }
@@ -12233,7 +12359,6 @@
 	
 	            // Node must be in DOM for image size to work
 	            this.$target.append(this.$node);
-	            this.$anims = this.$node.find(".js-animate");
 	
 	            core.images.handleImages(this.$node.find(".js-lazy-image"), function () {
 	                _this2.cycleAnimation();
@@ -12348,15 +12473,17 @@
 	         *
 	         * @public
 	         * @instance
-	         * @method destroy
+	         * @method teardown
 	         * @memberof indexes.IndexFull
 	         * @description Undo event bindings for this instance.
 	         *
 	         */
 	    }, {
-	        key: "destroy",
-	        value: function destroy() {
+	        key: "teardown",
+	        value: function teardown() {
 	            core.emitter.stop();
+	
+	            core.log("IndexFull teardown");
 	        }
 	    }]);
 	
@@ -12731,7 +12858,6 @@
   \**********************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	//import $ from "js_libs/hobo/dist/hobo.build";
 	"use strict";
 	
 	Object.defineProperty(exports, "__esModule", {
@@ -12749,10 +12875,6 @@
 	var _Project = __webpack_require__(/*! ./Project */ 66);
 	
 	var _Project2 = _interopRequireDefault(_Project);
-	
-	var _properjsImageloader = __webpack_require__(/*! properjs-imageloader */ 35);
-	
-	var _properjsImageloader2 = _interopRequireDefault(_properjsImageloader);
 	
 	var $_jsElement = null;
 	var instance = null;
@@ -12835,7 +12957,7 @@
 	        $_jsElement = null;
 	
 	        if (instance) {
-	            instance.destroy();
+	            instance.teardown();
 	            instance = null;
 	        }
 	
@@ -12869,180 +12991,15 @@
 	 */
 	var killProject = function killProject() {
 	    if (instance) {
-	        instance.destroy();
+	        instance.teardown();
 	        instance = null;
 	    }
-	
-	    _properjsImageloader2["default"].killInstances();
 	};
 	
 	/******************************************************************************
 	 * Export
 	*******************************************************************************/
 	exports["default"] = projects;
-	module.exports = exports["default"];
-
-/***/ },
-/* 74 */
-/*!***************************!*\
-  !*** ./js_src/animate.js ***!
-  \***************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
-	
-	var _core = __webpack_require__(/*! ./core */ 30);
-	
-	var core = _interopRequireWildcard(_core);
-	
-	var $_jsElements = null;
-	var _isActive = false;
-	
-	/**
-	 *
-	 * @public
-	 * @module animate
-	 * @description Handle a site-wide default animation style for elements in view.
-	 *
-	 */
-	var animate = {
-	    /**
-	     *
-	     * @public
-	     * @method init
-	     * @memberof animate
-	     * @description Method runs once when window loads.
-	     *
-	     */
-	    init: function init() {
-	        core.log("animate initialized");
-	
-	        core.emitter.on("app--update-animate", this.onUpdateAnimate.bind(this));
-	    },
-	
-	    /**
-	     *
-	     * @public
-	     * @method isActive
-	     * @memberof animate
-	     * @description Method informs PageController of active status.
-	     * @returns {boolean}
-	     *
-	     */
-	    isActive: function isActive() {
-	        return this.getElements() > 0;
-	    },
-	
-	    /**
-	     *
-	     * @public
-	     * @method onload
-	     * @memberof animate
-	     * @description Method performs onloading actions for this module.
-	     *
-	     */
-	    onload: function onload() {
-	        _isActive = true;
-	
-	        core.emitter.on("app--scroll", updateAnimate);
-	        core.emitter.on("app--resize", updateAnimate);
-	
-	        updateAnimate();
-	    },
-	
-	    /**
-	     *
-	     * @public
-	     * @method unload
-	     * @memberof animate
-	     * @description Method performs unloading actions for this module.
-	     *
-	     */
-	    unload: function unload() {
-	        this.teardown();
-	    },
-	
-	    /**
-	     *
-	     * @public
-	     * @method teardown
-	     * @memberof animate
-	     * @description Method performs cleanup after this module. Remmoves events, null vars etc...
-	     *
-	     */
-	    teardown: function teardown() {
-	        $_jsElements = null;
-	        _isActive = false;
-	    },
-	
-	    /**
-	     *
-	     * @public
-	     * @method getElements
-	     * @memberof animate
-	     * @description Method queries DOM for this modules node.
-	     * @returns {number}
-	     *
-	     */
-	    getElements: function getElements() {
-	        $_jsElements = core.dom.body.find(".js-animate");
-	
-	        return $_jsElements.length;
-	    },
-	
-	    /**
-	     *
-	     * @public
-	     * @method onUpdateAnimate
-	     * @memberof animate
-	     * @description Handle updating node list and activating elements.
-	     *
-	     */
-	    onUpdateAnimate: function onUpdateAnimate() {
-	        this.getElements();
-	
-	        if (!_isActive) {
-	            this.onload();
-	        } else {
-	            updateAnimate();
-	        }
-	    }
-	};
-	
-	/**
-	 *
-	 * @private
-	 * @method updateAnimate
-	 * @memberof animate
-	 * @description Update animation nodes.
-	 *
-	 */
-	var updateAnimate = function updateAnimate() {
-	    var $elems = $_jsElements;
-	    var $elem = null;
-	    var i = $elems.length;
-	
-	    for (i; i--;) {
-	        $elem = $elems.eq(i);
-	
-	        if (core.util.isElementInViewport($elem[0])) {
-	            $elem.addClass("is-active");
-	        } else {
-	            $elem.removeClass("is-active");
-	        }
-	    }
-	};
-	
-	/******************************************************************************
-	 * Export
-	*******************************************************************************/
-	exports["default"] = animate;
 	module.exports = exports["default"];
 
 /***/ }
