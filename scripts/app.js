@@ -179,8 +179,6 @@
 	            $target.addClass("is-active");
 	
 	            this.core.dom.main[0].id = "is-main--" + data.target;
-	
-	            //window.scrollTo( 0, 0 );
 	        }
 	    }]);
 	
@@ -1106,8 +1104,11 @@
 /*!**********************************************!*\
   !*** ./js_libs/hobo/lib/core/removeClass.js ***!
   \**********************************************/
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
+	var utils = __webpack_require__( /*! ../utils */ 5 );
+	
+	
 	/**
 	 *
 	 * @instance
@@ -1136,7 +1137,7 @@
 	                }
 	            });
 	
-	            element.className = elsClass.join( " " );
+	            element.className = utils.trimString( elsClass.join( " " ) );
 	        }
 	    });
 	
@@ -1239,8 +1240,10 @@
 	
 	    } else {
 	        this.forEach(function ( node, i ) {
-	            if ( typeof selector === "function" && selector( i, node ) ) {
-	                keepers.push( node );
+	            if ( typeof selector === "function" ) {
+	                if ( selector( i, node ) ) {
+	                    keepers.push( node );
+	                }
 	
 	            } else if ( !matchElement( node, selector ) ) {
 	                keepers.push( node );
@@ -2267,19 +2270,6 @@
 	
 	/**
 	 *
-	 * @description Noop a preventDefault() for event handlers
-	 * @method preNoop
-	 * @param {object} e The event object
-	 * @returns {boolean}
-	 *
-	 */
-	var preNoop = function preNoop(e) {
-	    e.preventDefault();
-	    return false;
-	};
-	
-	/**
-	 *
 	 * @description Add pixel units when inline styling
 	 * @method px
 	 * @param {string} str The value to pixel-ify
@@ -2365,6 +2355,16 @@
 	    return close;
 	};
 	
+	/**
+	 *
+	 * @public
+	 * @method getElementsInView
+	 * @param {Hobo} $nodes The elements to check
+	 * @memberof util
+	 * @description Get only visible elements
+	 * @returns {Hobo}
+	 *
+	 */
 	var getElementsInView = function getElementsInView($nodes) {
 	    var i = $nodes.length;
 	    var $ret = (0, _js_libsHoboDistHoboBuild2["default"])([]);
@@ -2382,7 +2382,7 @@
 	 *
 	 * @description Update images that have already been loaded
 	 * @method updateImages
-	 * @param {jQuery} images The optional argument passed collection to reload
+	 * @param {Hobo} images The optional argument passed collection to reload
 	 * @memberof util
 	 *
 	 */
@@ -2483,38 +2483,6 @@
 	
 	/**
 	 *
-	 * @description Toggle on/off scrollability
-	 * @method disableMouseWheel
-	 * @param {boolean} enable Flag to enable/disable
-	 * @memberof util
-	 *
-	 */
-	var disableMouseWheel = function disableMouseWheel(enable) {
-	    if (enable) {
-	        _dom2["default"].doc.on("DOMMouseScroll mousewheel", preNoop);
-	    } else {
-	        _dom2["default"].doc.off("DOMMouseScroll mousewheel");
-	    }
-	};
-	
-	/**
-	 *
-	 * @description Toggle on/off touch movement
-	 * @method disableTouchMove
-	 * @param {boolean} enable Flag to enable/disable
-	 * @memberof util
-	 *
-	 */
-	var disableTouchMove = function disableTouchMove(enable) {
-	    if (enable) {
-	        _dom2["default"].doc.on("touchmove", preNoop);
-	    } else {
-	        _dom2["default"].doc.off("touchmove");
-	    }
-	};
-	
-	/**
-	 *
 	 * @description Get the applied transition duration from CSS
 	 * @method getTransitionDuration
 	 * @param {object} el The DOMElement
@@ -2593,6 +2561,15 @@
 	    };
 	};
 	
+	/**
+	 *
+	 * @public
+	 * @method getPageKey
+	 * @memberof util
+	 * @description Get the unique page key for cache and such
+	 * @returns {object}
+	 *
+	 */
 	var getPageKey = function getPageKey() {
 	    var ret = null;
 	
@@ -2673,26 +2650,19 @@
 	 * Export
 	*******************************************************************************/
 	exports["default"] = {
-	    // Loading
-	    loadImages: loadImages,
-	    updateImages: updateImages,
-	    isElementLoadable: isElementLoadable,
-	    isElementInViewport: isElementInViewport,
-	    getElementsInView: getElementsInView,
-	
-	    // Disabling
-	    disableMouseWheel: disableMouseWheel,
-	    disableTouchMove: disableTouchMove,
-	
-	    // Random
 	    px: px,
 	    noop: noop,
 	    slugify: slugify,
+	    getPageKey: getPageKey,
+	    loadImages: loadImages,
 	    translate3d: translate3d,
 	    extendObject: extendObject,
+	    updateImages: updateImages,
+	    getElementsInView: getElementsInView,
+	    isElementLoadable: isElementLoadable,
+	    isElementInViewport: isElementInViewport,
 	    getTransitionDuration: getTransitionDuration,
-	    getDefaultHammerOptions: getDefaultHammerOptions,
-	    getPageKey: getPageKey
+	    getDefaultHammerOptions: getDefaultHammerOptions
 	};
 	module.exports = exports["default"];
 
@@ -6565,7 +6535,7 @@
 	 *
 	 * @public
 	 * @class ImageController
-	 * @param {jQuery} $images The image collection to load
+	 * @param {Hobo} $images The image collection to load
 	 * @classdesc Handles breaking out the preload vs lazyload batches
 	 * @memberof core
 	 *
@@ -10910,8 +10880,6 @@
 	
 	            instance = new _About2["default"]($_jsElement, data);
 	        }
-	
-	        core.log("about onload");
 	    },
 	
 	    /**
@@ -10922,19 +10890,7 @@
 	     * @description Method performs unloading actions for this module.
 	     *
 	     */
-	    unload: function unload() {
-	        core.log("about unload");
-	    },
-	
-	    /**
-	     *
-	     * @public
-	     * @method teardown
-	     * @memberof about
-	     * @description Method performs cleanup after this module. Remmoves events, null vars etc...
-	     *
-	     */
-	    teardown: function teardown() {},
+	    unload: function unload() {},
 	
 	    /**
 	     *
@@ -10987,7 +10943,7 @@
 	 *
 	 * @public
 	 * @class About
-	 * @param {jQuery} $node The element
+	 * @param {Hobo} $node The element
 	 * @param {object} data The datas
 	 * @classdesc Handle a menu view.
 	 * @memberof menus
@@ -11014,9 +10970,9 @@
 	     * @public
 	     * @instance
 	     * @method initialize
-	     * @param {jQuery} $node The element
+	     * @param {Hobo} $node The element
 	     * @param {object} data The datas
-	     * @memberof menus.About
+	     * @memberof about.About
 	     * @description Perform instance bootstrap actions.
 	     *
 	     */
@@ -11041,7 +10997,7 @@
 	         * @public
 	         * @instance
 	         * @method onPreload
-	         * @memberof menus.About
+	         * @memberof about.About
 	         * @description Handle preloaded images.
 	         *
 	         */
@@ -11062,15 +11018,13 @@
 	         * @public
 	         * @instance
 	         * @method teardown
-	         * @memberof menus.About
+	         * @memberof about.About
 	         * @description Undo event bindings for this instance.
 	         *
 	         */
 	    }, {
 	        key: "teardown",
-	        value: function teardown() {
-	            core.log("About teardown");
-	        }
+	        value: function teardown() {}
 	    }]);
 	
 	    return About;
@@ -11174,8 +11128,6 @@
 	        } else {
 	            instance.cycleAnimation();
 	        }
-	
-	        core.log("indexes onload");
 	    },
 	
 	    /**
@@ -11186,19 +11138,7 @@
 	     * @description Method performs unloading actions for this module.
 	     *
 	     */
-	    unload: function unload() {
-	        core.log("indexes unload");
-	    },
-	
-	    /**
-	     *
-	     * @public
-	     * @method teardown
-	     * @memberof indexes
-	     * @description Method performs cleanup after this module. Remmoves events, null vars etc...
-	     *
-	     */
-	    teardown: function teardown() {},
+	    unload: function unload() {},
 	
 	    /**
 	     *
@@ -11269,7 +11209,7 @@
 	 *
 	 * @public
 	 * @class IndexRoot
-	 * @param {jQuery} $node The element
+	 * @param {Hobo} $node The element
 	 * @param {object} data The datas
 	 * @classdesc Handle an index as a Singleton(ish).
 	 * @memberof indexes
@@ -11296,7 +11236,7 @@
 	     * @public
 	     * @instance
 	     * @method initialize
-	     * @param {jQuery} $node The element
+	     * @param {Hobo} $node The element
 	     * @param {object} data The datas
 	     * @memberof indexes.IndexRoot
 	     * @description Perform instance bootstrap actions.
@@ -11499,8 +11439,6 @@
 	        key: "teardown",
 	        value: function teardown() {
 	            core.emitter.stop();
-	
-	            core.log("IndexRoot teardown");
 	        }
 	    }]);
 	
@@ -11545,7 +11483,7 @@
 	 *
 	 * @public
 	 * @class Project
-	 * @param {jQuery} $node The element
+	 * @param {Hobo} $node The element
 	 * @param {object} data The datas
 	 * @classdesc Handle an index.
 	 * @memberof projects
@@ -11884,6 +11822,15 @@
 	        core.dom.overlay.elementTitle[0].innerHTML = text;
 	    },
 	
+	    /**
+	     *
+	     * @public
+	     * @method isActive
+	     * @memberof overlay
+	     * @description Is the overlay open?.
+	     * @returns {boolean}
+	     *
+	     */
 	    isActive: function isActive() {
 	        return _isActive;
 	    }
@@ -11982,8 +11929,6 @@
 	        } else {
 	            instance.cycleAnimation();
 	        }
-	
-	        core.log("listing onload");
 	    },
 	
 	    /**
@@ -11994,19 +11939,7 @@
 	     * @description Method performs unloading actions for this module.
 	     *
 	     */
-	    unload: function unload() {
-	        core.log("listing unload");
-	    },
-	
-	    /**
-	     *
-	     * @public
-	     * @method teardown
-	     * @memberof listing
-	     * @description Method performs cleanup after this module. Remmoves events, null vars etc...
-	     *
-	     */
-	    teardown: function teardown() {},
+	    unload: function unload() {},
 	
 	    /**
 	     *
@@ -12084,7 +12017,7 @@
 	 *
 	 * @public
 	 * @class IndexFull
-	 * @param {jQuery} $node The element
+	 * @param {Hobo} $node The element
 	 * @param {object} data The datas
 	 * @classdesc Handle an index as a Singleton(ish).
 	 * @memberof indexes
@@ -12111,7 +12044,7 @@
 	     * @public
 	     * @instance
 	     * @method initialize
-	     * @param {jQuery} $node The element
+	     * @param {Hobo} $node The element
 	     * @param {object} data The datas
 	     * @memberof indexes.IndexFull
 	     * @description Perform instance bootstrap actions.
@@ -12210,7 +12143,7 @@
 	         * @public
 	         * @instance
 	         * @method bindGallery
-	         * @param {jQuery} $elem The tile image that was clicked
+	         * @param {Hobo} $elem The tile image that was clicked
 	         * @memberof indexes.IndexFull
 	         * @description Bind active gallery view.
 	         *
@@ -12261,8 +12194,8 @@
 	         * @public
 	         * @instance
 	         * @method nextProject
-	         * @param {jQuery} $project The project grid
-	         * @param {jQuery} $tile The tile image to load in gallery
+	         * @param {Hobo} $project The project grid
+	         * @param {Hobo} $tile The tile image to load in gallery
 	         * @memberof indexes.IndexFull
 	         * @description Transition to a tile in a new project scope.
 	         *
@@ -12288,7 +12221,7 @@
 	         * @public
 	         * @instance
 	         * @method nextTitle
-	         * @param {jQuery} $title The title element
+	         * @param {Hobo} $title The title element
 	         * @param {string} text The optional text for the title to display
 	         * @memberof indexes.IndexFull
 	         * @description Transition to the title of the next project.
@@ -12315,7 +12248,7 @@
 	         * @public
 	         * @instance
 	         * @method nextTile
-	         * @param {jQuery} $tile The tile element
+	         * @param {Hobo} $tile The tile element
 	         * @memberof indexes.IndexFull
 	         * @description Transition to the next tile in a project.
 	         *
@@ -12513,8 +12446,6 @@
 	        key: "teardown",
 	        value: function teardown() {
 	            core.emitter.stop();
-	
-	            core.log("IndexFull teardown");
 	        }
 	    }]);
 	
@@ -12605,6 +12536,15 @@
 	        }
 	    },
 	
+	    /**
+	     *
+	     * @public
+	     * @method init
+	     * @memberof handleClick
+	     * @param {object} e The Event object
+	     * @description Handle gallery click, move forward/backward.
+	     *
+	     */
 	    handleClick: function handleClick(e) {
 	        var rect = this.$image[0].getBoundingClientRect();
 	        var direction = null;
@@ -12662,17 +12602,14 @@
 	     *
 	     * @public
 	     * @method setImage
-	     * @param {jQuery} $image The image to create a full view of.
+	     * @param {Hobo} $image The image to create a full view of.
 	     * @memberof gallery
 	     * @description Apply an image to the gallery view.
 	     *
 	     */
 	    setImage: function setImage($image) {
-	        var _this = this;
-	
 	        var data = $image.data();
 	
-	        this.isLoaded = false;
 	        this.open();
 	        this.$image.removeAttr(core.config.imageLoaderAttr).attr({
 	            "data-img-src": data.imgSrc,
@@ -12680,13 +12617,7 @@
 	            "data-original-size": data.originalSize
 	        });
 	
-	        core.dom.gallery.element.addClass("is-loading");
-	
-	        core.util.loadImages(this.$image, core.util.noop, true, window.innerWidth).on("done", function () {
-	            _this.isLoaded = true;
-	
-	            core.dom.gallery.element.removeClass("is-loading");
-	        });
+	        core.util.loadImages(this.$image, core.util.noop, true, window.innerWidth);
 	    }
 	};
 	
