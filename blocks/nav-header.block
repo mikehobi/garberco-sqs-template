@@ -11,11 +11,14 @@
                 </a>
             {.end}
         {.end}
-        <a class="nav__back nav__back--left icon-wrap icon-wrap--left js-controller js-controller--garberco js-root" href="/">
+        <a class="nav__back nav__back--left nav__back--arrow-left icon-wrap icon-wrap--left js-controller js-controller--garberco js-root" href="/">
             {@|apply icon--arrow-right.block}
         </a>
-        <a class="nav__back nav__back--right icon-wrap icon-wrap--right js-controller js-controller--garberco js-root" href="/">
+        <a class="nav__back nav__back--right nav__back--arrow-right icon-wrap icon-wrap--right js-controller js-controller--garberco js-root" href="/">
             {@|apply icon--arrow-left.block}
+        </a>
+        <a class="nav__back nav__back--right nav__back--x icon-wrap icon-wrap--right js-controller js-controller--garberco js-root" href="/">
+            {@|apply icon--x.block}
         </a>
     </div>
 </nav>

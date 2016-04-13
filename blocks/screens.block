@@ -1,4 +1,4 @@
-<div class="project-view js-project-view screen {.equal? collection.typeName "custom-photo"}is-active{.end}">
+<div class='project-view js-project-view screen {.equal? collection.typeName "custom-photo"}is-active{.end}'>
     <div class="project-view__pane js-project-view-pane -topper"></div>
 </div>
 
