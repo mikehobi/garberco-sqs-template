@@ -11319,8 +11319,13 @@
 	            // Fresh query for js- animatable elements each time
 	            this.$anims = this.$node.find(".js-animate");
 	
-	            core.emitter.stop();
-	            core.emitter.go(this.updateAnimate.bind(this));
+	            // Root index is loaded in the background when you hit a Project direct
+	            if (!_projectsProject2["default"].isActive()) {
+	                core.emitter.stop();
+	                core.emitter.go(this.updateAnimate.bind(this));
+	            } else {
+	                this.updateAnimate();
+	            }
 	        }
 	
 	        /**
@@ -11536,13 +11541,13 @@
 	    function Project($node, data) {
 	        _classCallCheck(this, Project);
 	
+	        isActive = true;
+	
 	        this.$node = $node;
 	        this.data = data;
 	        this.$plates = this.$node.find(".js-project-plate");
 	        this.$images = this.$node.find(".js-lazy-image");
 	        this.isEnded = false;
-	
-	        core.log("Project", this);
 	
 	        // Node must be in DOM for image size to work
 	        core.dom.project.elementPane.append(this.$node);
