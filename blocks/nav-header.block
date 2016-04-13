@@ -1,15 +1,23 @@
 <nav class="nav nav--header header js-header -text--center">
-    {.repeated section items}
-        {.section collection}
-            <a class="header__nav header__nav--{urlId} js-controller js-controller--{urlId} {.if homepage}js-root{.end} h3 -column" href="{fullUrl}" data-target="{urlId}">
-                {.if homepage}
-                    <img class="logo" src="/assets/svgs/GarberCo.svg" />
-                {.or}
-                    {navigationTitle}
-                {.end}
-            </a>
+    <div class="nav__menu">
+        {.repeated section items}
+            {.section collection}
+                <a class="header__nav header__nav--{urlId} js-controller js-controller--{urlId} {.if homepage}js-root{.end} h3 -column" href="{fullUrl}" data-target="{urlId}">
+                    {.if homepage}
+                        <img class="logo" src="/assets/svgs/GarberCo.svg" />
+                    {.or}
+                        {navigationTitle}
+                    {.end}
+                </a>
+            {.end}
         {.end}
-    {.end}
+        <a class="nav__back nav__back--left icon-wrap icon-wrap--left js-controller js-controller--garberco js-root" href="/">
+            {@|apply icon--arrow-right.block}
+        </a>
+        <a class="nav__back nav__back--right icon-wrap icon-wrap--right js-controller js-controller--garberco js-root" href="/">
+            {@|apply icon--arrow-left.block}
+        </a>
+    </div>
 </nav>
 <main class="main js-main" id="{.repeated section items}{.if folderActive || active}is-main--{collection.urlId}{.end}{.end}">
     {.repeated section items}

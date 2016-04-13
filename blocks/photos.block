@@ -4,11 +4,7 @@
         <div class="diptych__left -column">
             {@|apply image.block}
         </div>
-        {.if customContent.diptychImage}
-            <div class="diptych__right -column">
-                {customContent.diptychImage|apply image.block}
-            </div>
-        {.end}
+        {@|apply diptych.block}
     </div>
 {.end}
 {.if customContent.diptychSmallRight}
@@ -16,11 +12,7 @@
         <div class="diptych__left -column">
             {@|apply image.block}
         </div>
-        {.if customContent.diptychImage}
-            <div class="diptych__right -column">
-                {customContent.diptychImage|apply image.block}
-            </div>
-        {.end}
+        {@|apply diptych.block}
     </div>
 {.end}
 {.if customContent.diptychLeanLeft}
@@ -28,11 +20,7 @@
         <div class="diptych__left -column">
             {@|apply image.block}
         </div>
-        {.if customContent.diptychImage}
-            <div class="diptych__right -column">
-                {customContent.diptychImage|apply image.block}
-            </div>
-        {.end}
+        {@|apply diptych.block}
     </div>
 {.end}
 {.if customContent.diptychLeanRight}
@@ -40,11 +28,7 @@
         <div class="diptych__left -column">
             {@|apply image.block}
         </div>
-        {.if customContent.diptychImage}
-            <div class="diptych__right -column">
-                {customContent.diptychImage|apply image.block}
-            </div>
-        {.end}
+        {@|apply diptych.block}
     </div>
 {.end}
 {.if customContent.diptychGutterCenter}
@@ -52,11 +36,7 @@
         <div class="diptych__left -column">
             {@|apply image.block}
         </div>
-        {.if customContent.diptychImage}
-            <div class="diptych__right -column">
-                {customContent.diptychImage|apply image.block}
-            </div>
-        {.end}
+        {@|apply diptych.block}
     </div>
 {.end}
 {.if customContent.diptychFullCenter}
@@ -64,11 +44,7 @@
         <div class="diptych__left -column">
             {@|apply image.block}
         </div>
-        {.if customContent.diptychImage}
-            <div class="diptych__right -column">
-                {customContent.diptychImage|apply image.block}
-            </div>
-        {.end}
+        {@|apply diptych.block}
     </div>
 {.end}
 {.if customContent.diptychOverlapLeft}
@@ -76,23 +52,14 @@
         <div class="diptych__left -column">
             {@|apply image.block}
         </div>
-        {.if customContent.diptychImage}
-            <div class="diptych__right -column">
-                {customContent.diptychImage|apply image.block}
-            </div>
-        {.end}
+        {@|apply diptych.block}
     </div>
 {.end}
 {.if customContent.diptychOverlapRight}
     <div class="project__diptych project__diptych--overlap-right js-project-plate animate animate--fade">
         <div class="diptych__left -column">
             {@|apply image.block}
-        </div>
-        {.if customContent.diptychImage}
-            <div class="diptych__right -column">
-                {customContent.diptychImage|apply image.block}
-            </div>
-        {.end}
+        {@|apply diptych.block}
     </div>
 {.end}
 {.if customContent.diptychGutterSmalls}
@@ -100,11 +67,7 @@
         <div class="diptych__left -column">
             {@|apply image.block}
         </div>
-        {.if customContent.diptychImage}
-            <div class="diptych__right -column">
-                {customContent.diptychImage|apply image.block}
-            </div>
-        {.end}
+        {@|apply diptych.block}
     </div>
 {.end}
 {.if customContent.diptychGutterSmallsEven}
@@ -114,14 +77,7 @@
                 {@|apply image.block}
             </div>
         {.end}
-        {.if customContent.diptychImage}
-            {.if systemDataId}
-                <div class="-spacer -column"></div>
-            {.end}
-            <div class="diptych__right -column">
-                {customContent.diptychImage|apply image.block}
-            </div>
-        {.end}
+        {@|apply diptych.block}
     </div>
 {.end}
 {.if customContent.SingleSmallRight}

@@ -2403,11 +2403,12 @@
 	 * @param {object} images Optional collection of images to load
 	 * @param {function} handler Optional handler for load conditions
 	 * @param {boolean} useVariant Optional flag to skip loading size variants
+	 * @param {number} useWidth Optional manual width to determine variant against
 	 * @memberof util
 	 * @returns {instance}
 	 *
 	 */
-	var loadImages = function loadImages(images, handler, useVariant) {
+	var loadImages = function loadImages(images, handler, useVariant, useWidth) {
 	    var rQuery = /\?(.*)$/;
 	    var map = function map(vnt) {
 	        return parseInt(vnt, 10);
@@ -2441,7 +2442,7 @@
 	    for (i; i--;) {
 	        $img = images.eq(i);
 	        data = $img.data();
-	        width = $img[0].clientWidth || $img[0].parentNode.clientWidth || window.innerWidth;
+	        width = useWidth || $img[0].clientWidth || $img[0].parentNode.clientWidth || window.innerWidth;
 	        source = data.imgSrc.replace(rQuery, "");
 	
 	        // Pre-process portrait vs landscape using originalSize
@@ -5905,7 +5906,17 @@
 	   * @description The string attribute ImageLoader gives loaded images.
 	   *
 	   */
-	  imageLoaderAttr: "data-imageloader"
+	  imageLoaderAttr: "data-imageloader",
+	
+	  /**
+	   *
+	   * @public
+	   * @member offcanvasClasses
+	   * @memberof config
+	   * @description The string of offcanvas element classNames.
+	   *
+	   */
+	  offcanvasClasses: "is-offcanvas is-offcanvas--about is-offcanvas--index is-offcanvas--project"
 	};
 	
 	/******************************************************************************
@@ -8576,9 +8587,11 @@
 	            this.root = window.location.pathname;
 	        }
 	
-	        core.dom.root[0].href = this.root;
+	        core.dom.root.attr("href", this.root);
 	
 	        core.dom.root.on("click", function () {
+	            core.dom.html.removeClass(core.config.offcanvasClasses);
+	
 	            core.emitter.fire("app--root");
 	        });
 	
@@ -8632,7 +8645,7 @@
 	
 	            // GarberCo?
 	            if (match === core.config.rootUrlId) {
-	                core.dom.html.removeClass("is-offcanvas");
+	                core.dom.html.removeClass(core.config.offcanvasClasses);
 	                //core.dom.html.removeClass( "is-neverflow" );
 	            }
 	
@@ -10858,8 +10871,6 @@
 	     */
 	    init: function init() {
 	        core.emitter.on("app--root", function () {
-	            core.dom.html.removeClass("is-offcanvas");
-	
 	            if (instance) {
 	                instance.teardown();
 	            }
@@ -10892,7 +10903,7 @@
 	    onload: function onload() {
 	        core.emitter.fire("app--offcanvas");
 	
-	        core.dom.html.addClass("is-offcanvas");
+	        core.dom.html.removeClass(core.config.offcanvasClasses).addClass("is-offcanvas is-offcanvas--about");
 	
 	        if (!instance) {
 	            var data = $_jsElement.data();
@@ -11240,6 +11251,10 @@
 	
 	var core = _interopRequireWildcard(_core);
 	
+	var _router = __webpack_require__(/*! ../router */ 56);
+	
+	var _router2 = _interopRequireDefault(_router);
+	
 	var _projectsProject = __webpack_require__(/*! ../projects/Project */ 66);
 	
 	var _projectsProject2 = _interopRequireDefault(_projectsProject);
@@ -11319,8 +11334,8 @@
 	            // Fresh query for js- animatable elements each time
 	            this.$anims = this.$node.find(".js-animate");
 	
-	            // Root index is loaded in the background when you hit a Project direct
-	            if (!_projectsProject2["default"].isActive()) {
+	            // If pathname is not the `root` we shant not start raf cycle
+	            if (window.location.pathname === _router2["default"].root) {
 	                core.emitter.stop();
 	                core.emitter.go(this.updateAnimate.bind(this));
 	            } else {
@@ -11709,7 +11724,7 @@
 	Project.open = function () {
 	    isActive = true;
 	
-	    core.dom.html.addClass("is-offcanvas");
+	    core.dom.html.addClass("is-offcanvas is-offcanvas--project");
 	    core.dom.body.append(core.dom.project.element);
 	
 	    setTimeout(function () {
@@ -11734,7 +11749,7 @@
 	    core.dom.project.element.removeClass("is-active is-inactive");
 	
 	    setTimeout(function () {
-	        core.dom.html.removeClass("is-offcanvas");
+	        core.dom.html.removeClass(core.config.offcanvasClasses);
 	        core.dom.project.element.detach();
 	        core.dom.project.elementPane[0].innerHTML = "";
 	    }, core.dom.project.elementTransitionDuration);
@@ -11926,8 +11941,6 @@
 	     */
 	    init: function init() {
 	        core.emitter.on("app--root", function () {
-	            core.dom.html.removeClass("is-offcanvas");
-	
 	            if (instance) {
 	                instance.teardown();
 	            }
@@ -11960,7 +11973,7 @@
 	    onload: function onload() {
 	        core.emitter.fire("app--offcanvas");
 	
-	        core.dom.html.addClass("is-offcanvas");
+	        core.dom.html.removeClass(core.config.offcanvasClasses).addClass("is-offcanvas is-offcanvas--index");
 	
 	        if (!instance) {
 	            var data = $_jsElement.data();
@@ -12291,6 +12304,8 @@
 	
 	                _overlay2["default"].open();
 	
+	                core.dom.gallery.element.addClass("is-title");
+	
 	                this.$tile = $title;
 	            }
 	        }
@@ -12375,16 +12390,23 @@
 	         * @public
 	         * @instance
 	         * @method onGalleryImage
+	         * @param {string} direction The direction to move
 	         * @memberof indexes.IndexFull
 	         * @description Trigger gallery arrow key right.
 	         *
 	         */
 	    }, {
 	        key: "onGalleryImage",
-	        value: function onGalleryImage() {
-	            this.onKeyDown({
-	                keyCode: 39
-	            });
+	        value: function onGalleryImage(direction) {
+	            if (direction === "left") {
+	                this.onKeyDown({
+	                    keyCode: 37
+	                });
+	            } else {
+	                this.onKeyDown({
+	                    keyCode: 39
+	                });
+	            }
 	        }
 	
 	        /**
@@ -12399,6 +12421,8 @@
 	    }, {
 	        key: "onGalleryBack",
 	        value: function onGalleryBack() {
+	            _gallery2["default"].empty();
+	
 	            this.unbindGallery();
 	        }
 	
@@ -12444,6 +12468,8 @@
 	
 	                        this.nextProject($project, $project.find(".js-listing-tile").last());
 	                    }
+	
+	                core.dom.gallery.element.removeClass("is-title");
 	
 	                // Arrow right, has next tile
 	            } else if (e.keyCode === 39 && $next.length) {
@@ -12553,16 +12579,43 @@
 	     */
 	    init: function init() {
 	        this.menu = new _Menu2["default"](core.dom.gallery.element);
+	        this.klasa = "gallery__image figure__image image";
+	        this.$image = (0, _js_libsHoboDistHoboBuild2["default"])(new Image());
+	        this.$image[0].className = this.klasa;
+	
+	        core.dom.gallery.elementNode.append(this.$image);
 	
 	        core.dom.gallery.element.on("click", (0, _properjsDebounce2["default"])(this.onClick.bind(this), 200, true));
 	    },
 	
+	    /**
+	     *
+	     * @public
+	     * @method init
+	     * @memberof onClick
+	     * @param {object} e The Event object
+	     * @description Handle gallery click event.
+	     *
+	     */
 	    onClick: function onClick(e) {
-	        if (e.target === this.$image[0] || !this.isLoaded || _overlay2["default"].isActive()) {
-	            core.emitter.fire("app--gallery-image");
+	        if (e.target === core.dom.gallery.elementNode[0] || _overlay2["default"].isActive()) {
+	            this.handleClick(e);
 	        } else {
 	            core.emitter.fire("app--gallery-background");
 	        }
+	    },
+	
+	    handleClick: function handleClick(e) {
+	        var rect = this.$image[0].getBoundingClientRect();
+	        var direction = null;
+	
+	        if (e.clientX <= rect.width / 2 + rect.left && !_overlay2["default"].isActive()) {
+	            direction = "left";
+	        } else {
+	            direction = "right";
+	        }
+	
+	        core.emitter.fire("app--gallery-image", direction);
 	    },
 	
 	    /**
@@ -12602,7 +12655,7 @@
 	     *
 	     */
 	    empty: function empty() {
-	        core.dom.gallery.elementNode[0].innerHTML = "";
+	        this.$image[0].src = "";
 	    },
 	
 	    /**
@@ -12620,20 +12673,19 @@
 	        var data = $image.data();
 	
 	        this.isLoaded = false;
-	        this.empty();
 	        this.open();
-	        this.$image = (0, _js_libsHoboDistHoboBuild2["default"])(new Image());
-	        this.$image.attr({
+	        this.$image.removeAttr(core.config.imageLoaderAttr).attr({
 	            "data-img-src": data.imgSrc,
 	            "data-variants": data.variants,
 	            "data-original-size": data.originalSize
-	        }).addClass("gallery__image figure__image image");
+	        });
 	
-	        core.dom.gallery.elementNode.append(this.$image);
+	        core.dom.gallery.element.addClass("is-loading");
 	
-	        core.util.loadImages(this.$image, core.util.noop).on("done", function () {
+	        core.util.loadImages(this.$image, core.util.noop, true, window.innerWidth).on("done", function () {
 	            _this.isLoaded = true;
-	            _this.$image.addClass("is-active");
+	
+	            core.dom.gallery.element.removeClass("is-loading");
 	        });
 	    }
 	};
