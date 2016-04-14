@@ -73,7 +73,7 @@
 	
 	var _overlay2 = _interopRequireDefault(_overlay);
 	
-	var _gallery = __webpack_require__(/*! ./gallery */ 70);
+	var _gallery = __webpack_require__(/*! ./gallery */ 71);
 	
 	var _gallery2 = _interopRequireDefault(_gallery);
 	
@@ -8352,7 +8352,7 @@
 	
 	var _indexes2 = _interopRequireDefault(_indexes);
 	
-	var _indexesListing = __webpack_require__(/*! ./indexes/listing */ 68);
+	var _indexesListing = __webpack_require__(/*! ./indexes/listing */ 69);
 	
 	var _indexesListing2 = _interopRequireDefault(_indexesListing);
 	
@@ -8364,7 +8364,7 @@
 	
 	var _overlay2 = _interopRequireDefault(_overlay);
 	
-	var _gallery = __webpack_require__(/*! ./gallery */ 70);
+	var _gallery = __webpack_require__(/*! ./gallery */ 71);
 	
 	var _gallery2 = _interopRequireDefault(_gallery);
 	
@@ -11477,6 +11477,10 @@
 	
 	var _overlay2 = _interopRequireDefault(_overlay);
 	
+	var _Menu = __webpack_require__(/*! ../Menu */ 68);
+	
+	var _Menu2 = _interopRequireDefault(_Menu);
+	
 	var isActive = false;
 	
 	/**
@@ -11491,21 +11495,22 @@
 	 */
 	
 	var Project = (function () {
-	    function Project($node, data) {
+	    function Project($node, $info, data) {
 	        _classCallCheck(this, Project);
 	
 	        isActive = true;
 	
 	        this.$node = $node;
+	        this.$infoScreen = $info;
+	        this.$infoButton = core.dom.header.find(".js-project-info");
+	        this.menu = new _Menu2["default"](this.$infoScreen);
 	        this.data = data;
 	        this.$plates = this.$node.find(".js-project-plate");
 	        this.$images = this.$node.find(".js-lazy-image");
 	        this.isEnded = false;
 	
-	        // Node must be in DOM for image size to work
-	        core.dom.project.elementPane.append(this.$node);
-	
-	        core.images.handleImages(this.$images, this.onPreload.bind(this));
+	        this.bindEvents();
+	        this.loadProject();
 	    }
 	
 	    /**
@@ -11519,17 +11524,42 @@
 	     *
 	     */
 	
-	    /**
-	     *
-	     * @public
-	     * @instance
-	     * @method onPreload
-	     * @memberof projects.Project
-	     * @description Handle loaded project images.
-	     *
-	     */
-	
 	    _createClass(Project, [{
+	        key: "bindEvents",
+	        value: function bindEvents() {
+	            this._onClickInfo = this.onClickInfo.bind(this);
+	
+	            this.$infoScreen.on("click", this._onClickInfo);
+	            this.$infoButton.on("click", this._onClickInfo);
+	        }
+	    }, {
+	        key: "loadProject",
+	        value: function loadProject() {
+	            // Node must be in DOM for image size to work
+	            core.dom.project.elementPane.append(this.$node);
+	
+	            core.images.handleImages(this.$images, this.onPreload.bind(this));
+	        }
+	    }, {
+	        key: "onClickInfo",
+	        value: function onClickInfo() {
+	            if (this.menu.isActive()) {
+	                this.menu.close();
+	            } else {
+	                this.menu.open();
+	            }
+	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @instance
+	         * @method onPreload
+	         * @memberof projects.Project
+	         * @description Handle loaded project images.
+	         *
+	         */
+	    }, {
 	        key: "onPreload",
 	        value: function onPreload() {
 	            _overlay2["default"].close();
@@ -11844,6 +11874,173 @@
 
 /***/ },
 /* 68 */
+/*!************************!*\
+  !*** ./js_src/Menu.js ***!
+  \************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var _core = __webpack_require__(/*! ./core */ 30);
+	
+	var core = _interopRequireWildcard(_core);
+	
+	/**
+	 *
+	 * @public
+	 * @class Menu
+	 * @classdesc Handle normalized open/close for overlay menus.
+	 * @param {Hobo} $node The menu element
+	 *
+	 */
+	
+	var Menu = (function () {
+	    function Menu($node) {
+	        _classCallCheck(this, Menu);
+	
+	        this.$node = $node;
+	        this.tDuration = core.util.getTransitionDuration(this.$node[0]);
+	        this.isOpen = false;
+	        this.scrollPos = core.scroller.getScrollY();
+	
+	        this.$node.detach();
+	    }
+	
+	    /******************************************************************************
+	     * Export
+	    *******************************************************************************/
+	
+	    /**
+	     *
+	     * @public
+	     * @instance
+	     * @method open
+	     * @memberof menus.Menu
+	     * @description Open the menu.
+	     *
+	     */
+	
+	    _createClass(Menu, [{
+	        key: "open",
+	        value: function open() {
+	            var _this = this;
+	
+	            this.isOpen = true;
+	
+	            core.dom.html.addClass("is-menu-open");
+	            core.dom.body.append(this.$node);
+	
+	            // Handle scroll suppression
+	
+	            // 0.2 => Get the current scroll position
+	            this.scrollPos = core.scroller.getScrollY();
+	
+	            // 0.3 => Suppress the scrolls emitter
+	            core.scrolls.suppress(true);
+	
+	            // 0.4 => Broadcast the open menu
+	            core.emitter.fire("app--menu-opened");
+	
+	            setTimeout(function () {
+	                return _this.$node.addClass("is-active");
+	            }, 0);
+	            setTimeout(function () {
+	                _this.$node.addClass("is-active-events");
+	                core.dom.html.addClass("is-clipped");
+	                core.dom.body.addClass("is-clipped");
+	            }, this.tDuration * 2);
+	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @instance
+	         * @method close
+	         * @memberof menus.Menu
+	         * @description Close the menu.
+	         *
+	         */
+	    }, {
+	        key: "close",
+	        value: function close() {
+	            var _this2 = this;
+	
+	            this.$node.removeClass("is-active");
+	            core.dom.html.removeClass("is-clipped");
+	            core.dom.body.removeClass("is-clipped");
+	
+	            // Handle scroll suppression
+	
+	            // 0.1 => Reset the document scroll position
+	            core.dom.body[0].scrollTop = this.scrollPos;
+	
+	            // 0.2 => Un-suppress the scrolls emitter
+	            core.scrolls.suppress(false);
+	
+	            // 0.3 => Broadcast the closed menu
+	            core.emitter.fire("app--menu-closed");
+	
+	            setTimeout(function () {
+	                _this2.isOpen = false;
+	                core.dom.html.removeClass("is-menu-open");
+	                _this2.$node.detach();
+	            }, this.tDuration * 2);
+	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @instance
+	         * @method toggle
+	         * @memberof menus.Menu
+	         * @description Open or Close the menu.
+	         *
+	         */
+	    }, {
+	        key: "toggle",
+	        value: function toggle() {
+	            if (this.isOpen) {
+	                this.close();
+	            } else {
+	                this.open();
+	            }
+	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @instance
+	         * @method isActive
+	         * @memberof menus.Menu
+	         * @description Check the state of the menu.
+	         * @returns {boolean}
+	         *
+	         */
+	    }, {
+	        key: "isActive",
+	        value: function isActive() {
+	            return this.isOpen;
+	        }
+	    }]);
+	
+	    return Menu;
+	})();
+	
+	exports["default"] = Menu;
+	module.exports = exports["default"];
+
+/***/ },
+/* 69 */
 /*!***********************************!*\
   !*** ./js_src/indexes/listing.js ***!
   \***********************************/
@@ -11863,7 +12060,7 @@
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _IndexFull = __webpack_require__(/*! ./IndexFull */ 69);
+	var _IndexFull = __webpack_require__(/*! ./IndexFull */ 70);
 	
 	var _IndexFull2 = _interopRequireDefault(_IndexFull);
 	
@@ -11964,7 +12161,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 69 */
+/* 70 */
 /*!*************************************!*\
   !*** ./js_src/indexes/IndexFull.js ***!
   \*************************************/
@@ -11996,7 +12193,7 @@
 	
 	var _router2 = _interopRequireDefault(_router);
 	
-	var _gallery = __webpack_require__(/*! ../gallery */ 70);
+	var _gallery = __webpack_require__(/*! ../gallery */ 71);
 	
 	var _gallery2 = _interopRequireDefault(_gallery);
 	
@@ -12456,7 +12653,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 70 */
+/* 71 */
 /*!***************************!*\
   !*** ./js_src/gallery.js ***!
   \***************************/
@@ -12480,7 +12677,7 @@
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _Menu = __webpack_require__(/*! ./Menu */ 71);
+	var _Menu = __webpack_require__(/*! ./Menu */ 68);
 	
 	var _Menu2 = _interopRequireDefault(_Menu);
 	
@@ -12628,173 +12825,6 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 71 */
-/*!************************!*\
-  !*** ./js_src/Menu.js ***!
-  \************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-	
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	var _core = __webpack_require__(/*! ./core */ 30);
-	
-	var core = _interopRequireWildcard(_core);
-	
-	/**
-	 *
-	 * @public
-	 * @class Menu
-	 * @classdesc Handle normalized open/close for overlay menus.
-	 * @param {Hobo} $node The menu element
-	 *
-	 */
-	
-	var Menu = (function () {
-	    function Menu($node) {
-	        _classCallCheck(this, Menu);
-	
-	        this.$node = $node;
-	        this.tDuration = core.util.getTransitionDuration(this.$node[0]);
-	        this.isOpen = false;
-	        this.scrollPos = core.scroller.getScrollY();
-	
-	        this.$node.detach();
-	    }
-	
-	    /******************************************************************************
-	     * Export
-	    *******************************************************************************/
-	
-	    /**
-	     *
-	     * @public
-	     * @instance
-	     * @method open
-	     * @memberof menus.Menu
-	     * @description Open the menu.
-	     *
-	     */
-	
-	    _createClass(Menu, [{
-	        key: "open",
-	        value: function open() {
-	            var _this = this;
-	
-	            this.isOpen = true;
-	
-	            core.dom.html.addClass("is-menu-open");
-	            core.dom.body.append(this.$node);
-	
-	            // Handle scroll suppression
-	
-	            // 0.2 => Get the current scroll position
-	            this.scrollPos = core.scroller.getScrollY();
-	
-	            // 0.3 => Suppress the scrolls emitter
-	            core.scrolls.suppress(true);
-	
-	            // 0.4 => Broadcast the open menu
-	            core.emitter.fire("app--menu-opened");
-	
-	            setTimeout(function () {
-	                return _this.$node.addClass("is-active");
-	            }, 0);
-	            setTimeout(function () {
-	                _this.$node.addClass("is-active-events");
-	                core.dom.html.addClass("is-clipped");
-	                core.dom.body.addClass("is-clipped");
-	            }, this.tDuration * 2);
-	        }
-	
-	        /**
-	         *
-	         * @public
-	         * @instance
-	         * @method close
-	         * @memberof menus.Menu
-	         * @description Close the menu.
-	         *
-	         */
-	    }, {
-	        key: "close",
-	        value: function close() {
-	            var _this2 = this;
-	
-	            this.$node.removeClass("is-active");
-	            core.dom.html.removeClass("is-clipped");
-	            core.dom.body.removeClass("is-clipped");
-	
-	            // Handle scroll suppression
-	
-	            // 0.1 => Reset the document scroll position
-	            core.dom.body[0].scrollTop = this.scrollPos;
-	
-	            // 0.2 => Un-suppress the scrolls emitter
-	            core.scrolls.suppress(false);
-	
-	            // 0.3 => Broadcast the closed menu
-	            core.emitter.fire("app--menu-closed");
-	
-	            setTimeout(function () {
-	                _this2.isOpen = false;
-	                core.dom.html.removeClass("is-menu-open");
-	                _this2.$node.detach();
-	            }, this.tDuration * 2);
-	        }
-	
-	        /**
-	         *
-	         * @public
-	         * @instance
-	         * @method toggle
-	         * @memberof menus.Menu
-	         * @description Open or Close the menu.
-	         *
-	         */
-	    }, {
-	        key: "toggle",
-	        value: function toggle() {
-	            if (this.isOpen) {
-	                this.close();
-	            } else {
-	                this.open();
-	            }
-	        }
-	
-	        /**
-	         *
-	         * @public
-	         * @instance
-	         * @method isActive
-	         * @memberof menus.Menu
-	         * @description Check the state of the menu.
-	         * @returns {boolean}
-	         *
-	         */
-	    }, {
-	        key: "isActive",
-	        value: function isActive() {
-	            return this.isOpen;
-	        }
-	    }]);
-	
-	    return Menu;
-	})();
-	
-	exports["default"] = Menu;
-	module.exports = exports["default"];
-
-/***/ },
 /* 72 */
 /*!*****************************************!*\
   !*** ./~/properjs-template/template.js ***!
@@ -12864,6 +12894,7 @@
 	
 	var _Project2 = _interopRequireDefault(_Project);
 	
+	var $_jsInfo = null;
 	var $_jsElement = null;
 	var instance = null;
 	
@@ -12915,7 +12946,7 @@
 	    onload: function onload() {
 	        var data = $_jsElement.data();
 	
-	        instance = new _Project2["default"]($_jsElement, data);
+	        instance = new _Project2["default"]($_jsElement, $_jsInfo, data);
 	
 	        core.emitter.on("app--root", killProject);
 	        core.emitter.on("app--project-ended", killProject);
@@ -12942,6 +12973,7 @@
 	     *
 	     */
 	    teardown: function teardown() {
+	        $_jsInfo = null;
 	        $_jsElement = null;
 	
 	        if (instance) {
@@ -12963,6 +12995,7 @@
 	     *
 	     */
 	    getElements: function getElements() {
+	        $_jsInfo = core.dom.page.find(".js-info");
 	        $_jsElement = core.dom.page.find(".js-project");
 	
 	        return $_jsElement.length;
