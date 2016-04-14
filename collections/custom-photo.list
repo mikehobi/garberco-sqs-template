@@ -5,7 +5,7 @@
         {.end}
     </div>
     <div class="info js-info screen -text--center ghost">
-        <div class="info__text ghost__child h3 -light">
+        <div class="info__text ghost__child h3">
             <squarespace:block-field id="project-info--{collection.urlId}" columns="1" lock-layout="true" />
         </div>
     </div>
