@@ -4,9 +4,9 @@
             {@|apply photos.block}
         {.end}
     </div>
-</div>
-<div class="info js-info screen -text--center ghost">
-    <div class="info__text ghost__child">
-        <squarespace:block-field id="project-info--{collection.urlId}" columns="1" lock-layout="true" />
+    <div class="info js-info screen -text--center ghost">
+        <div class="info__text ghost__child">
+            <squarespace:block-field id="project-info--{collection.urlId}" columns="1" lock-layout="true" />
+        </div>
     </div>
 </div>
