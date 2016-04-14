@@ -11524,6 +11524,16 @@
 	     *
 	     */
 	
+	    /**
+	     *
+	     * @public
+	     * @instance
+	     * @method bindEvents
+	     * @memberof projects.Project
+	     * @description Bind event handlers for open Project.
+	     *
+	     */
+	
 	    _createClass(Project, [{
 	        key: "bindEvents",
 	        value: function bindEvents() {
@@ -11532,6 +11542,16 @@
 	            this.$infoScreen.on("click", this._onClickInfo);
 	            this.$infoButton.on("click", this._onClickInfo);
 	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @instance
+	         * @method loadProject
+	         * @memberof projects.Project
+	         * @description Load images with {@link ImageController}.
+	         *
+	         */
 	    }, {
 	        key: "loadProject",
 	        value: function loadProject() {
@@ -11540,12 +11560,24 @@
 	
 	            core.images.handleImages(this.$images, this.onPreload.bind(this));
 	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @instance
+	         * @method onClickInfo
+	         * @memberof projects.Project
+	         * @description Handle Info text/overlay interaction.
+	         *
+	         */
 	    }, {
 	        key: "onClickInfo",
 	        value: function onClickInfo() {
 	            if (core.env.isConfig() && this.menu.isActive()) {
 	                return;
 	            }
+	
+	            console.log(this.menu.isActive());
 	
 	            if (this.menu.isActive()) {
 	                this.menu.close();
@@ -11673,6 +11705,11 @@
 	    }, {
 	        key: "teardown",
 	        value: function teardown() {
+	            if (this._onClickInfo) {
+	                this.$infoScreen.on("click", this._onClickInfo);
+	                this.$infoButton.on("click", this._onClickInfo);
+	            }
+	
 	            Project.close();
 	        }
 	    }]);
@@ -11979,7 +12016,7 @@
 	        value: function close() {
 	            var _this2 = this;
 	
-	            this.$node.removeClass("is-active");
+	            this.$node.removeClass("is-active is-active-events");
 	            core.dom.html.removeClass("is-clipped");
 	            core.dom.body.removeClass("is-clipped");
 	

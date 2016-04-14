@@ -4,7 +4,7 @@
             {.section collection}
                 <a class="header__nav header__nav--{urlId} js-controller js-controller--{urlId} {.if homepage}js-root{.end} h3 -column" href="{fullUrl}" data-target="{urlId}">
                     {.if homepage}
-                        <img class="logo" src="/assets/svgs/GarberCo.svg" />
+                        {@|apply icon--garberco.block}
                     {.or}
                         {navigationTitle}
                     {.end}
