@@ -11543,6 +11543,10 @@
 	    }, {
 	        key: "onClickInfo",
 	        value: function onClickInfo() {
+	            if (core.env.isConfig() && this.menu.isActive()) {
+	                return;
+	            }
+	
 	            if (this.menu.isActive()) {
 	                this.menu.close();
 	            } else {
