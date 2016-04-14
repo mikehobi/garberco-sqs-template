@@ -8,7 +8,7 @@
         <div class="info__text ghost__child h3">
             <squarespace:block-field id="project-info--{collection.urlId}" columns="1" lock-layout="true" />
             {.if authenticatedAccount}
-                <a href="{website.internalUrl}/config#/pages|/{collection.urlId}" target="_blank">
+                <a href="{website.internalUrl}/config#/pages|/{collection.urlId}" target="_blank" class="icon-wrap">
                     {@|apply icon--pencil.block}
                 </a>
             {.end}
