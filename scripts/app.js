@@ -77,6 +77,10 @@
 	
 	var _gallery2 = _interopRequireDefault(_gallery);
 	
+	var _intro = __webpack_require__(/*! ./intro */ 74);
+	
+	var _intro2 = _interopRequireDefault(_intro);
+	
 	/**
 	 *
 	 * @public
@@ -93,15 +97,12 @@
 	        this.router = _router2["default"];
 	        this.overlay = _overlay2["default"];
 	        this.gallery = _gallery2["default"];
+	        this.intro = _intro2["default"];
 	        this.analytics = new core.Analytics();
 	        this.$mainPanels = this.core.dom.header.find(".js-main-panel");
 	
 	        this.initModules();
 	        this.bindEvents();
-	
-	        // @note:
-	        // Remove cart until it has a use ?
-	        (0, _js_libsHoboDistHoboBuild2["default"])(".absolute-cart-box").remove();
 	
 	        core.log("App", this);
 	    }
@@ -143,7 +144,27 @@
 	    }, {
 	        key: "bindEvents",
 	        value: function bindEvents() {
+	            this._onPreloadDone = this.onPreloadDone.bind(this);
+	
+	            this.core.emitter.on("app--preload-done", this._onPreloadDone);
 	            this.core.dom.header.on("click", ".js-controller", this.onController.bind(this));
+	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @instance
+	         * @method onPreloadDone
+	         * @memberof App
+	         * @description Handle intro teardown.
+	         *
+	         */
+	    }, {
+	        key: "onPreloadDone",
+	        value: function onPreloadDone() {
+	            this.core.emitter.off("app--preload-done", this._onPreloadDone);
+	
+	            this.intro.teardown();
 	        }
 	
 	        /**
@@ -2142,6 +2163,16 @@
 	   *
 	   */
 	  nav: (0, _js_libsHoboDistHoboBuild2["default"])(".js-nav"),
+	
+	  /**
+	   *
+	   * @public
+	   * @member intro
+	   * @memberof dom
+	   * @description The cached intro node?
+	   *
+	   */
+	  intro: (0, _js_libsHoboDistHoboBuild2["default"])(".js-intro"),
 	
 	  /**
 	   *
@@ -11577,8 +11608,6 @@
 	                return;
 	            }
 	
-	            console.log(this.menu.isActive());
-	
 	            if (this.menu.isActive()) {
 	                this.menu.close();
 	            } else {
@@ -13062,6 +13091,60 @@
 	 * Export
 	*******************************************************************************/
 	exports["default"] = projects;
+	module.exports = exports["default"];
+
+/***/ },
+/* 74 */
+/*!*************************!*\
+  !*** ./js_src/intro.js ***!
+  \*************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
+	
+	var _core = __webpack_require__(/*! ./core */ 30);
+	
+	var core = _interopRequireWildcard(_core);
+	
+	/**
+	 *
+	 * @public
+	 * @namespace intro
+	 * @description Performs the branded load-in screen sequence.
+	 *
+	 */
+	var intro = {
+	    /**
+	     *
+	     * @public
+	     * @method teardown
+	     * @memberof intro
+	     * @description Method removes loadin node from DOM.
+	     *
+	     */
+	    teardown: function teardown() {
+	        if (!core.dom.intro.length) {
+	            return;
+	        }
+	
+	        core.dom.intro.removeClass("is-active");
+	
+	        setTimeout(function () {
+	            core.dom.intro.remove();
+	        }, core.util.getTransitionDuration(core.dom.intro[0]));
+	    }
+	};
+	
+	/******************************************************************************
+	 * Export
+	*******************************************************************************/
+	exports["default"] = intro;
 	module.exports = exports["default"];
 
 /***/ }

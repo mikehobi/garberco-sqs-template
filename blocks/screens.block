@@ -20,3 +20,14 @@
 <div class="gallery js-gallery screen -text--center ghost">
     <figure class="gallery__figure ghost__child js-gallery-node"></figure>
 </div>
+
+
+
+{.equal? collection.typeName "custom-photo"}
+{.or}
+    <div class="intro js-intro screen -text--center ghost is-active">
+        <div class="icon icon--garberco icon--garberco--intro ghost__child">
+            {@|apply icon--garberco.block}
+        </div>
+    </div>
+{.end}
