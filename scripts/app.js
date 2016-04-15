@@ -3389,7 +3389,7 @@
 	"use strict";
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
@@ -3429,93 +3429,102 @@
 	 *
 	 */
 	var images = {
-	    /**
-	     *
-	     * @public
-	     * @method init
-	     * @memberof core.images
-	     * @description Method runs once when window loads.
-	     *
-	     */
-	    init: function init() {
-	        (0, _log2["default"])("preload initialized");
-	    },
+	  /**
+	   *
+	   * @public
+	   * @method init
+	   * @memberof core.images
+	   * @description Method runs once when window loads.
+	   *
+	   */
+	  init: function init() {
+	    (0, _log2["default"])("preload initialized");
+	  },
 	
-	    /**
-	     *
-	     * @public
-	     * @method isActive
-	     * @memberof core.images
-	     * @description Method informs PageController of active status.
-	     * @returns {boolean}
-	     *
-	     */
-	    isActive: util.noop,
+	  /**
+	   *
+	   * @public
+	   * @method isActive
+	   * @memberof core.images
+	   * @description Method informs PageController of active status.
+	   * @returns {boolean}
+	   *
+	   */
+	  isActive: util.noop,
 	
-	    /**
-	     *
-	     * @public
-	     * @method onload
-	     * @memberof core.images
-	     * @description Method performs onloading actions for this module.
-	     *
-	     */
-	    onload: function onload() {
-	        this.handleImages();
-	    },
+	  /**
+	   *
+	   * @public
+	   * @method onload
+	   * @memberof core.images
+	   * @description Method performs onloading actions for this module.
+	   *
+	   */
+	  onload: function onload() {
+	    this.handleImages();
+	  },
 	
-	    /**
-	     *
-	     * @public
-	     * @method unload
-	     * @memberof core.images
-	     * @description Method performs unloading actions for this module.
-	     *
-	     */
-	    unload: function unload() {},
+	  /**
+	   *
+	   * @public
+	   * @method unload
+	   * @memberof core.images
+	   * @description Method performs unloading actions for this module.
+	   *
+	   */
+	  unload: function unload() {},
 	
-	    /**
-	     *
-	     * @public
-	     * @method handlePreload
-	     * @memberof core.images
-	     * @param {function} callback The passed callback from `handleImages`
-	     * @description Method handles the `done` preloading event cycle.
-	     *
-	     */
-	    handlePreload: function handlePreload(callback) {
-	        if (typeof callback === "function") {
-	            callback();
-	        }
-	
-	        _emitter2["default"].fire("app--preload-done");
-	    },
-	
-	    /**
-	     *
-	     * @public
-	     * @method handleImages
-	     * @memberof core.images
-	     * @param {object} $images Optionally, the image collection to load
-	     * @param {function} callback Optionally, a callback to fire when loading is done
-	     * @description Method handles separation of pre-load and lazy-load.
-	     *
-	     */
-	    handleImages: function handleImages($images, callback) {
-	        $images = $images || _dom2["default"].page.find(_config2["default"].lazyImageSelector);
-	
-	        if ($images.length) {
-	            var imageController = new _ImageController2["default"]($images);
-	
-	            imageController.on("preload", this.handlePreload.bind(this, callback));
-	
-	            imageController.on("lazyload", function () {
-	                _emitter2["default"].fire("app--lazyload-done");
-	            });
-	        } else {
-	            this.handlePreload(callback);
-	        }
+	  /**
+	   *
+	   * @public
+	   * @method handlePreload
+	   * @memberof core.images
+	   * @param {function} callback The passed callback from `handleImages`
+	   * @description Method handles the `done` preloading event cycle.
+	   *
+	   */
+	  handlePreload: function handlePreload(callback) {
+	    if (typeof callback === "function") {
+	      callback();
 	    }
+	
+	    _emitter2["default"].fire("app--preload-done");
+	  },
+	
+	  /**
+	   *
+	   * @public
+	   * @method handleLazyload
+	   * @memberof core.images
+	   * @description Method handles the `done` lazyloading event cycle.
+	   *
+	   */
+	  handleLazyload: function handleLazyload() {
+	    _emitter2["default"].fire("app--lazyload-done");
+	  },
+	
+	  /**
+	   *
+	   * @public
+	   * @method handleImages
+	   * @memberof core.images
+	   * @param {object} $images Optionally, the image collection to load
+	   * @param {function} callback Optionally, a callback to fire when loading is done
+	   * @description Method handles separation of pre-load and lazy-load.
+	   *
+	   */
+	  handleImages: function handleImages($images, callback) {
+	    $images = $images || _dom2["default"].page.find(_config2["default"].lazyImageSelector);
+	
+	    if ($images.length) {
+	      var imageController = new _ImageController2["default"]($images);
+	
+	      imageController.on("preload", this.handlePreload.bind(this, callback));
+	      imageController.on("lazyload", this.handleLazyload.bind(this));
+	    } else {
+	      this.handlePreload(callback);
+	    }
+	  }
 	};
 	
 	/******************************************************************************
@@ -8359,30 +8368,30 @@
 	            this.$anim = this.$node.find(".js-animate-in");
 	            this.$images = this.$node.find(".js-lazy-image");
 	
-	            instance = this;
+	            this.loadContent();
 	
-	            core.images.handleImages(this.$images, this.onPreload.bind(this));
+	            instance = this;
 	        }
 	
 	        /**
 	         *
 	         * @public
 	         * @instance
-	         * @method onPreload
+	         * @method loadContent
 	         * @memberof about.About
-	         * @description Handle preloaded images.
+	         * @description Handle content.
 	         *
 	         */
 	    }, {
-	        key: "onPreload",
-	        value: function onPreload() {
+	        key: "loadContent",
+	        value: function loadContent() {
 	            var _this = this;
 	
 	            this.$target.append(this.$node);
 	
 	            setTimeout(function () {
 	                _this.$anim.addClass("is-active");
-	            }, this.transTime);
+	            }, 10);
 	        }
 	
 	        /**
@@ -8575,7 +8584,12 @@
 	
 	var _overlay2 = _interopRequireDefault(_overlay);
 	
+	var _properjsController = __webpack_require__(/*! properjs-controller */ 40);
+	
+	var _properjsController2 = _interopRequireDefault(_properjsController);
+	
 	var instance = null;
+	var animator = new _properjsController2["default"]();
 	
 	/**
 	 *
@@ -8648,8 +8662,8 @@
 	
 	            // If pathname is not the `root` we shant not start raf cycle
 	            if (window.location.pathname === _router2["default"].root) {
-	                core.emitter.stop();
-	                core.emitter.go(this.updateAnimate.bind(this));
+	                animator.stop();
+	                animator.go(this.updateAnimate.bind(this));
 	            } else {
 	                this.updateAnimate();
 	            }
@@ -8813,7 +8827,7 @@
 	    }, {
 	        key: "teardown",
 	        value: function teardown() {
-	            core.emitter.stop();
+	            animator.stop();
 	        }
 	    }]);
 	
@@ -8856,7 +8870,12 @@
 	
 	var _Menu2 = _interopRequireDefault(_Menu);
 	
+	var _properjsController = __webpack_require__(/*! properjs-controller */ 40);
+	
+	var _properjsController2 = _interopRequireDefault(_properjsController);
+	
 	var isActive = false;
+	var animator = new _properjsController2["default"]();
 	
 	/**
 	 *
@@ -8990,8 +9009,8 @@
 	        value: function cycleAnimation() {
 	            this.onUpdateEmitter();
 	
-	            core.emitter.stop();
-	            core.emitter.go(this.onUpdateEmitter.bind(this));
+	            animator.stop();
+	            animator.go(this.onUpdateEmitter.bind(this));
 	        }
 	
 	        /**
@@ -9126,7 +9145,7 @@
 	Project.close = function () {
 	    isActive = false;
 	
-	    core.emitter.stop();
+	    animator.stop();
 	
 	    core.dom.project.element.removeClass("is-active is-inactive");
 	
@@ -9619,7 +9638,12 @@
 	
 	var _properjsTemplate2 = _interopRequireDefault(_properjsTemplate);
 	
+	var _properjsController = __webpack_require__(/*! properjs-controller */ 40);
+	
+	var _properjsController2 = _interopRequireDefault(_properjsController);
+	
 	var instance = null;
+	var animator = new _properjsController2["default"]();
 	var _gridTitleTpl = "<div class=\"listing__title js-listing-title\" data-title=\"{title}\"><h3 class=\"listing__title__text h3\">{text}</h3></div>";
 	var _gridWrapTpl = "<div class=\"listing__grid js-listing-project grid grid--index\"></div>";
 	var _gridItemTpl = "\n<div class=\"listing__tile grid__item__small js-listing-tile\">\n    <div class=\"grid__photo grid__photo--small animate animate--fade js-animate\">\n        <figure class=\"figure\">\n            <img class=\"figure__image image js-lazy-image\" data-img-src=\"{assetUrl}\" data-variants=\"{systemDataVariants}\" data-original-size=\"{originalSize}\" />\n        </figure>\n    </div>\n</div>\n";
@@ -9693,8 +9717,8 @@
 	            // Fresh query for js- animatable elements each time
 	            this.$anims = this.$node.find(".js-animate");
 	
-	            core.emitter.stop();
-	            core.emitter.go(this.updateAnimate.bind(this));
+	            animator.stop();
+	            animator.go(this.updateAnimate.bind(this));
 	        }
 	
 	        /**
@@ -10052,7 +10076,7 @@
 	    }, {
 	        key: "teardown",
 	        value: function teardown() {
-	            core.emitter.stop();
+	            animator.stop();
 	        }
 	    }]);
 	
