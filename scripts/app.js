@@ -61,23 +61,23 @@
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _router = __webpack_require__(/*! ./router */ 55);
+	var _router = __webpack_require__(/*! ./router */ 47);
 	
 	var _router2 = _interopRequireDefault(_router);
 	
-	var _overlay = __webpack_require__(/*! ./overlay */ 66);
+	var _overlay = __webpack_require__(/*! ./overlay */ 58);
 	
 	var _overlay2 = _interopRequireDefault(_overlay);
 	
-	var _gallery = __webpack_require__(/*! ./gallery */ 70);
+	var _gallery = __webpack_require__(/*! ./gallery */ 62);
 	
 	var _gallery2 = _interopRequireDefault(_gallery);
 	
-	var _intro = __webpack_require__(/*! ./intro */ 73);
+	var _intro = __webpack_require__(/*! ./intro */ 66);
 	
 	var _intro2 = _interopRequireDefault(_intro);
 	
-	var _main = __webpack_require__(/*! ./main */ 74);
+	var _main = __webpack_require__(/*! ./main */ 67);
 	
 	var _main2 = _interopRequireDefault(_main);
 	
@@ -125,8 +125,8 @@
 	        key: "initModules",
 	        value: function initModules() {
 	            this.core.detect.init(this);
-	            this.core.resizes.init(this);
-	            this.core.scrolls.init(this);
+	            //this.core.resizes.init( this );
+	            //this.core.scrolls.init( this );
 	            this.main.init(this);
 	            this.router.init(this);
 	            this.overlay.init(this);
@@ -211,14 +211,6 @@
 	
 	var _images2 = _interopRequireDefault(_images);
 	
-	var _resizes = __webpack_require__(/*! ./resizes */ 42);
-	
-	var _resizes2 = _interopRequireDefault(_resizes);
-	
-	var _scrolls = __webpack_require__(/*! ./scrolls */ 47);
-	
-	var _scrolls2 = _interopRequireDefault(_scrolls);
-	
 	var _util = __webpack_require__(/*! ./util */ 33);
 	
 	var util = _interopRequireWildcard(_util);
@@ -235,15 +227,15 @@
 	
 	var _log2 = _interopRequireDefault(_log);
 	
-	var _api = __webpack_require__(/*! ./api */ 50);
+	var _api = __webpack_require__(/*! ./api */ 42);
 	
 	var _api2 = _interopRequireDefault(_api);
 	
-	var _cache = __webpack_require__(/*! ./cache */ 52);
+	var _cache = __webpack_require__(/*! ./cache */ 44);
 	
 	var _cache2 = _interopRequireDefault(_cache);
 	
-	var _Analytics = __webpack_require__(/*! ./Analytics */ 54);
+	var _Analytics = __webpack_require__(/*! ./Analytics */ 46);
 	
 	var _Analytics2 = _interopRequireDefault(_Analytics);
 	
@@ -251,19 +243,14 @@
 	
 	var _emitter2 = _interopRequireDefault(_emitter);
 	
-	var _scroller = __webpack_require__(/*! ./scroller */ 48);
-	
-	var _scroller2 = _interopRequireDefault(_scroller);
-	
-	var _resizer = __webpack_require__(/*! ./resizer */ 43);
-	
-	var _resizer2 = _interopRequireDefault(_resizer);
+	//import scroller from "./scroller";
+	//import resizer from "./resizer";
+	//import resizes from "./resizes";
+	//import scrolls from "./scrolls";
 	
 	exports.detect = _detect2["default"];
 	exports.dom = _dom2["default"];
 	exports.images = _images2["default"];
-	exports.resizes = _resizes2["default"];
-	exports.scrolls = _scrolls2["default"];
 	exports.util = util;
 	exports.config = _config2["default"];
 	exports.env = _env2["default"];
@@ -271,9 +258,12 @@
 	exports.api = _api2["default"];
 	exports.cache = _cache2["default"];
 	exports.Analytics = _Analytics2["default"];
-	exports.emitter = _emitter2["default"];
-	exports.scroller = _scroller2["default"];
-	exports.resizer = _resizer2["default"];
+	exports.emitter
+	//scroller,
+	//resizer,
+	//resizes,
+	//scrolls
+	 = _emitter2["default"];
 
 /***/ },
 /* 2 */
@@ -3734,958 +3724,6 @@
 
 /***/ },
 /* 42 */
-/*!********************************!*\
-  !*** ./js_src/core/resizes.js ***!
-  \********************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-	
-	var _log = __webpack_require__(/*! ./log */ 37);
-	
-	var _log2 = _interopRequireDefault(_log);
-	
-	var _util = __webpack_require__(/*! ./util */ 33);
-	
-	var util = _interopRequireWildcard(_util);
-	
-	var _emitter = __webpack_require__(/*! ./emitter */ 40);
-	
-	var _emitter2 = _interopRequireDefault(_emitter);
-	
-	var _resizer = __webpack_require__(/*! ./resizer */ 43);
-	
-	var _resizer2 = _interopRequireDefault(_resizer);
-	
-	var _properjsThrottle = __webpack_require__(/*! properjs-throttle */ 45);
-	
-	var _properjsThrottle2 = _interopRequireDefault(_properjsThrottle);
-	
-	var _properjsDebounce = __webpack_require__(/*! properjs-debounce */ 46);
-	
-	var _properjsDebounce2 = _interopRequireDefault(_properjsDebounce);
-	
-	var _throttled = 50;
-	var _debounced = 300;
-	
-	/**
-	 *
-	 * @public
-	 * @namespace resizes
-	 * @memberof core
-	 * @description Handles app-wide emission of various resize detection events.
-	 *
-	 */
-	var resizes = {
-	  /**
-	   *
-	   * @public
-	   * @method init
-	   * @memberof core.resizes
-	   * @description Method binds event listeners for resize controller.
-	   *
-	   */
-	  init: function init() {
-	    _resizer2["default"].on("resize", (0, _properjsThrottle2["default"])(onThrottle, _throttled));
-	
-	    // Hook into resize of `width` only for this handler
-	    // @bug: iOS window size changes when Safari's chrome switches between full and minimal-ui.
-	    _resizer2["default"].on("resizewidth", (0, _properjsDebounce2["default"])(onDebounce, _debounced));
-	
-	    (0, _log2["default"])("resizes initialized");
-	  }
-	};
-	
-	/**
-	 *
-	 * @private
-	 * @method onDebounce
-	 * @memberof core.resizes
-	 * @description Debounced resize events.
-	 *
-	 */
-	var onDebounce = function onDebounce() {
-	  _emitter2["default"].fire("app--resize-debounced");
-	
-	  util.updateImages();
-	};
-	
-	/**
-	 *
-	 * @private
-	 * @method onThrottle
-	 * @memberof core.resizes
-	 * @description Method handles the window resize event via [ResizeController]{@link https://github.com/ProperJS/ResizeController}.
-	 *
-	 */
-	var onThrottle = function onThrottle() {
-	  _emitter2["default"].fire("app--resize");
-	};
-	
-	/******************************************************************************
-	 * Export
-	*******************************************************************************/
-	exports["default"] = resizes;
-	module.exports = exports["default"];
-
-/***/ },
-/* 43 */
-/*!********************************!*\
-  !*** ./js_src/core/resizer.js ***!
-  \********************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-	
-	var _properjsResizecontroller = __webpack_require__(/*! properjs-resizecontroller */ 44);
-	
-	var _properjsResizecontroller2 = _interopRequireDefault(_properjsResizecontroller);
-	
-	/**
-	 *
-	 * @description Single app instanceof [ResizeController]{@link https://github.com/ProperJS/ResizeController} for raf resize handling
-	 * @member resizer
-	 * @memberof core
-	 *
-	 */
-	var resizer = new _properjsResizecontroller2["default"]();
-	
-	/******************************************************************************
-	 * Export
-	*******************************************************************************/
-	exports["default"] = resizer;
-	module.exports = exports["default"];
-
-/***/ },
-/* 44 */
-/*!*********************************************************!*\
-  !*** ./~/properjs-resizecontroller/ResizeController.js ***!
-  \*********************************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	/*!
-	 *
-	 * Window resize / orientationchange event controller
-	 *
-	 * @ResizeController
-	 * @author: kitajchuk
-	 *
-	 *
-	 */
-	(function ( factory ) {
-	    
-	    if ( true ) {
-	        module.exports = factory();
-	
-	    } else if ( typeof window !== "undefined" ) {
-	        window.ResizeController = factory();
-	    }
-	    
-	})(function () {
-	
-	    var Controller = __webpack_require__( /*! properjs-controller */ 35 ),
-	
-	        // Orientation?
-	        _hasOrientation = ("orientation" in window),
-	
-	        // Current window viewport
-	        _currentView = null,
-	
-	        // Singleton
-	        _instance = null;
-	
-	    /**
-	     *
-	     * Window resize / orientationchange event controller
-	     * @constructor ResizeController
-	     * @augments Controller
-	     * @requires Controller
-	     * @memberof! <global>
-	     *
-	     * @fires resize
-	     * @fires resizedown
-	     * @fires resizeup
-	     * @fires resizewidth
-	     * @fires resizeheight
-	     * @fires orientationchange
-	     * @fires orientationportrait
-	     * @fires orientationlandscape
-	     *
-	     */
-	    var ResizeController = function () {
-	        // Singleton
-	        if ( !_instance ) {
-	            _instance = this;
-	
-	            // Initial viewport settings
-	            _currentView = _instance.getViewport();
-	
-	            // Call on parent cycle
-	            this.go(function () {
-	                var currentView = _instance.getViewport(),
-	                    isStill = (currentView.width === _currentView.width && currentView.height === _currentView.height),
-	                    isResize = (currentView.width !== _currentView.width || currentView.height !== _currentView.height),
-	                    isResizeUp = (currentView.width > _currentView.width || currentView.height > _currentView.height),
-	                    isResizeDown = (currentView.width < _currentView.width || currentView.height < _currentView.height),
-	                    isResizeWidth = (currentView.width !== _currentView.width),
-	                    isResizeHeight = (currentView.height !== _currentView.height),
-	                    isOrientation = (currentView.orient !== _currentView.orient),
-	                    isOrientationPortrait = (currentView.orient !== _currentView.orient && currentView.orient !== 90),
-	                    isOrientationLandscape = (currentView.orient !== _currentView.orient && currentView.orient === 90);
-	
-	                // Fire blanket resize event
-	                if ( isResize ) {
-	                    /**
-	                     *
-	                     * @event resize
-	                     *
-	                     */
-	                    _instance.fire( "resize" );
-	                }
-	
-	                // Fire resizeup and resizedown
-	                if ( isResizeDown ) {
-	                    /**
-	                     *
-	                     * @event resizedown
-	                     *
-	                     */
-	                    _instance.fire( "resizedown" );
-	
-	                } else if ( isResizeUp ) {
-	                    /**
-	                     *
-	                     * @event resizeup
-	                     *
-	                     */
-	                    _instance.fire( "resizeup" );
-	                }
-	
-	                // Fire resizewidth and resizeheight
-	                if ( isResizeWidth ) {
-	                    /**
-	                     *
-	                     * @event resizewidth
-	                     *
-	                     */
-	                    _instance.fire( "resizewidth" );
-	
-	                } else if ( isResizeHeight ) {
-	                    /**
-	                     *
-	                     * @event resizeheight
-	                     *
-	                     */
-	                    _instance.fire( "resizeheight" );
-	                }
-	
-	                // Fire blanket orientationchange event
-	                if ( isOrientation ) {
-	                    /**
-	                     *
-	                     * @event orientationchange
-	                     *
-	                     */
-	                    _instance.fire( "orientationchange" );
-	                }
-	
-	                // Fire orientationportrait and orientationlandscape
-	                if ( isOrientationPortrait ) {
-	                    /**
-	                     *
-	                     * @event orientationportrait
-	                     *
-	                     */
-	                    _instance.fire( "orientationportrait" );
-	
-	                } else if ( isOrientationLandscape ) {
-	                    /**
-	                     *
-	                     * @event orientationlandscape
-	                     *
-	                     */
-	                    _instance.fire( "orientationlandscape" );
-	                }
-	
-	                _currentView = currentView;
-	            });
-	        }
-	
-	        return _instance;
-	    };
-	
-	    ResizeController.prototype = new Controller();
-	
-	    /**
-	     *
-	     * Returns the current window viewport specs
-	     * @memberof ResizeController
-	     * @method getViewport
-	     * @returns object
-	     *
-	     */
-	    ResizeController.prototype.getViewport = function () {
-	        return {
-	            width: window.innerWidth,
-	            height: window.innerHeight,
-	            orient: _hasOrientation ? Math.abs( window.orientation ) : null
-	        };
-	    };
-	
-	    /**
-	     *
-	     * Tells if the viewport is in protrait mode
-	     * @memberof ResizeController
-	     * @method isPortrait
-	     * @returns boolean
-	     *
-	     */
-	    ResizeController.prototype.isPortrait = function () {
-	        var orient = this.getViewport().orient;
-	
-	        return (orient !== null && orient !== 90);
-	    };
-	
-	    /**
-	     *
-	     * Tells if the viewport is in landscape mode
-	     * @memberof ResizeController
-	     * @method isLandscape
-	     * @returns boolean
-	     *
-	     */
-	    ResizeController.prototype.isLandscape = function () {
-	        var orient = this.getViewport().orient;
-	
-	        return (orient !== null && orient === 90);
-	    };
-	
-	
-	    return ResizeController;
-	
-	});
-
-/***/ },
-/* 45 */
-/*!*****************************************!*\
-  !*** ./~/properjs-throttle/throttle.js ***!
-  \*****************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	/*!
-	 *
-	 * Throttle callbacks
-	 *
-	 * @throttle
-	 * @author: kitajchuk
-	 *
-	 */
-	(function ( factory ) {
-	    
-	    if ( true ) {
-	        module.exports = factory();
-	
-	    } else if ( typeof window !== "undefined" ) {
-	        window.throttle = factory();
-	    }
-	    
-	})(function () {
-	
-	
-	    /**
-	     *
-	     * Rev limit your method calls
-	     * @requires debounce
-	     * @memberof! <global>
-	     * @method throttle
-	     * @param {function} callback The method handler
-	     * @param {number} threshold The timeout delay in ms
-	     *
-	     */
-	    var throttle = function ( callback, threshold ) {
-	        var wait = false;
-	
-	        return function () {
-	            if ( !wait ) {
-	                callback.call();
-	                wait = true;
-	
-	                setTimeout(function () {
-	                    wait = false;
-	
-	                }, (threshold || 100) );
-	            }
-	        };
-	    };
-	    
-	    
-	    return throttle;
-	
-	
-	});
-
-/***/ },
-/* 46 */
-/*!*****************************************!*\
-  !*** ./~/properjs-debounce/debounce.js ***!
-  \*****************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	/*!
-	 *
-	 * Debounce methods
-	 * Sourced from here:
-	 * http://unscriptable.com/2009/03/20/debouncing-javascript-methods/
-	 *
-	 * @debounce
-	 * @author: kitajchuk
-	 *
-	 */
-	(function ( factory ) {
-	    
-	    if ( true ) {
-	        module.exports = factory();
-	
-	    } else if ( typeof window !== "undefined" ) {
-	        window.debounce = factory();
-	    }
-	    
-	})(function () {
-	
-	
-	    /**
-	     *
-	     * Limit method calls
-	     * @memberof! <global>
-	     * @method debounce
-	     * @param {function} callback The method handler
-	     * @param {number} threshold The timeout delay in ms
-	     * @param {boolean} execAsap Call function at beginning or end of detection period
-	     *
-	     */
-	    var debounce = function ( callback, threshold, execAsap ) {
-	        var timeout = null;
-	        
-	        return function debounced() {
-	            var args = arguments,
-	                context = this;
-	            
-	            function delayed() {
-	                if ( !execAsap ) {
-	                    callback.apply( context, args );
-	                }
-	                
-	                timeout = null;
-	            }
-	            
-	            if ( timeout ) {
-	                clearTimeout( timeout );
-	                
-	            } else if ( execAsap ) {
-	                callback.apply( context, args );
-	            }
-	            
-	            timeout = setTimeout( delayed, (threshold || 100) );
-	        };
-	    };
-	    
-	    
-	    return debounce;
-	
-	
-	});
-
-/***/ },
-/* 47 */
-/*!********************************!*\
-  !*** ./js_src/core/scrolls.js ***!
-  \********************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-	
-	var _dom = __webpack_require__(/*! ./dom */ 3);
-	
-	var _dom2 = _interopRequireDefault(_dom);
-	
-	var _log = __webpack_require__(/*! ./log */ 37);
-	
-	var _log2 = _interopRequireDefault(_log);
-	
-	var _detect = __webpack_require__(/*! ./detect */ 2);
-	
-	var _detect2 = _interopRequireDefault(_detect);
-	
-	var _emitter = __webpack_require__(/*! ./emitter */ 40);
-	
-	var _emitter2 = _interopRequireDefault(_emitter);
-	
-	var _scroller = __webpack_require__(/*! ./scroller */ 48);
-	
-	var _scroller2 = _interopRequireDefault(_scroller);
-	
-	var _timeout = null;
-	var _isSuppressed = false;
-	var _isSuppressedEvents = false;
-	var _idleout = 300;
-	
-	/**
-	 *
-	 * @public
-	 * @namespace scrolls
-	 * @memberof core
-	 * @description Handles app-wide emission of various scroll detection events.
-	 *
-	 */
-	var scrolls = {
-	    /**
-	     *
-	     * @public
-	     * @method init
-	     * @memberof core.scrolls
-	     * @description Method runs once when window loads.
-	     *
-	     */
-	    init: function init() {
-	        _scroller2["default"].on("scroll", onScroller);
-	        _scroller2["default"].on("scrollup", onScrollerUp);
-	        _scroller2["default"].on("scrolldown", onScrollerDown);
-	
-	        onScroller();
-	
-	        this.topout();
-	
-	        (0, _log2["default"])("scrolls initialized");
-	    },
-	
-	    /**
-	     *
-	     * @public
-	     * @method topout
-	     * @param {number} top Optionally, the scroll position to apply
-	     * @memberof core.scrolls
-	     * @description Method set scroll position to argument value or zero.
-	     *
-	     */
-	    topout: function topout(top) {
-	        top = top || 0;
-	
-	        window.scrollTo(0, top);
-	    },
-	
-	    /**
-	     *
-	     * @public
-	     * @method suppress
-	     * @param {boolean} bool Whether or not to suppress
-	     * @memberof core.scrolls
-	     * @description Method will suppress scroll position broadcasting.
-	     *
-	     */
-	    suppress: function suppress(bool) {
-	        _isSuppressed = bool;
-	    },
-	
-	    /**
-	     *
-	     * @public
-	     * @method clearStates
-	     * @memberof core.scrolls
-	     * @description Method removes all applied classNames from this module
-	     *
-	     */
-	    clearStates: function clearStates() {
-	        _dom2["default"].html.removeClass("is-scrolling-up is-scrolling-down is-scrolling");
-	    },
-	
-	    /**
-	     *
-	     * @public
-	     * @method isScrollInRange
-	     * @memberof core.scrolls
-	     * @description Method determines if scroll is within range
-	     * @returns {boolean}
-	     *
-	     */
-	    isScrollInRange: function isScrollInRange() {
-	        var scrollPos = _scroller2["default"].getScrollY();
-	
-	        return scrollPos > 0 || scrollPos < _scroller2["default"].getScrollMax();
-	    },
-	
-	    /**
-	     *
-	     * @public
-	     * @method isScrollOutOfRange
-	     * @memberof core.scrolls
-	     * @description Method determines if scroll is out of range
-	     * @returns {boolean}
-	     *
-	     */
-	    isScrollOutOfRange: function isScrollOutOfRange() {
-	        var scrollPos = _scroller2["default"].getScrollY();
-	
-	        return scrollPos <= 0 || scrollPos >= _scroller2["default"].getScrollMax();
-	    }
-	};
-	
-	/**
-	 *
-	 * @private
-	 * @method broadcast
-	 * @param {string} event The scroll event to emit
-	 * @param {number} position The current scroll position
-	 * @memberof core.scrolls
-	 * @description Method will emit scroll position information.
-	 *
-	 */
-	var broadcast = function broadcast(event, position) {
-	    if (_isSuppressed) {
-	        return;
-	    }
-	
-	    _emitter2["default"].fire(event, position);
-	};
-	
-	/**
-	 *
-	 * @private
-	 * @method suppressEvents
-	 * @param {number} scrollPos The current scrollY position
-	 * @memberof core.scrolls
-	 * @description Method applies className to disable events while scrolling
-	 *
-	 */
-	var suppressEvents = function suppressEvents(scrollPos) {
-	    if (_detect2["default"].isStandalone()) {
-	        return;
-	    }
-	
-	    try {
-	        clearTimeout(_timeout);
-	    } catch (error) {
-	        (0, _log2["default"])(error);
-	    }
-	
-	    if (!_isSuppressedEvents) {
-	        _isSuppressedEvents = true;
-	
-	        _dom2["default"].html.addClass("is-scrolling");
-	
-	        broadcast("app--scroll-start", scrollPos);
-	    }
-	
-	    _timeout = setTimeout(function () {
-	        if (scrollPos === _scroller2["default"].getScrollY()) {
-	            _isSuppressedEvents = false;
-	
-	            _dom2["default"].html.removeClass("is-scrolling");
-	
-	            broadcast("app--scroll-end", scrollPos);
-	        }
-	    }, _idleout);
-	};
-	
-	/**
-	 *
-	 * @private
-	 * @method onScrollerUp
-	 * @memberof core.scrolls
-	 * @description Method handles upward scroll event
-	 *
-	 */
-	var onScrollerUp = function onScrollerUp() {
-	    if (!scrolls.isScrollInRange() || _detect2["default"].isStandalone()) {
-	        return;
-	    }
-	
-	    var scrollPos = _scroller2["default"].getScrollY();
-	
-	    broadcast("app--scroll-up", scrollPos);
-	
-	    _dom2["default"].html.removeClass("is-scrolling-down").addClass("is-scrolling-up");
-	};
-	
-	/**
-	 *
-	 * @private
-	 * @method onScrollerDown
-	 * @memberof core.scrolls
-	 * @description Method handles downward scroll event
-	 *
-	 */
-	var onScrollerDown = function onScrollerDown() {
-	    if (!scrolls.isScrollInRange() || _detect2["default"].isStandalone()) {
-	        return;
-	    }
-	
-	    var scrollPos = _scroller2["default"].getScrollY();
-	
-	    broadcast("app--scroll-down", scrollPos);
-	
-	    _dom2["default"].html.removeClass("is-scrolling-up").addClass("is-scrolling-down");
-	};
-	
-	/**
-	 *
-	 * @private
-	 * @method onScroller
-	 * @memberof core.scrolls
-	 * @description Method handles regular scroll event via [ScrollController]{@link https://github.com/ProperJS/ScrollController}
-	 *
-	 */
-	var onScroller = function onScroller() {
-	    if (!scrolls.isScrollInRange() || _detect2["default"].isStandalone()) {
-	        return;
-	    }
-	
-	    var scrollPos = _scroller2["default"].getScrollY();
-	
-	    suppressEvents(scrollPos);
-	
-	    broadcast("app--scroll", scrollPos);
-	};
-	
-	/******************************************************************************
-	 * Export
-	*******************************************************************************/
-	exports["default"] = scrolls;
-	module.exports = exports["default"];
-
-/***/ },
-/* 48 */
-/*!*********************************!*\
-  !*** ./js_src/core/scroller.js ***!
-  \*********************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-	
-	var _properjsScrollcontroller = __webpack_require__(/*! properjs-scrollcontroller */ 49);
-	
-	var _properjsScrollcontroller2 = _interopRequireDefault(_properjsScrollcontroller);
-	
-	/**
-	 *
-	 * @description Single app instanceof [ScrollController]{@link https://github.com/ProperJS/ScrollController} for raf scroll handling
-	 * @member scroller
-	 * @memberof core
-	 *
-	 */
-	var scroller = new _properjsScrollcontroller2["default"]();
-	
-	/******************************************************************************
-	 * Export
-	*******************************************************************************/
-	exports["default"] = scroller;
-	module.exports = exports["default"];
-
-/***/ },
-/* 49 */
-/*!*********************************************************!*\
-  !*** ./~/properjs-scrollcontroller/ScrollController.js ***!
-  \*********************************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	/*!
-	 *
-	 * Window scroll event controller
-	 *
-	 * @ScrollController
-	 * @author: kitajchuk
-	 *
-	 *
-	 */
-	(function ( factory ) {
-	    
-	    if ( true ) {
-	        module.exports = factory();
-	
-	    } else if ( typeof window !== "undefined" ) {
-	        window.ScrollController = factory();
-	    }
-	    
-	})(function () {
-	
-	    var Controller = __webpack_require__( /*! properjs-controller */ 35 ),
-	        
-	        // Current scroll position
-	        _currentY = null,
-	    
-	        // Singleton
-	        _instance = null;
-	    
-	    /**
-	     *
-	     * Window scroll event controller
-	     * @constructor ScrollController
-	     * @augments Controller
-	     * @requires Controller
-	     * @memberof! <global>
-	     *
-	     * @fires scroll
-	     * @fires scrolldown
-	     * @fires scrollup
-	     * @fires scrollmax
-	     * @fires scrollmin
-	     *
-	     */
-	    var ScrollController = function () {
-	        // Singleton
-	        if ( !_instance ) {
-	            _instance = this;
-	    
-	            // Call on parent cycle
-	            this.go(function () {
-	                var currentY = _instance.getScrollY(),
-	                    isStill = (currentY === _currentY),
-	                    isScroll = (currentY !== _currentY),
-	                    isScrollUp = (currentY < _currentY),
-	                    isScrollDown = (currentY > _currentY),
-	                    isScrollMax = (currentY !== _currentY && _instance.isScrollMax()),
-	                    isScrollMin = (currentY !== _currentY && _instance.isScrollMin());
-	    
-	                // Fire blanket scroll event
-	                if ( isScroll ) {
-	                    /**
-	                     *
-	                     * @event scroll
-	                     *
-	                     */
-	                    _instance.fire( "scroll" );
-	                }
-	    
-	                // Fire scrollup and scrolldown
-	                if ( isScrollDown ) {
-	                    /**
-	                     *
-	                     * @event scrolldown
-	                     *
-	                     */
-	                    _instance.fire( "scrolldown" );
-	    
-	                } else if ( isScrollUp ) {
-	                    /**
-	                     *
-	                     * @event scrollup
-	                     *
-	                     */
-	                    _instance.fire( "scrollup" );
-	                }
-	    
-	                // Fire scrollmax and scrollmin
-	                if ( isScrollMax ) {
-	                    /**
-	                     *
-	                     * @event scrollmax
-	                     *
-	                     */
-	                    _instance.fire( "scrollmax" );
-	    
-	                } else if ( isScrollMin ) {
-	                    /**
-	                     *
-	                     * @event scrollmin
-	                     *
-	                     */
-	                    _instance.fire( "scrollmin" );
-	                }
-	    
-	                _currentY = currentY;
-	            });
-	        }
-	    
-	        return _instance;
-	    };
-	    
-	    ScrollController.prototype = new Controller();
-	    
-	    /**
-	     *
-	     * Returns the current window vertical scroll position
-	     * @memberof ScrollController
-	     * @method getScrollY
-	     * @returns number
-	     *
-	     */
-	    ScrollController.prototype.getScrollY = function () {
-	        return (window.scrollY || document.documentElement.scrollTop);
-	    };
-	    
-	    /**
-	     *
-	     * Get the max document scrollable height
-	     * @memberof ScrollController
-	     * @method getScrollMax
-	     * @returns number
-	     *
-	     */
-	    ScrollController.prototype.getScrollMax = function () {
-	        return Math.max(
-	            document.body.scrollHeight, document.documentElement.scrollHeight,
-	            document.body.offsetHeight, document.documentElement.offsetHeight,
-	            document.documentElement.clientHeight
-	
-	        ) - window.innerHeight;
-	    };
-	    
-	    /**
-	     *
-	     * Determines if scroll position is at maximum for document
-	     * @memberof ScrollController
-	     * @method isScrollMax
-	     * @returns boolean
-	     *
-	     */
-	    ScrollController.prototype.isScrollMax = function () {
-	        return (this.getScrollY() >= this.getScrollMax());
-	    };
-	    
-	    /**
-	     *
-	     * Determines if scroll position is at minimum for document
-	     * @memberof ScrollController
-	     * @method isScrollMin
-	     * @returns boolean
-	     *
-	     */
-	    ScrollController.prototype.isScrollMin = function () {
-	        return (this.getScrollY() <= 0);
-	    };
-	    
-	    
-	    return ScrollController;
-	
-	});
-
-/***/ },
-/* 50 */
 /*!****************************!*\
   !*** ./js_src/core/api.js ***!
   \****************************/
@@ -4705,7 +3743,7 @@
 	
 	var _js_libsHoboDistHoboBuild2 = _interopRequireDefault(_js_libsHoboDistHoboBuild);
 	
-	var _paramalama = __webpack_require__(/*! paramalama */ 51);
+	var _paramalama = __webpack_require__(/*! paramalama */ 43);
 	
 	var _paramalama2 = _interopRequireDefault(_paramalama);
 	
@@ -4887,7 +3925,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 51 */
+/* 43 */
 /*!************************************!*\
   !*** ./~/paramalama/paramalama.js ***!
   \************************************/
@@ -4956,7 +3994,7 @@
 
 
 /***/ },
-/* 52 */
+/* 44 */
 /*!******************************!*\
   !*** ./js_src/core/cache.js ***!
   \******************************/
@@ -4970,7 +4008,7 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 	
-	var _Store = __webpack_require__(/*! ./Store */ 53);
+	var _Store = __webpack_require__(/*! ./Store */ 45);
 	
 	var _Store2 = _interopRequireDefault(_Store);
 	
@@ -4988,7 +4026,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 53 */
+/* 45 */
 /*!******************************!*\
   !*** ./js_src/core/Store.js ***!
   \******************************/
@@ -5216,7 +4254,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 54 */
+/* 46 */
 /*!**********************************!*\
   !*** ./js_src/core/Analytics.js ***!
   \**********************************/
@@ -5245,7 +4283,7 @@
 	
 	var util = _interopRequireWildcard(_util);
 	
-	var _cache = __webpack_require__(/*! ./cache */ 52);
+	var _cache = __webpack_require__(/*! ./cache */ 44);
 	
 	var _cache2 = _interopRequireDefault(_cache);
 	
@@ -5427,7 +4465,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 55 */
+/* 47 */
 /*!**************************!*\
   !*** ./js_src/router.js ***!
   \**************************/
@@ -5443,7 +4481,7 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 	
-	var _properjsPagecontroller = __webpack_require__(/*! properjs-pagecontroller */ 56);
+	var _properjsPagecontroller = __webpack_require__(/*! properjs-pagecontroller */ 48);
 	
 	var _properjsPagecontroller2 = _interopRequireDefault(_properjsPagecontroller);
 	
@@ -5455,31 +4493,31 @@
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _about = __webpack_require__(/*! ./about */ 61);
+	var _about = __webpack_require__(/*! ./about */ 53);
 	
 	var _about2 = _interopRequireDefault(_about);
 	
-	var _indexes = __webpack_require__(/*! ./indexes */ 63);
+	var _indexes = __webpack_require__(/*! ./indexes */ 55);
 	
 	var _indexes2 = _interopRequireDefault(_indexes);
 	
-	var _indexesListing = __webpack_require__(/*! ./indexes/listing */ 68);
+	var _indexesListing = __webpack_require__(/*! ./indexes/listing */ 60);
 	
 	var _indexesListing2 = _interopRequireDefault(_indexesListing);
 	
-	var _projects = __webpack_require__(/*! ./projects */ 72);
+	var _projects = __webpack_require__(/*! ./projects */ 65);
 	
 	var _projects2 = _interopRequireDefault(_projects);
 	
-	var _overlay = __webpack_require__(/*! ./overlay */ 66);
+	var _overlay = __webpack_require__(/*! ./overlay */ 58);
 	
 	var _overlay2 = _interopRequireDefault(_overlay);
 	
-	var _gallery = __webpack_require__(/*! ./gallery */ 70);
+	var _gallery = __webpack_require__(/*! ./gallery */ 62);
 	
 	var _gallery2 = _interopRequireDefault(_gallery);
 	
-	var _projectsProject = __webpack_require__(/*! ./projects/Project */ 65);
+	var _projectsProject = __webpack_require__(/*! ./projects/Project */ 57);
 	
 	var _projectsProject2 = _interopRequireDefault(_projectsProject);
 	
@@ -5875,7 +4913,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 56 */
+/* 48 */
 /*!*****************************************************!*\
   !*** ./~/properjs-pagecontroller/PageController.js ***!
   \*****************************************************/
@@ -5908,7 +4946,7 @@
 	})(function () {
 	
 	    // Useful stuff
-	    var Router = __webpack_require__( /*! properjs-router */ 57 ),
+	    var Router = __webpack_require__( /*! properjs-router */ 49 ),
 	        Controller = __webpack_require__( /*! properjs-controller */ 35 ),
 	
 	        _router = null,
@@ -6406,7 +5444,7 @@
 	});
 
 /***/ },
-/* 57 */
+/* 49 */
 /*!***************************************************************!*\
   !*** ./~/properjs-pagecontroller/~/properjs-router/Router.js ***!
   \***************************************************************/
@@ -6431,9 +5469,9 @@
 	
 	})(function () {
 	
-	    var PushState = __webpack_require__( /*! properjs-pushstate */ 58 ),
-	        MatchRoute = __webpack_require__( /*! properjs-matchroute */ 59 ),
-	        matchElement = __webpack_require__( /*! properjs-matchelement */ 60 ),
+	    var PushState = __webpack_require__( /*! properjs-pushstate */ 50 ),
+	        MatchRoute = __webpack_require__( /*! properjs-matchroute */ 51 ),
+	        matchElement = __webpack_require__( /*! properjs-matchelement */ 52 ),
 	        _initDelay = 200,
 	        _triggerEl;
 	
@@ -7088,7 +6126,7 @@
 	});
 
 /***/ },
-/* 58 */
+/* 50 */
 /*!***************************************************************************************!*\
   !*** ./~/properjs-pagecontroller/~/properjs-router/~/properjs-pushstate/PushState.js ***!
   \***************************************************************************************/
@@ -7485,7 +6523,7 @@
 	});
 
 /***/ },
-/* 59 */
+/* 51 */
 /*!*****************************************************************************************!*\
   !*** ./~/properjs-pagecontroller/~/properjs-router/~/properjs-matchroute/MatchRoute.js ***!
   \*****************************************************************************************/
@@ -7510,7 +6548,7 @@
 	    
 	})(function () {
 	
-	    var paramalama = __webpack_require__( /*! paramalama */ 51 ),
+	    var paramalama = __webpack_require__( /*! paramalama */ 43 ),
 	
 	    /**
 	     *
@@ -7844,7 +6882,7 @@
 	});
 
 /***/ },
-/* 60 */
+/* 52 */
 /*!*************************************************!*\
   !*** ./~/properjs-matchelement/matchElement.js ***!
   \*************************************************/
@@ -7906,7 +6944,7 @@
 	});
 
 /***/ },
-/* 61 */
+/* 53 */
 /*!*******************************!*\
   !*** ./js_src/about/index.js ***!
   \*******************************/
@@ -7927,7 +6965,7 @@
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _About = __webpack_require__(/*! ./About */ 62);
+	var _About = __webpack_require__(/*! ./About */ 54);
 	
 	var _About2 = _interopRequireDefault(_About);
 	
@@ -8026,7 +7064,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 62 */
+/* 54 */
 /*!*******************************!*\
   !*** ./js_src/about/About.js ***!
   \*******************************/
@@ -8145,7 +7183,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 63 */
+/* 55 */
 /*!*********************************!*\
   !*** ./js_src/indexes/index.js ***!
   \*********************************/
@@ -8169,7 +7207,7 @@
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _IndexRoot = __webpack_require__(/*! ./IndexRoot */ 64);
+	var _IndexRoot = __webpack_require__(/*! ./IndexRoot */ 56);
 	
 	var _IndexRoot2 = _interopRequireDefault(_IndexRoot);
 	
@@ -8274,7 +7312,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 64 */
+/* 56 */
 /*!*************************************!*\
   !*** ./js_src/indexes/IndexRoot.js ***!
   \*************************************/
@@ -8302,15 +7340,15 @@
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _router = __webpack_require__(/*! ../router */ 55);
+	var _router = __webpack_require__(/*! ../router */ 47);
 	
 	var _router2 = _interopRequireDefault(_router);
 	
-	var _projectsProject = __webpack_require__(/*! ../projects/Project */ 65);
+	var _projectsProject = __webpack_require__(/*! ../projects/Project */ 57);
 	
 	var _projectsProject2 = _interopRequireDefault(_projectsProject);
 	
-	var _overlay = __webpack_require__(/*! ../overlay */ 66);
+	var _overlay = __webpack_require__(/*! ../overlay */ 58);
 	
 	var _overlay2 = _interopRequireDefault(_overlay);
 	
@@ -8568,7 +7606,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 65 */
+/* 57 */
 /*!************************************!*\
   !*** ./js_src/projects/Project.js ***!
   \************************************/
@@ -8592,11 +7630,11 @@
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _overlay = __webpack_require__(/*! ../overlay */ 66);
+	var _overlay = __webpack_require__(/*! ../overlay */ 58);
 	
 	var _overlay2 = _interopRequireDefault(_overlay);
 	
-	var _Menu = __webpack_require__(/*! ../Menu */ 67);
+	var _Menu = __webpack_require__(/*! ../Menu */ 59);
 	
 	var _Menu2 = _interopRequireDefault(_Menu);
 	
@@ -8896,7 +7934,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 66 */
+/* 58 */
 /*!***************************!*\
   !*** ./js_src/overlay.js ***!
   \***************************/
@@ -9039,7 +8077,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 67 */
+/* 59 */
 /*!************************!*\
   !*** ./js_src/Menu.js ***!
   \************************/
@@ -9077,7 +8115,7 @@
 	        this.$node = $node;
 	        this.tDuration = core.util.getTransitionDuration(this.$node[0]);
 	        this.isOpen = false;
-	        this.scrollPos = core.scroller.getScrollY();
+	        //this.scrollPos = core.scroller.getScrollY();
 	
 	        this.$node.detach();
 	    }
@@ -9109,17 +8147,17 @@
 	            // Handle scroll suppression
 	
 	            // 0.2 => Get the current scroll position
-	            this.scrollPos = core.scroller.getScrollY();
+	            //this.scrollPos = core.scroller.getScrollY();
 	
 	            // 0.3 => Suppress the scrolls emitter
-	            core.scrolls.suppress(true);
+	            //core.scrolls.suppress( true );
 	
 	            // 0.4 => Broadcast the open menu
 	            core.emitter.fire("app--menu-opened");
 	
 	            setTimeout(function () {
 	                return _this.$node.addClass("is-active");
-	            }, 0);
+	            }, 10);
 	            setTimeout(function () {
 	                _this.$node.addClass("is-active-events");
 	                core.dom.html.addClass("is-clipped");
@@ -9148,10 +8186,10 @@
 	            // Handle scroll suppression
 	
 	            // 0.1 => Reset the document scroll position
-	            core.dom.body[0].scrollTop = this.scrollPos;
+	            //core.dom.body[ 0 ].scrollTop = this.scrollPos;
 	
 	            // 0.2 => Un-suppress the scrolls emitter
-	            core.scrolls.suppress(false);
+	            //core.scrolls.suppress( false );
 	
 	            // 0.3 => Broadcast the closed menu
 	            core.emitter.fire("app--menu-closed");
@@ -9206,7 +8244,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 68 */
+/* 60 */
 /*!***********************************!*\
   !*** ./js_src/indexes/listing.js ***!
   \***********************************/
@@ -9226,7 +8264,7 @@
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _IndexFull = __webpack_require__(/*! ./IndexFull */ 69);
+	var _IndexFull = __webpack_require__(/*! ./IndexFull */ 61);
 	
 	var _IndexFull2 = _interopRequireDefault(_IndexFull);
 	
@@ -9327,7 +8365,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 69 */
+/* 61 */
 /*!*************************************!*\
   !*** ./js_src/indexes/IndexFull.js ***!
   \*************************************/
@@ -9355,19 +8393,19 @@
 	
 	var _js_libsHoboDistHoboBuild2 = _interopRequireDefault(_js_libsHoboDistHoboBuild);
 	
-	var _router = __webpack_require__(/*! ../router */ 55);
+	var _router = __webpack_require__(/*! ../router */ 47);
 	
 	var _router2 = _interopRequireDefault(_router);
 	
-	var _gallery = __webpack_require__(/*! ../gallery */ 70);
+	var _gallery = __webpack_require__(/*! ../gallery */ 62);
 	
 	var _gallery2 = _interopRequireDefault(_gallery);
 	
-	var _overlay = __webpack_require__(/*! ../overlay */ 66);
+	var _overlay = __webpack_require__(/*! ../overlay */ 58);
 	
 	var _overlay2 = _interopRequireDefault(_overlay);
 	
-	var _properjsTemplate = __webpack_require__(/*! properjs-template */ 71);
+	var _properjsTemplate = __webpack_require__(/*! properjs-template */ 64);
 	
 	var _properjsTemplate2 = _interopRequireDefault(_properjsTemplate);
 	
@@ -9820,7 +8858,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 70 */
+/* 62 */
 /*!***************************!*\
   !*** ./js_src/gallery.js ***!
   \***************************/
@@ -9844,15 +8882,15 @@
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _Menu = __webpack_require__(/*! ./Menu */ 67);
+	var _Menu = __webpack_require__(/*! ./Menu */ 59);
 	
 	var _Menu2 = _interopRequireDefault(_Menu);
 	
-	var _properjsDebounce = __webpack_require__(/*! properjs-debounce */ 46);
+	var _properjsDebounce = __webpack_require__(/*! properjs-debounce */ 63);
 	
 	var _properjsDebounce2 = _interopRequireDefault(_properjsDebounce);
 	
-	var _overlay = __webpack_require__(/*! ./overlay */ 66);
+	var _overlay = __webpack_require__(/*! ./overlay */ 58);
 	
 	var _overlay2 = _interopRequireDefault(_overlay);
 	
@@ -9992,7 +9030,78 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 71 */
+/* 63 */
+/*!*****************************************!*\
+  !*** ./~/properjs-debounce/debounce.js ***!
+  \*****************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	/*!
+	 *
+	 * Debounce methods
+	 * Sourced from here:
+	 * http://unscriptable.com/2009/03/20/debouncing-javascript-methods/
+	 *
+	 * @debounce
+	 * @author: kitajchuk
+	 *
+	 */
+	(function ( factory ) {
+	    
+	    if ( true ) {
+	        module.exports = factory();
+	
+	    } else if ( typeof window !== "undefined" ) {
+	        window.debounce = factory();
+	    }
+	    
+	})(function () {
+	
+	
+	    /**
+	     *
+	     * Limit method calls
+	     * @memberof! <global>
+	     * @method debounce
+	     * @param {function} callback The method handler
+	     * @param {number} threshold The timeout delay in ms
+	     * @param {boolean} execAsap Call function at beginning or end of detection period
+	     *
+	     */
+	    var debounce = function ( callback, threshold, execAsap ) {
+	        var timeout = null;
+	        
+	        return function debounced() {
+	            var args = arguments,
+	                context = this;
+	            
+	            function delayed() {
+	                if ( !execAsap ) {
+	                    callback.apply( context, args );
+	                }
+	                
+	                timeout = null;
+	            }
+	            
+	            if ( timeout ) {
+	                clearTimeout( timeout );
+	                
+	            } else if ( execAsap ) {
+	                callback.apply( context, args );
+	            }
+	            
+	            timeout = setTimeout( delayed, (threshold || 100) );
+	        };
+	    };
+	    
+	    
+	    return debounce;
+	
+	
+	});
+
+/***/ },
+/* 64 */
 /*!*****************************************!*\
   !*** ./~/properjs-template/template.js ***!
   \*****************************************/
@@ -10037,7 +9146,7 @@
 	});
 
 /***/ },
-/* 72 */
+/* 65 */
 /*!**********************************!*\
   !*** ./js_src/projects/index.js ***!
   \**********************************/
@@ -10057,7 +9166,7 @@
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _Project = __webpack_require__(/*! ./Project */ 65);
+	var _Project = __webpack_require__(/*! ./Project */ 57);
 	
 	var _Project2 = _interopRequireDefault(_Project);
 	
@@ -10191,7 +9300,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 73 */
+/* 66 */
 /*!*************************!*\
   !*** ./js_src/intro.js ***!
   \*************************/
@@ -10245,7 +9354,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 74 */
+/* 67 */
 /*!************************!*\
   !*** ./js_src/main.js ***!
   \************************/
@@ -10254,7 +9363,7 @@
 	"use strict";
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
@@ -10277,65 +9386,57 @@
 	 *
 	 */
 	var main = {
-	    /**
-	     *
-	     * @public
-	     * @method init
-	     * @memberof main
-	     * @description Initialize the main element.
-	     *
-	     */
-	    init: function init() {
-	        this.$mainPanels = core.dom.main.find(".js-main-panel");
-	        this.mainDuration = core.util.getTransitionDuration(this.$mainPanels[0]);
+	  /**
+	   *
+	   * @public
+	   * @method init
+	   * @memberof main
+	   * @description Initialize the main element.
+	   *
+	   */
+	  init: function init() {
+	    this.$mainPanels = core.dom.main.find(".js-main-panel");
+	    this.mainDuration = core.util.getTransitionDuration(this.$mainPanels[0]);
 	
-	        this.bindEvents();
-	    },
+	    this.bindEvents();
+	  },
 	
-	    /**
-	     *
-	     * @public
-	     * @instance
-	     * @method bindEvents
-	     * @memberof App
-	     * @description Bind top-level app events.
-	     *
-	     */
-	    bindEvents: function bindEvents() {
-	        core.dom.header.on("click", ".js-controller", this.onController.bind(this));
-	    },
+	  /**
+	   *
+	   * @public
+	   * @instance
+	   * @method bindEvents
+	   * @memberof App
+	   * @description Bind top-level app events.
+	   *
+	   */
+	  bindEvents: function bindEvents() {
+	    core.dom.header.on("click", ".js-controller", this.onController.bind(this));
+	  },
 	
-	    /**
-	     *
-	     * @public
-	     * @instance
-	     * @method onController
-	     * @param {object} e The Event object
-	     * @memberof App
-	     * @description Handle controller links for main app.
-	     *
-	     */
-	    onController: function onController(e) {
-	        var _this = this;
+	  /**
+	   *
+	   * @public
+	   * @instance
+	   * @method onController
+	   * @param {object} e The Event object
+	   * @memberof App
+	   * @description Handle controller links for main app.
+	   *
+	   */
+	  onController: function onController(e) {
+	    e.preventDefault();
 	
-	        e.preventDefault();
+	    var $target = (0, _js_libsHoboDistHoboBuild2["default"])(e.target);
+	    var $controller = $target.is(".js-controller") ? $target : $target.closest(".js-controller");
+	    var data = $controller.data();
+	    var $panel = core.dom.main.find(".js-main--" + data.target);
 	
-	        var $target = (0, _js_libsHoboDistHoboBuild2["default"])(e.target);
-	        var $controller = $target.is(".js-controller") ? $target : $target.closest(".js-controller");
-	        var data = $controller.data();
-	        var $panel = core.dom.main.find(".js-main--" + data.target);
+	    this.$mainPanels.removeClass("is-active");
+	    $panel.addClass("is-active");
 	
-	        this.$mainPanels.removeClass("is-hidden is-active");
-	        $panel.addClass("is-active");
-	
-	        setTimeout(function () {
-	            core.dom.main[0].id = "is-main--" + data.target;
-	        }, 10);
-	
-	        setTimeout(function () {
-	            _this.$mainPanels.not($panel).addClass("is-hidden");
-	        }, this.mainDuration + 10);
-	    }
+	    core.dom.main[0].id = "is-main--" + data.target;
+	  }
 	};
 	
 	/******************************************************************************
