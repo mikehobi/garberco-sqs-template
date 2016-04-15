@@ -2529,20 +2529,24 @@
 	 * @memberof util
 	 * @param {object} target The target object/array
 	 * @param {object} arrow The incoming object/array
-	 * @description Merge or clone objects and arrays
+	 * @description Merge objects and arrays by cloning - non-mutable
 	 * @returns {object}
 	 *
 	 */
 	var extendObject = function extendObject(target, arrow) {
 	    var i = null;
-	    var ret = target;
 	
-	    // Normalize arrow
-	    arrow = arrow || {};
+	    // Never mutate the target
+	    var ret = Array.isArray(target) ? [] : {};
 	
 	    // Merge Arrays
-	    // This is really just used as a `cloning` mechanism
 	    if (Array.isArray(arrow)) {
+	        i = target.length;
+	
+	        for (i; i--;) {
+	            ret[i] = target[i];
+	        }
+	
 	        i = arrow.length;
 	
 	        for (i; i--;) {
@@ -2550,8 +2554,13 @@
 	        }
 	
 	        // Merge Objects
-	        // This could `clone` as well, but is better for merging 2 objects
 	    } else {
+	            for (i in target) {
+	                if (target.hasOwnProperty(i)) {
+	                    ret[i] = target[i];
+	                }
+	            }
+	
 	            for (i in arrow) {
 	                if (arrow.hasOwnProperty(i)) {
 	                    ret[i] = arrow[i];
