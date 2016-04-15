@@ -207,7 +207,7 @@
 	
 	var _dom2 = _interopRequireDefault(_dom);
 	
-	var _images = __webpack_require__(/*! ./images */ 38);
+	var _images = __webpack_require__(/*! ./images */ 39);
 	
 	var _images2 = _interopRequireDefault(_images);
 	
@@ -223,15 +223,15 @@
 	
 	var util = _interopRequireWildcard(_util);
 	
-	var _config = __webpack_require__(/*! ./config */ 35);
+	var _config = __webpack_require__(/*! ./config */ 36);
 	
 	var _config2 = _interopRequireDefault(_config);
 	
-	var _env = __webpack_require__(/*! ./env */ 37);
+	var _env = __webpack_require__(/*! ./env */ 38);
 	
 	var _env2 = _interopRequireDefault(_env);
 	
-	var _log = __webpack_require__(/*! ./log */ 36);
+	var _log = __webpack_require__(/*! ./log */ 37);
 	
 	var _log2 = _interopRequireDefault(_log);
 	
@@ -247,7 +247,7 @@
 	
 	var _Analytics2 = _interopRequireDefault(_Analytics);
 	
-	var _emitter = __webpack_require__(/*! ./emitter */ 39);
+	var _emitter = __webpack_require__(/*! ./emitter */ 40);
 	
 	var _emitter2 = _interopRequireDefault(_emitter);
 	
@@ -294,7 +294,7 @@
 	
 	var _dom2 = _interopRequireDefault(_dom);
 	
-	var _log = __webpack_require__(/*! ./log */ 36);
+	var _log = __webpack_require__(/*! ./log */ 37);
 	
 	var _log2 = _interopRequireDefault(_log);
 	
@@ -2252,7 +2252,7 @@
 	
 	var _dom2 = _interopRequireDefault(_dom);
 	
-	var _config = __webpack_require__(/*! ./config */ 35);
+	var _config = __webpack_require__(/*! ./config */ 36);
 	
 	var _config2 = _interopRequireDefault(_config);
 	
@@ -2274,7 +2274,7 @@
 	 * @description Module onImageLoadHander method, handles event
 	 * @method isElementLoadable
 	 * @param {object} el The DOMElement to check the offset of
-	 * @memberof util
+	 * @memberof core.util
 	 * @returns {boolean}
 	 *
 	 */
@@ -2396,7 +2396,7 @@
 	    var i = null;
 	
 	    // Normalize the handler
-	    handler = handler || isElementLoadable;
+	    handler = handler || isElementInViewport;
 	
 	    // Normalize the images
 	    images = images || _dom2["default"].page.find(_config2["default"].lazyImageSelector);
@@ -2449,9 +2449,8 @@
 	    return new _properjsImageloader2["default"]({
 	        elements: images,
 	        property: _config2["default"].lazyImageAttr,
-	        transitionDelay: 0
-	
-	    }).on("data", handler);
+	        executor: handler
+	    });
 	};
 	
 	/**
@@ -2608,8 +2607,8 @@
 	    loadImages: loadImages,
 	    extendObject: extendObject,
 	    updateImages: updateImages,
-	    getElementsInView: getElementsInView,
 	    isElementLoadable: isElementLoadable,
+	    getElementsInView: getElementsInView,
 	    isElementInViewport: isElementInViewport,
 	    getTransitionDuration: getTransitionDuration
 	};
@@ -2632,122 +2631,19 @@
 	 *
 	 */
 	(function ( factory ) {
-	    
+	
 	    if ( true ) {
 	        module.exports = factory();
 	
 	    } else if ( typeof window !== "undefined" ) {
 	        window.ImageLoader = factory();
 	    }
-	    
+	
 	})(function () {
 	
-	    var raf = window.requestAnimationFrame,
-	        caf = window.cancelAnimationFrame,
-	    
-	        _i,
-	        _all = 0,
-	        _num = 0,
-	        _raf = null,
-	        _ini = false,
-	    
-	        // Holds all "instances"
-	        // This way we can use a single animator
-	        _instances = [];
-	    
-	    
-	    // Should support elements as null, undefined, DOMElement, HTMLCollection, string selector
-	    function setElements( elements ) {
-	        // Handles string selector
-	        if ( typeof elements === "string" ) {
-	            elements = document.querySelectorAll( elements );
-	    
-	        // Handles DOMElement
-	        } else if ( elements && elements.nodeType === 1 ) {
-	            elements = [ elements ];
-	        
-	        } else if ( !elements ) {
-	            elements = [];
-	        }
-	    
-	        // Default:
-	        // HTMLCollection / Array
-	        return elements;
-	    }
-	    
-	    
-	    // Called when instances are created
-	    function initializer( instance ) {
-	        // Increment ALL
-	        _all = _all + instance._num2Load;
-	    
-	        // Private instances array
-	        _instances.push( instance );
-	    
-	        // One stop shopping
-	        if ( !_ini ) {
-	            _ini = true;
-	            animate();
-	        }
-	    }
-	    
-	    
-	    // Called on each iteration of the animation cycle
-	    function animate() {
-	        if ( _num !== _all ) {
-	            _raf = raf( animate );
-	    
-	            for ( _i = _instances.length; _i--; ) {
-	                if ( _instances[ _i ]._numLoaded !== _instances[ _i ]._num2Load && _instances[ _i ]._loadType === "async" ) {
-	                    _instances[ _i ].handle();
-	                }
-	            }
-	    
-	        } else {
-	            stop();
-	        }
-	    }
-	    
-	    
-	    // Stops the animation cycle queue for loading images
-	    function stop () {
-	        caf( _raf );
-	    
-	        _raf = null;
-	        _ini = false;
-	    }
-	    
-	    
-	    // Simple add class polyfill
-	    function addClass( el, str ) {
-	        var newClass = str.split( " " ),
-	            elsClass = el.className.split( " " );
-	    
-	        for ( var i = 0, len = newClass.length; i < len; i++ ) {
-	            if ( elsClass.indexOf( newClass[ i ] ) === -1 ) {
-	                elsClass.push( newClass[ i ] );
-	            }
-	        }
-	    
-	        el.className = elsClass.join( " " );
-	    }
-	    
-	    
-	    // Simple remove class polyfill
-	    function removeClass( el, str ) {
-	        var oldClass = str.split( " " ),
-	            elsClass = el.className.split( " " );
-	    
-	        for ( var i = 0, len = oldClass.length; i < len; i++ ) {
-	            if ( elsClass.indexOf( oldClass[ i ] ) !== -1 ) {
-	                elsClass.splice( elsClass.indexOf( oldClass[ i ] ), 1 );
-	            }
-	        }
-	    
-	        el.className = elsClass.join( " " );
-	    }
-	    
-	    
+	    var Controller = __webpack_require__( /*! properjs-controller */ 35 );
+	
+	
 	    /**
 	     *
 	     * Handle lazy-loading images with unique callback conditions
@@ -2763,418 +2659,307 @@
 	     * </ul>
 	     *
 	     */
-	    var ImageLoader = function () {
-	        return this.init.apply( this, arguments );
-	    };
-	    
-	    
-	    /**
-	     *
-	     * Stop all instances and reset the stack for EVERYTHING
-	     * @method killInstances
-	     * @memberof ImageLoader
-	     *
-	     */
-	    ImageLoader.killInstances = function () {
-	        stop();
-	        
-	        _all = 0;
-	        _num = 0;
-	        _instances = [];
-	    };
-	    
-	    
-	    /**
-	     *
-	     * ClassName for the element loading state
-	     * @member IS_LOADING
-	     * @memberof ImageLoader
-	     *
-	     */
-	    ImageLoader.IS_LOADING = "-is-lazy-loading";
-	    
-	    
-	    /**
-	     *
-	     * ClassName for the element transitioning state
-	     * @member IS_TRANSITION
-	     * @memberof ImageLoader
-	     *
-	     */
-	    ImageLoader.IS_TRANSITION = "-is-lazy-transition";
-	    
-	    
-	    /**
-	     *
-	     * ClassName for the elements loaded state
-	     * @member IS_LOADED
-	     * @memberof ImageLoader
-	     *
-	     */
-	    ImageLoader.IS_LOADED = "-is-lazy-loaded";
-	    
-	    
-	    /**
-	     *
-	     * ClassName to define the element as having been loaded
-	     * @member IS_HANDLED
-	     * @memberof ImageLoader
-	     *
-	     */
-	    ImageLoader.IS_HANDLED = "-is-lazy-handled";
-	    
-	    
-	    ImageLoader.prototype = {
-	        constructor: ImageLoader,
-	    
-	        init: function ( options ) {
-	            var self = this;
-	    
-	            if ( !options ) {
-	                throw new Error( "ImageLoader Class requires options to be passed" );
-	            }
-	    
-	            /**
-	             *
-	             * The Collection to load against
-	             * @memberof ImageLoader
-	             * @member _elements
-	             * @private
-	             *
-	             */
-	            this._elements = setElements( options.elements );
-	    
-	            /**
-	             *
-	             * The property to get image source from
-	             * @memberof ImageLoader
-	             * @member _property
-	             * @private
-	             *
-	             */
-	            this._property = (options.property || "data-src");
-	    
-	            /**
-	             *
-	             * The way to load, async or sync
-	             * Using "sync" loading requires calling .start() on the instance
-	             * and the "handle" event will not be utilized, rather each image
-	             * will be loaded in succession as the previous finishes loading
-	             * @memberof ImageLoader
-	             * @member _loadType
-	             * @private
-	             *
-	             */
-	            this._loadType = (options.loadType || "async");
-	    
-	            /**
-	             *
-	             * The current amount of elements lazy loaded
-	             * @memberof ImageLoader
-	             * @member _numLoaded
-	             * @private
-	             *
-	             */
-	            this._numLoaded = 0;
-	    
-	            /**
-	             *
-	             * The total amount of elements to lazy load
-	             * @memberof ImageLoader
-	             * @member _num2Load
-	             * @private
-	             *
-	             */
-	            this._num2Load = (this._elements ? this._elements.length : 0);
-	    
-	            /**
-	             *
-	             * The delay to execute lazy loading on an element in ms
-	             * @memberof ImageLoader
-	             * @member _transitionDelay
-	             * @default 100
-	             * @private
-	             *
-	             */
-	            this._transitionDelay = (options.transitionDelay || 100);
-	    
-	            /**
-	             *
-	             * The duration on a lazy loaded elements fade in in ms
-	             * @memberof ImageLoader
-	             * @member _transitionDuration
-	             * @default 600
-	             * @private
-	             *
-	             */
-	            this._transitionDuration = (options.transitionDuration || 600);
-	    
-	            /**
-	             *
-	             * This flags that all elements have been loaded
-	             * @memberof ImageLoader
-	             * @member _resolved
-	             * @private
-	             *
-	             */
-	            this._resolved = false;
-	    
-	            /**
-	             *
-	             * Defined event namespaced handlers
-	             * @memberof ImageLoader
-	             * @member _handlers
-	             * @private
-	             *
-	             */
-	            this._handlers = {
-	                data: null,
-	                load: null,
-	                done: null,
-	                error: null,
-	                update: null
-	            };
-	    
-	            // Break out if no elements in collection
-	            if ( !this._elements.length ) {
-	                return this;
-	            }
-	    
-	            // Only run animation frame for async loading
-	            if ( this._loadType === "async" ) {
-	                initializer( this );
-	    
-	            } else {
-	                this._syncLoad();
-	            }
-	        },
-	    
+	    var ImageLoader = function ( options ) {
+	        var self = this;
+	
+	        if ( !options ) {
+	            throw new Error( "ImageLoader Class requires options to be passed" );
+	        }
+	
+	        // Up, up and away...
+	        Controller.call( this );
+	
 	        /**
 	         *
-	         * Add a callback handler for the specified event name
+	         * The method to determine if an image should load itself
 	         * @memberof ImageLoader
-	         * @method on
-	         * @param {string} event The event name to listen for
-	         * @param {function} handler The handler callback to be fired
-	         *
-	         */
-	        on: function ( event, handler ) {
-	            this._handlers[ event ] = handler;
-	    
-	            return this;
-	        },
-	        
-	        /**
-	         *
-	         * Fire the given event for the loaded element
-	         * @memberof ImageLoader
-	         * @method fire
-	         * @returns bool
-	         *
-	         */
-	        fire: function ( event, element ) {
-	            var ret = false;
-	    
-	            if ( typeof this._handlers[ event ] === "function" ) {
-	                ret = this._handlers[ event ].call( this, element );
-	            }
-	    
-	            return ret;
-	        },
-	    
-	        /**
-	         *
-	         * Iterate over elements and fire the update handler
-	         * @memberof ImageLoader
-	         * @method update
-	         *
-	         * @fires update
-	         *
-	         */
-	        update: function () {
-	            var self = this;
-	    
-	            for ( var i = 0, len = this._elements.length; i < len; i++ ) {
-	                var element = this._elements[ i ];
-	    
-	                this.fire( "update", element );
-	            }
-	        },
-	        
-	        /**
-	         *
-	         * Perform the image loading and set correct values on element
-	         * @method load
-	         * @memberof ImageLoader
-	         * @param {object} $elem element object
-	         * @param {function} callback optional callback for each load
-	         *
-	         * @fires done
-	         *
-	         */
-	        load: function ( element, callback ) {
-	            var self = this,
-	                image = null,
-	                timeout = null,
-	                isImage = (element.nodeName.toLowerCase() === "img"),
-	                source = element.getAttribute( this._property );
-	    
-	            element.setAttribute( "data-imageloader", true );
-	    
-	            addClass( element, ImageLoader.IS_LOADING );
-	    
-	            if ( isImage ) {
-	                image = element;
-	    
-	            } else {
-	                image = new Image();
-	            }
-	    
-	            timeout = setTimeout(function () {
-	                clearTimeout( timeout );
-	    
-	                addClass( element, ImageLoader.IS_TRANSITION );
-	    
-	                image.onload = function () {
-	                    self.fire( "load", element );
-	    
-	                    if ( !isImage ) {
-	                        element.style.backgroundImage = ("url(" + source + ")");
-	    
-	                        image = null;
-	                    }
-	    
-	                    addClass( element, ImageLoader.IS_LOADED );
-	    
-	                    timeout = setTimeout(function () {
-	                        clearTimeout( timeout );
-	    
-	                        removeClass( element, ImageLoader.IS_LOADING + " " + ImageLoader.IS_TRANSITION + " " + ImageLoader.IS_LOADED )
-	                        addClass( element, ImageLoader.IS_HANDLED );
-	    
-	                        if ( (self._numLoaded === self._num2Load) && !self._resolved ) {
-	                            self._resolveInstance( true );
-	    
-	                        } else if ( typeof callback === "function" ) {
-	                            // Errors first
-	                            callback( false );
-	                        }
-	    
-	                    }, self._transitionDuration );
-	                };
-	    
-	                image.onerror = function () {
-	                    self.fire( "error", element );
-	    
-	                    if ( (self._numLoaded === self._num2Load) && !self._resolved ) {
-	                        self._resolveInstance( true );
-	    
-	                    } else if ( typeof callback === "function" ) {
-	                        // Errors first
-	                        callback( true );
-	                    }
-	                };
-	    
-	                image.src = source;
-	    
-	            }, this._transitionDelay );
-	    
-	            return this;
-	        },
-	    
-	        /**
-	         *
-	         * Handles element iterations and loading based on callbacks
-	         * @memberof ImageLoader
-	         * @method handle
-	         *
-	         * @fires handle
-	         *
-	         */
-	        handle: function () {
-	            var elems = this._getNotLoaded(),
-	                self = this;
-	    
-	            for ( var i = 0, len = elems.length; i < len; i++ ) {
-	                var elem = elems[ i ];
-	    
-	                // Fires the predefined "data" event
-	                if ( self.fire( "data", elem ) ) {
-	                    _num++;
-	    
-	                    self._numLoaded++;
-	    
-	                    self.load( elem );
-	                }
-	            }
-	        },
-	        
-	        /**
-	         *
-	         * Resolve an instance and remove it from the stack
-	         * @memberof ImageLoader
-	         * @method _resolveInstance
-	         *
-	         */
-	        _resolveInstance: function () {
-	            // Resolved state
-	            this._resolved = true;
-	            
-	            // Fires the predefined "done" event
-	            this.fire( "done" );
-	            
-	            // Purge the instance from the stack
-	            _instances.splice( _instances.indexOf( this ), 1 );
-	        },
-	    
-	        /**
-	         *
-	         * Get all images in the set that have yet to be loaded
-	         * @memberof ImageLoader
-	         * @method _getNotLoaded
+	         * @member _executor
 	         * @private
 	         *
 	         */
-	        _getNotLoaded: function () {
-	            var elems = [];
-	    
-	            for ( var i = 0, len = this._elements.length; i < len; i++ ) {
-	                if ( !this._elements[ i ].getAttribute( "data-imageloader" ) ) {
-	                    elems.push( this._elements[ i ] );
-	                }
-	            }
-	    
-	            return elems;
-	        },
-	    
+	        this._executor = (options.executor || function ( elem ) {
+	            return elem;
+	        });
+	
 	        /**
 	         *
-	         * Support batch synchronous loading of a set of images
+	         * The Collection to load against
 	         * @memberof ImageLoader
-	         * @method _syncLoad
+	         * @member _elements
 	         * @private
 	         *
 	         */
-	        _syncLoad: function () {
-	            var self = this;
-	    
-	            function syncLoad() {
-	                var elem = self._elements[ self._numLoaded ];
-	    
-	                self._numLoaded++;
-	    
-	                self.load( elem, function ( error ) {
-	                    if ( !error && !self._resolved ) {
-	                        syncLoad();
-	                    }
-	                });
-	            }
-	    
-	            syncLoad();
+	        this._elements = options.elements;
+	
+	        /**
+	         *
+	         * The property to get image source from
+	         * @memberof ImageLoader
+	         * @member _property
+	         * @private
+	         *
+	         */
+	        this._property = (options.property || "data-src");
+	
+	        /**
+	         *
+	         * The way to load, async or sync
+	         * Using "sync" loading requires calling .start() on the instance
+	         * and the "handle" event will not be utilized, rather each image
+	         * will be loaded in succession as the previous finishes loading
+	         * @memberof ImageLoader
+	         * @member _loadType
+	         * @private
+	         *
+	         */
+	        this._loadType = (options.loadType || "async");
+	
+	        /**
+	         *
+	         * The current amount of elements lazy loaded
+	         * @memberof ImageLoader
+	         * @member _numLoaded
+	         * @private
+	         *
+	         */
+	        this._numLoaded = 0;
+	
+	        /**
+	         *
+	         * The total amount of elements to lazy load
+	         * @memberof ImageLoader
+	         * @member _num2Load
+	         * @private
+	         *
+	         */
+	        this._num2Load = (this._elements ? this._elements.length : 0);
+	
+	        /**
+	         *
+	         * The delay to execute lazy loading on an element in ms
+	         * @memberof ImageLoader
+	         * @member _transitionDelay
+	         * @default 100
+	         * @private
+	         *
+	         */
+	        this._transitionDelay = (options.transitionDelay || 0);
+	
+	        /**
+	         *
+	         * The duration on a lazy loaded elements fade in in ms
+	         * @memberof ImageLoader
+	         * @member _transitionDuration
+	         * @default 600
+	         * @private
+	         *
+	         */
+	        this._transitionDuration = (options.transitionDuration || 400);
+	
+	        /**
+	         *
+	         * This flags that all elements have been loaded
+	         * @memberof ImageLoader
+	         * @member _resolved
+	         * @private
+	         *
+	         */
+	        this._resolved = false;
+	
+	        // Break out if no elements in collection
+	        if ( !this._elements.length ) {
+	            return this;
+	        }
+	
+	        // Only run animation frame for async loading
+	        if ( this._loadType === "async" ) {
+	            this.initAsync();
+	
+	        } else {
+	            this.initSync();
 	        }
 	    };
-	    
-	    
+	
+	
+	    /**
+	     *
+	     * @extends Controller
+	     *
+	     */
+	    ImageLoader.prototype = Object.create( Controller.prototype );
+	
+	
+	    /**
+	     *
+	     * Support asynchronous loading of a set of images
+	     * @memberof ImageLoader
+	     * @method initAsync
+	     *
+	     */
+	    ImageLoader.prototype.initAsync = function () {
+	        var self = this;
+	
+	        this.go(function () {
+	            if ( self._resolved ) {
+	                self.stop();
+	
+	            } else {
+	                self.handle();
+	            }
+	        });
+	    };
+	
+	    /**
+	     *
+	     * Support batch synchronous loading of a set of images
+	     * @memberof ImageLoader
+	     * @method initSync
+	     *
+	     */
+	    ImageLoader.prototype.initSync = function () {
+	        var self = this;
+	
+	        function syncLoad() {
+	            var elem = self._elements[ self._numLoaded ];
+	
+	            self._numLoaded++;
+	
+	            self.load( elem, function ( error ) {
+	                if ( !error && !self._resolved ) {
+	                    syncLoad();
+	                }
+	            });
+	        }
+	
+	        syncLoad();
+	    };
+	
+	    /**
+	     *
+	     * Perform the image loading and set correct values on element
+	     * @method load
+	     * @memberof ImageLoader
+	     * @param {object} $elem element object
+	     * @param {function} callback optional callback for each load
+	     * @fires done
+	     *
+	     */
+	    ImageLoader.prototype.load = function ( element, callback ) {
+	        var self = this,
+	            image = null,
+	            timeout = null,
+	            isImage = (element.nodeName === "IMG"),
+	            source = element.getAttribute( this._property );
+	
+	        element.setAttribute( "data-imageloader", true );
+	
+	        if ( isImage ) {
+	            image = element;
+	
+	        } else {
+	            image = new Image();
+	        }
+	
+	        timeout = setTimeout(function () {
+	            clearTimeout( timeout );
+	
+	            image.onload = function () {
+	                self.fire( "load", element );
+	
+	                if ( !isImage ) {
+	                    element.style.backgroundImage = ("url(" + source + ")");
+	
+	                    image = null;
+	                }
+	
+	                timeout = setTimeout(function () {
+	                    clearTimeout( timeout );
+	
+	                    if ( (self._numLoaded === self._num2Load) && !self._resolved ) {
+	                        self._resolve();
+	
+	                    } else if ( typeof callback === "function" ) {
+	                        // Errors first
+	                        callback( false );
+	                    }
+	
+	                }, self._transitionDuration );
+	            };
+	
+	            image.onerror = function () {
+	                self.fire( "error", element );
+	
+	                if ( (self._numLoaded === self._num2Load) && !self._resolved ) {
+	                    self._resolve();
+	
+	                } else if ( typeof callback === "function" ) {
+	                    // Errors first
+	                    callback( true );
+	                }
+	            };
+	
+	            image.src = source;
+	
+	        }, this._transitionDelay );
+	
+	        return this;
+	    };
+	
+	    /**
+	     *
+	     * Handles element iterations and loading based on callbacks
+	     * @memberof ImageLoader
+	     * @method handle
+	     *
+	     */
+	    ImageLoader.prototype.handle = function () {
+	        var elems = this.getNotLoaded(),
+	            self = this;
+	
+	        for ( var i = 0, len = elems.length; i < len; i++ ) {
+	            if ( self._executor( elems[ i ] ) ) {
+	                self._numLoaded++;
+	
+	                self.load( elems[ i ] );
+	            }
+	        }
+	    };
+	
+	    /**
+	     *
+	     * Get all images in the set that have yet to be loaded
+	     * @memberof ImageLoader
+	     * @method getNotLoaded
+	     *
+	     */
+	    ImageLoader.prototype.getNotLoaded = function () {
+	        var elems = [];
+	
+	        for ( var i = 0, len = this._elements.length; i < len; i++ ) {
+	            if ( !this._elements[ i ].getAttribute( "data-imageloader" ) ) {
+	                elems.push( this._elements[ i ] );
+	            }
+	        }
+	
+	        return elems;
+	    };
+	
+	    /**
+	     *
+	     * Resolve an instance and remove it from the stack
+	     * @memberof ImageLoader
+	     * @method _resolve
+	     *
+	     */
+	    ImageLoader.prototype._resolve = function () {
+	        // Resolved state
+	        this._resolved = true;
+	
+	        // Fires the predefined "done" event
+	        this.fire( "done" );
+	    };
+	
+	
 	    return ImageLoader;
 	
 	
@@ -3182,393 +2967,6 @@
 
 /***/ },
 /* 35 */
-/*!*******************************!*\
-  !*** ./js_src/core/config.js ***!
-  \*******************************/
-/***/ function(module, exports) {
-
-	/**
-	 *
-	 * @public
-	 * @module config
-	 * @description Stores app-wide config values.
-	 *
-	 */
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	var config = {
-	  /**
-	   *
-	   * @public
-	   * @member rootUrlId
-	   * @memberof config
-	   * @description The urlId for "/".
-	   *
-	   */
-	  rootUrlId: "garberco",
-	
-	  /**
-	   *
-	   * @public
-	   * @member homepageKey
-	   * @memberof config
-	   * @description The cache key to use for homepage.
-	   *
-	   */
-	  homepageKey: "homepage",
-	
-	  /**
-	   *
-	   * @public
-	   * @member lazyImageSelector
-	   * @memberof config
-	   * @description The string selector used for images deemed lazy-loadable.
-	   *
-	   */
-	  lazyImageSelector: ".js-lazy-image",
-	
-	  /**
-	   *
-	   * @public
-	   * @member lazyImageAttr
-	   * @memberof config
-	   * @description The string attribute for lazy image source URLs.
-	   *
-	   */
-	  lazyImageAttr: "data-img-src",
-	
-	  /**
-	   *
-	   * @public
-	   * @member imageLoaderAttr
-	   * @memberof config
-	   * @description The string attribute ImageLoader gives loaded images.
-	   *
-	   */
-	  imageLoaderAttr: "data-imageloader",
-	
-	  /**
-	   *
-	   * @public
-	   * @member offcanvasClasses
-	   * @memberof config
-	   * @description The string of offcanvas element classNames.
-	   *
-	   */
-	  offcanvasClasses: "is-offcanvas is-offcanvas--about is-offcanvas--index is-offcanvas--project"
-	};
-	
-	/******************************************************************************
-	 * Export
-	*******************************************************************************/
-	exports["default"] = config;
-	module.exports = exports["default"];
-
-/***/ },
-/* 36 */
-/*!****************************!*\
-  !*** ./js_src/core/log.js ***!
-  \****************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-	
-	var _env = __webpack_require__(/*! ./env */ 37);
-	
-	var _env2 = _interopRequireDefault(_env);
-	
-	/**
-	 *
-	 * @public
-	 * @method log
-	 * @description Normalized app console logger.
-	 *
-	 */
-	var log = function log() {
-	  if (_env2["default"].get() === _env2["default"].DEV) {
-	    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-	      args[_key] = arguments[_key];
-	    }
-	
-	    console.log(args);
-	  }
-	};
-	
-	/******************************************************************************
-	 * Export
-	*******************************************************************************/
-	exports["default"] = log;
-	module.exports = exports["default"];
-
-/***/ },
-/* 37 */
-/*!****************************!*\
-  !*** ./js_src/core/env.js ***!
-  \****************************/
-/***/ function(module, exports) {
-
-	/**
-	 *
-	 * @public
-	 * @module env
-	 * @description Set the app environment.
-	 *
-	 */
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	var env = {
-	  /**
-	   *
-	   * @member DEV
-	   * @memberof env
-	   * @description The `production` development ref.
-	   *
-	   */
-	  DEV: "development",
-	
-	  /**
-	   *
-	   * @member PROD
-	   * @memberof env
-	   * @description The `production` environment ref.
-	   *
-	   */
-	  PROD: "production",
-	
-	  /**
-	   *
-	   * @method get
-	   * @memberof env
-	   * @description Returns the active code `environment`.
-	   * @returns {boolean}
-	   *
-	   */
-	  get: function get() {
-	    return (/localhost|squarespace/g.test(document.domain) ? this.DEV : this.PROD
-	    );
-	  },
-	
-	  /**
-	   *
-	   * @method isConfig
-	   * @memberof env
-	   * @description Determine whether we are in Squarespace /config land or not.
-	   * @returns {boolean}
-	   *
-	   */
-	  isConfig: function isConfig() {
-	    return window.parent.location.pathname.indexOf("/config") !== -1;
-	  }
-	};
-	
-	/******************************************************************************
-	 * Export
-	*******************************************************************************/
-	exports["default"] = env;
-	module.exports = exports["default"];
-
-/***/ },
-/* 38 */
-/*!*******************************!*\
-  !*** ./js_src/core/images.js ***!
-  \*******************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-	
-	var _dom = __webpack_require__(/*! ./dom */ 3);
-	
-	var _dom2 = _interopRequireDefault(_dom);
-	
-	var _util = __webpack_require__(/*! ./util */ 33);
-	
-	var util = _interopRequireWildcard(_util);
-	
-	var _log = __webpack_require__(/*! ./log */ 36);
-	
-	var _log2 = _interopRequireDefault(_log);
-	
-	var _config = __webpack_require__(/*! ./config */ 35);
-	
-	var _config2 = _interopRequireDefault(_config);
-	
-	var _emitter = __webpack_require__(/*! ./emitter */ 39);
-	
-	var _emitter2 = _interopRequireDefault(_emitter);
-	
-	var _ImageController = __webpack_require__(/*! ./ImageController */ 41);
-	
-	var _ImageController2 = _interopRequireDefault(_ImageController);
-	
-	/**
-	 *
-	 * @public
-	 * @namespace images
-	 * @memberof core
-	 * @description Handles separation of image pre-loading and image lazy-loading.
-	 *
-	 */
-	var images = {
-	  /**
-	   *
-	   * @public
-	   * @method init
-	   * @memberof core.images
-	   * @description Method runs once when window loads.
-	   *
-	   */
-	  init: function init() {
-	    (0, _log2["default"])("preload initialized");
-	  },
-	
-	  /**
-	   *
-	   * @public
-	   * @method isActive
-	   * @memberof core.images
-	   * @description Method informs PageController of active status.
-	   * @returns {boolean}
-	   *
-	   */
-	  isActive: util.noop,
-	
-	  /**
-	   *
-	   * @public
-	   * @method onload
-	   * @memberof core.images
-	   * @description Method performs onloading actions for this module.
-	   *
-	   */
-	  onload: function onload() {
-	    this.handleImages();
-	  },
-	
-	  /**
-	   *
-	   * @public
-	   * @method unload
-	   * @memberof core.images
-	   * @description Method performs unloading actions for this module.
-	   *
-	   */
-	  unload: function unload() {},
-	
-	  /**
-	   *
-	   * @public
-	   * @method handlePreload
-	   * @memberof core.images
-	   * @param {function} callback The passed callback from `handleImages`
-	   * @description Method handles the `done` preloading event cycle.
-	   *
-	   */
-	  handlePreload: function handlePreload(callback) {
-	    if (typeof callback === "function") {
-	      callback();
-	    }
-	
-	    _emitter2["default"].fire("app--preload-done");
-	  },
-	
-	  /**
-	   *
-	   * @public
-	   * @method handleLazyload
-	   * @memberof core.images
-	   * @description Method handles the `done` lazyloading event cycle.
-	   *
-	   */
-	  handleLazyload: function handleLazyload() {
-	    _emitter2["default"].fire("app--lazyload-done");
-	  },
-	
-	  /**
-	   *
-	   * @public
-	   * @method handleImages
-	   * @memberof core.images
-	   * @param {object} $images Optionally, the image collection to load
-	   * @param {function} callback Optionally, a callback to fire when loading is done
-	   * @description Method handles separation of pre-load and lazy-load.
-	   *
-	   */
-	  handleImages: function handleImages($images, callback) {
-	    $images = $images || _dom2["default"].page.find(_config2["default"].lazyImageSelector);
-	
-	    if ($images.length) {
-	      var imageController = new _ImageController2["default"]($images);
-	
-	      imageController.on("preload", this.handlePreload.bind(this, callback));
-	      imageController.on("lazyload", this.handleLazyload.bind(this));
-	    } else {
-	      this.handlePreload(callback);
-	    }
-	  }
-	};
-	
-	/******************************************************************************
-	 * Export
-	*******************************************************************************/
-	exports["default"] = images;
-	module.exports = exports["default"];
-
-/***/ },
-/* 39 */
-/*!********************************!*\
-  !*** ./js_src/core/emitter.js ***!
-  \********************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-	
-	var _properjsController = __webpack_require__(/*! properjs-controller */ 40);
-	
-	var _properjsController2 = _interopRequireDefault(_properjsController);
-	
-	/**
-	 *
-	 * @description Single app instanceof [Controller]{@link https://github.com/ProperJS/Controller} for arbitrary event emitting
-	 * @member emitter
-	 * @memberof core
-	 *
-	 */
-	var emitter = new _properjsController2["default"]();
-	
-	/******************************************************************************
-	 * Export
-	*******************************************************************************/
-	exports["default"] = emitter;
-	module.exports = exports["default"];
-
-/***/ },
-/* 40 */
 /*!*********************************************!*\
   !*** ./~/properjs-controller/Controller.js ***!
   \*********************************************/
@@ -3876,6 +3274,338 @@
 	});
 
 /***/ },
+/* 36 */
+/*!*******************************!*\
+  !*** ./js_src/core/config.js ***!
+  \*******************************/
+/***/ function(module, exports) {
+
+	/**
+	 *
+	 * @public
+	 * @module config
+	 * @description Stores app-wide config values.
+	 *
+	 */
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	var config = {
+	  /**
+	   *
+	   * @public
+	   * @member rootUrlId
+	   * @memberof config
+	   * @description The urlId for "/".
+	   *
+	   */
+	  rootUrlId: "garberco",
+	
+	  /**
+	   *
+	   * @public
+	   * @member homepageKey
+	   * @memberof config
+	   * @description The cache key to use for homepage.
+	   *
+	   */
+	  homepageKey: "homepage",
+	
+	  /**
+	   *
+	   * @public
+	   * @member lazyImageSelector
+	   * @memberof config
+	   * @description The string selector used for images deemed lazy-loadable.
+	   *
+	   */
+	  lazyImageSelector: ".js-lazy-image",
+	
+	  /**
+	   *
+	   * @public
+	   * @member lazyImageAttr
+	   * @memberof config
+	   * @description The string attribute for lazy image source URLs.
+	   *
+	   */
+	  lazyImageAttr: "data-img-src",
+	
+	  /**
+	   *
+	   * @public
+	   * @member imageLoaderAttr
+	   * @memberof config
+	   * @description The string attribute ImageLoader gives loaded images.
+	   *
+	   */
+	  imageLoaderAttr: "data-imageloader",
+	
+	  /**
+	   *
+	   * @public
+	   * @member offcanvasClasses
+	   * @memberof config
+	   * @description The string of offcanvas element classNames.
+	   *
+	   */
+	  offcanvasClasses: "is-offcanvas is-offcanvas--about is-offcanvas--index is-offcanvas--project"
+	};
+	
+	/******************************************************************************
+	 * Export
+	*******************************************************************************/
+	exports["default"] = config;
+	module.exports = exports["default"];
+
+/***/ },
+/* 37 */
+/*!****************************!*\
+  !*** ./js_src/core/log.js ***!
+  \****************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+	
+	var _env = __webpack_require__(/*! ./env */ 38);
+	
+	var _env2 = _interopRequireDefault(_env);
+	
+	/**
+	 *
+	 * @public
+	 * @method log
+	 * @description Normalized app console logger.
+	 *
+	 */
+	var log = function log() {
+	  if (_env2["default"].get() === _env2["default"].DEV) {
+	    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+	      args[_key] = arguments[_key];
+	    }
+	
+	    console.log(args);
+	  }
+	};
+	
+	/******************************************************************************
+	 * Export
+	*******************************************************************************/
+	exports["default"] = log;
+	module.exports = exports["default"];
+
+/***/ },
+/* 38 */
+/*!****************************!*\
+  !*** ./js_src/core/env.js ***!
+  \****************************/
+/***/ function(module, exports) {
+
+	/**
+	 *
+	 * @public
+	 * @module env
+	 * @description Set the app environment.
+	 *
+	 */
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	var env = {
+	  /**
+	   *
+	   * @member DEV
+	   * @memberof env
+	   * @description The `production` development ref.
+	   *
+	   */
+	  DEV: "development",
+	
+	  /**
+	   *
+	   * @member PROD
+	   * @memberof env
+	   * @description The `production` environment ref.
+	   *
+	   */
+	  PROD: "production",
+	
+	  /**
+	   *
+	   * @method get
+	   * @memberof env
+	   * @description Returns the active code `environment`.
+	   * @returns {boolean}
+	   *
+	   */
+	  get: function get() {
+	    return (/localhost|squarespace/g.test(document.domain) ? this.DEV : this.PROD
+	    );
+	  },
+	
+	  /**
+	   *
+	   * @method isConfig
+	   * @memberof env
+	   * @description Determine whether we are in Squarespace /config land or not.
+	   * @returns {boolean}
+	   *
+	   */
+	  isConfig: function isConfig() {
+	    return window.parent.location.pathname.indexOf("/config") !== -1;
+	  }
+	};
+	
+	/******************************************************************************
+	 * Export
+	*******************************************************************************/
+	exports["default"] = env;
+	module.exports = exports["default"];
+
+/***/ },
+/* 39 */
+/*!*******************************!*\
+  !*** ./js_src/core/images.js ***!
+  \*******************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+	
+	var _dom = __webpack_require__(/*! ./dom */ 3);
+	
+	var _dom2 = _interopRequireDefault(_dom);
+	
+	var _config = __webpack_require__(/*! ./config */ 36);
+	
+	var _config2 = _interopRequireDefault(_config);
+	
+	var _emitter = __webpack_require__(/*! ./emitter */ 40);
+	
+	var _emitter2 = _interopRequireDefault(_emitter);
+	
+	var _ImageController = __webpack_require__(/*! ./ImageController */ 41);
+	
+	var _ImageController2 = _interopRequireDefault(_ImageController);
+	
+	/**
+	 *
+	 * @public
+	 * @namespace images
+	 * @memberof core
+	 * @description Handles separation of image pre-loading and image lazy-loading.
+	 *
+	 */
+	var images = {
+	    /**
+	     *
+	     * @public
+	     * @method handlePreload
+	     * @memberof core.images
+	     * @param {function} callback The passed callback from `handleImages`
+	     * @description Method handles the `done` preloading event cycle.
+	     *
+	     */
+	    handlePreload: function handlePreload(callback) {
+	        if (typeof callback === "function") {
+	            callback();
+	        }
+	
+	        _emitter2["default"].fire("app--preload-done");
+	    },
+	
+	    /**
+	     *
+	     * @public
+	     * @method handleLazyload
+	     * @memberof core.images
+	     * @description Method handles the `done` lazyloading event cycle.
+	     *
+	     */
+	    handleLazyload: function handleLazyload() {
+	        _emitter2["default"].fire("app--lazyload-done");
+	    },
+	
+	    /**
+	     *
+	     * @public
+	     * @method handleImages
+	     * @memberof core.images
+	     * @param {object} $images Optionally, the image collection to load
+	     * @param {function} callback Optionally, a callback to fire when loading is done
+	     * @description Method handles separation of pre-load and lazy-load.
+	     *
+	     */
+	    handleImages: function handleImages($images, callback) {
+	        $images = $images || _dom2["default"].page.find(_config2["default"].lazyImageSelector);
+	
+	        if ($images.length) {
+	            var imageController = new _ImageController2["default"]($images);
+	
+	            imageController.on("preload", this.handlePreload.bind(this, callback));
+	            imageController.on("lazyload", this.handleLazyload.bind(this));
+	        } else {
+	            this.handlePreload(callback);
+	        }
+	    }
+	};
+	
+	/******************************************************************************
+	 * Export
+	*******************************************************************************/
+	exports["default"] = images;
+	module.exports = exports["default"];
+
+/***/ },
+/* 40 */
+/*!********************************!*\
+  !*** ./js_src/core/emitter.js ***!
+  \********************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+	
+	var _properjsController = __webpack_require__(/*! properjs-controller */ 35);
+	
+	var _properjsController2 = _interopRequireDefault(_properjsController);
+	
+	/**
+	 *
+	 * @description Single app instanceof [Controller]{@link https://github.com/ProperJS/Controller} for arbitrary event emitting
+	 * @member emitter
+	 * @memberof core
+	 *
+	 */
+	var emitter = new _properjsController2["default"]();
+	
+	/******************************************************************************
+	 * Export
+	*******************************************************************************/
+	exports["default"] = emitter;
+	module.exports = exports["default"];
+
+/***/ },
 /* 41 */
 /*!****************************************!*\
   !*** ./js_src/core/ImageController.js ***!
@@ -3904,11 +3634,11 @@
 	
 	var util = _interopRequireWildcard(_util);
 	
-	var _log = __webpack_require__(/*! ./log */ 36);
+	var _log = __webpack_require__(/*! ./log */ 37);
 	
 	var _log2 = _interopRequireDefault(_log);
 	
-	var _properjsController = __webpack_require__(/*! properjs-controller */ 40);
+	var _properjsController = __webpack_require__(/*! properjs-controller */ 35);
 	
 	var _properjsController2 = _interopRequireDefault(_properjsController);
 	
@@ -4019,7 +3749,7 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 	
-	var _log = __webpack_require__(/*! ./log */ 36);
+	var _log = __webpack_require__(/*! ./log */ 37);
 	
 	var _log2 = _interopRequireDefault(_log);
 	
@@ -4027,7 +3757,7 @@
 	
 	var util = _interopRequireWildcard(_util);
 	
-	var _emitter = __webpack_require__(/*! ./emitter */ 39);
+	var _emitter = __webpack_require__(/*! ./emitter */ 40);
 	
 	var _emitter2 = _interopRequireDefault(_emitter);
 	
@@ -4167,7 +3897,7 @@
 	    
 	})(function () {
 	
-	    var Controller = __webpack_require__( /*! properjs-controller */ 40 ),
+	    var Controller = __webpack_require__( /*! properjs-controller */ 35 ),
 	
 	        // Orientation?
 	        _hasOrientation = ("orientation" in window),
@@ -4498,7 +4228,7 @@
 	
 	var _dom2 = _interopRequireDefault(_dom);
 	
-	var _log = __webpack_require__(/*! ./log */ 36);
+	var _log = __webpack_require__(/*! ./log */ 37);
 	
 	var _log2 = _interopRequireDefault(_log);
 	
@@ -4506,7 +4236,7 @@
 	
 	var _detect2 = _interopRequireDefault(_detect);
 	
-	var _emitter = __webpack_require__(/*! ./emitter */ 39);
+	var _emitter = __webpack_require__(/*! ./emitter */ 40);
 	
 	var _emitter2 = _interopRequireDefault(_emitter);
 	
@@ -4803,7 +4533,7 @@
 	    
 	})(function () {
 	
-	    var Controller = __webpack_require__( /*! properjs-controller */ 40 ),
+	    var Controller = __webpack_require__( /*! properjs-controller */ 35 ),
 	        
 	        // Current scroll position
 	        _currentY = null,
@@ -5276,7 +5006,7 @@
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	var _log = __webpack_require__(/*! ./log */ 36);
+	var _log = __webpack_require__(/*! ./log */ 37);
 	
 	var _log2 = _interopRequireDefault(_log);
 	
@@ -5507,7 +5237,7 @@
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	var _log = __webpack_require__(/*! ./log */ 36);
+	var _log = __webpack_require__(/*! ./log */ 37);
 	
 	var _log2 = _interopRequireDefault(_log);
 	
@@ -5519,7 +5249,7 @@
 	
 	var _cache2 = _interopRequireDefault(_cache);
 	
-	var _emitter = __webpack_require__(/*! ./emitter */ 39);
+	var _emitter = __webpack_require__(/*! ./emitter */ 40);
 	
 	var _emitter2 = _interopRequireDefault(_emitter);
 	
@@ -6179,7 +5909,7 @@
 	
 	    // Useful stuff
 	    var Router = __webpack_require__( /*! properjs-router */ 57 ),
-	        Controller = __webpack_require__( /*! properjs-controller */ 40 ),
+	        Controller = __webpack_require__( /*! properjs-controller */ 35 ),
 	
 	        _router = null,
 	        _config = [],
@@ -8584,7 +8314,7 @@
 	
 	var _overlay2 = _interopRequireDefault(_overlay);
 	
-	var _properjsController = __webpack_require__(/*! properjs-controller */ 40);
+	var _properjsController = __webpack_require__(/*! properjs-controller */ 35);
 	
 	var _properjsController2 = _interopRequireDefault(_properjsController);
 	
@@ -8870,7 +8600,7 @@
 	
 	var _Menu2 = _interopRequireDefault(_Menu);
 	
-	var _properjsController = __webpack_require__(/*! properjs-controller */ 40);
+	var _properjsController = __webpack_require__(/*! properjs-controller */ 35);
 	
 	var _properjsController2 = _interopRequireDefault(_properjsController);
 	
@@ -8905,6 +8635,8 @@
 	
 	        this.bindEvents();
 	        this.loadProject();
+	
+	        core.log("Project", this);
 	    }
 	
 	    /**
@@ -9052,16 +8784,14 @@
 	        key: "updatePosition",
 	        value: function updatePosition() {
 	            var nodeRect = this.$node[0].getBoundingClientRect();
-	            var $imageloaded = this.$images.filter(".-is-lazy-handled");
+	            var $imageloaded = this.$images.filter("[" + core.config.imageLoaderAttr + "]");
 	
 	            if ($imageloaded.length !== this.$images.length) {
 	                return;
 	            }
 	
-	            if (Math.floor(nodeRect.bottom) <= 0 && !this.isEnded) {
+	            if (core.dom.project.element[0].scrollTop !== 0 && Math.floor(nodeRect.bottom) <= 0 && !this.isEnded) {
 	                this.isEnded = true;
-	
-	                core.dom.project.element.addClass("is-inactive");
 	
 	                setTimeout(function () {
 	                    core.emitter.fire("app--project-ended");
@@ -9131,6 +8861,9 @@
 	    setTimeout(function () {
 	        return core.dom.project.element.addClass("is-active");
 	    }, 10);
+	    setTimeout(function () {
+	        return core.dom.project.element.removeClass("is-noscroll");
+	    }, core.dom.project.elementTransitionDuration);
 	};
 	
 	/**
@@ -9147,11 +8880,11 @@
 	
 	    animator.stop();
 	
-	    core.dom.project.element.removeClass("is-active is-inactive");
+	    core.dom.project.element.removeClass("is-active");
 	
 	    setTimeout(function () {
 	        core.dom.html.removeClass(core.config.offcanvasClasses);
-	        core.dom.project.element.detach();
+	        core.dom.project.element.detach().addClass("is-noscroll");
 	        core.dom.project.elementPane[0].innerHTML = "";
 	    }, core.dom.project.elementTransitionDuration);
 	};
@@ -9638,7 +9371,7 @@
 	
 	var _properjsTemplate2 = _interopRequireDefault(_properjsTemplate);
 	
-	var _properjsController = __webpack_require__(/*! properjs-controller */ 40);
+	var _properjsController = __webpack_require__(/*! properjs-controller */ 35);
 	
 	var _properjsController2 = _interopRequireDefault(_properjsController);
 	
