@@ -4707,6 +4707,7 @@
 	        // Offcanvas/Project paths will need to manually load the root index
 	        if (this.pageData.type === "site") {
 	            this.root = "/";
+	            this.loadRootIndex();
 	        } else if (this.pageData.type !== "index") {
 	            if (this.pageData.type === "offcanvas") {
 	                this.root = "/";
