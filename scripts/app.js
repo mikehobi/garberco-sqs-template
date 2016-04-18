@@ -4562,6 +4562,7 @@
 	        this.tweenScroll = null;
 	        this.$rootPanel = core.dom.main.find(".js-main--garberco");
 	
+	        debugger;
 	        if (this.pageData.type === "site") {
 	            this.redirect();
 	        } else {
