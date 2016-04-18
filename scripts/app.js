@@ -4556,6 +4556,7 @@
 	     */
 	    init: function init() {
 	        this.state = {};
+	        this.status = 200;
 	        this.navData = core.dom.nav.data();
 	        this.pageData = core.dom.page.data();
 	        this.pageDuration = core.util.getTransitionDuration(core.dom.page[0]);
@@ -4753,7 +4754,9 @@
 	     * @description Perform actions after PageController init callback.
 	     *
 	     */
-	    initPage: function initPage() /* data */{
+	    initPage: function initPage(data) {
+	        this.status = data.status;
+	
 	        core.dom.nav.detach();
 	        core.dom.page.detach();
 	
@@ -4931,6 +4934,8 @@
 	     *
 	     */
 	    changeContent: function changeContent(data) {
+	        this.status = data.status;
+	
 	        var doc = this.parseDoc(data.response);
 	
 	        core.dom.page[0].innerHTML = doc.pageHtml;
@@ -7746,7 +7751,6 @@
 	    function IndexRoot($node, data) {
 	        _classCallCheck(this, IndexRoot);
 	
-	        console.log($node, data);
 	        if (!instance || instance && instance.data.id !== data.id) {
 	            this.initialize($node, data);
 	        }
@@ -7802,7 +7806,7 @@
 	            this.$anims = this.$node.find(".js-animate");
 	
 	            // If pathname is not the `root` we shant not start raf cycle
-	            if (window.location.pathname === _router2["default"].root) {
+	            if (window.location.pathname === _router2["default"].root || _router2["default"].status === 404) {
 	                animator.stop();
 	                animator.go(this.updateAnimate.bind(this));
 	
