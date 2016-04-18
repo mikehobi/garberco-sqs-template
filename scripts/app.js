@@ -7746,6 +7746,7 @@
 	    function IndexRoot($node, data) {
 	        _classCallCheck(this, IndexRoot);
 	
+	        console.log($node, data);
 	        if (!instance || instance && instance.data.id !== data.id) {
 	            this.initialize($node, data);
 	        }
