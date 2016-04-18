@@ -4706,10 +4706,7 @@
 	        // Index?
 	        // Indexes will already have the root gridwall loaded
 	        // Offcanvas/Project paths will need to manually load the root index
-	        if (this.pageData.type === "site") {
-	            this.root = "/";
-	            this.loadRootIndex();
-	        } else if (this.pageData.type !== "index") {
+	        if (this.pageData.type !== "index") {
 	            if (this.pageData.type === "offcanvas") {
 	                this.root = "/";
 	            } else {
@@ -4757,13 +4754,17 @@
 	    initPage: function initPage(data) {
 	        this.status = data.status;
 	
-	        core.dom.nav.detach();
-	        core.dom.page.detach();
+	        if (this.status === 404) {
+	            window.location.href = window.location.origin + this.root;
+	        } else {
+	            core.dom.nav.detach();
+	            core.dom.page.detach();
 	
-	        core.dom.html.removeClass("is-clipped");
-	        core.dom.body.removeClass("is-clipped");
+	            core.dom.html.removeClass("is-clipped");
+	            core.dom.body.removeClass("is-clipped");
 	
-	        window.addEventListener("popstate", this.handlePopstate.bind(this), false);
+	            window.addEventListener("popstate", this.handlePopstate.bind(this), false);
+	        }
 	    },
 	
 	    /**
@@ -7818,7 +7819,7 @@
 	            this.$anims = this.$node.find(".js-animate");
 	
 	            // If pathname is not the `root` we shant not start raf cycle
-	            if (window.location.pathname === _router2["default"].root || _router2["default"].status === 404) {
+	            if (window.location.pathname === _router2["default"].root) {
 	                animator.stop();
 	                animator.go(this.updateAnimate.bind(this));
 	
