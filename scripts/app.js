@@ -65,19 +65,19 @@
 	
 	var _router2 = _interopRequireDefault(_router);
 	
-	var _overlay = __webpack_require__(/*! ./overlay */ 58);
+	var _overlay = __webpack_require__(/*! ./overlay */ 60);
 	
 	var _overlay2 = _interopRequireDefault(_overlay);
 	
-	var _gallery = __webpack_require__(/*! ./gallery */ 62);
+	var _gallery = __webpack_require__(/*! ./gallery */ 64);
 	
 	var _gallery2 = _interopRequireDefault(_gallery);
 	
-	var _intro = __webpack_require__(/*! ./intro */ 66);
+	var _intro = __webpack_require__(/*! ./intro */ 68);
 	
 	var _intro2 = _interopRequireDefault(_intro);
 	
-	var _main = __webpack_require__(/*! ./main */ 67);
+	var _main = __webpack_require__(/*! ./main */ 69);
 	
 	var _main2 = _interopRequireDefault(_main);
 	
@@ -4490,7 +4490,15 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 	
-	var _properjsPagecontroller = __webpack_require__(/*! properjs-pagecontroller */ 48);
+	var _properjsEasing = __webpack_require__(/*! properjs-easing */ 48);
+	
+	var _properjsEasing2 = _interopRequireDefault(_properjsEasing);
+	
+	var _properjsTween = __webpack_require__(/*! properjs-tween */ 49);
+	
+	var _properjsTween2 = _interopRequireDefault(_properjsTween);
+	
+	var _properjsPagecontroller = __webpack_require__(/*! properjs-pagecontroller */ 50);
 	
 	var _properjsPagecontroller2 = _interopRequireDefault(_properjsPagecontroller);
 	
@@ -4502,31 +4510,31 @@
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _about = __webpack_require__(/*! ./about */ 53);
+	var _about = __webpack_require__(/*! ./about */ 55);
 	
 	var _about2 = _interopRequireDefault(_about);
 	
-	var _indexes = __webpack_require__(/*! ./indexes */ 55);
+	var _indexes = __webpack_require__(/*! ./indexes */ 57);
 	
 	var _indexes2 = _interopRequireDefault(_indexes);
 	
-	var _indexesListing = __webpack_require__(/*! ./indexes/listing */ 60);
+	var _indexesListing = __webpack_require__(/*! ./indexes/listing */ 62);
 	
 	var _indexesListing2 = _interopRequireDefault(_indexesListing);
 	
-	var _projects = __webpack_require__(/*! ./projects */ 65);
+	var _projects = __webpack_require__(/*! ./projects */ 67);
 	
 	var _projects2 = _interopRequireDefault(_projects);
 	
-	var _overlay = __webpack_require__(/*! ./overlay */ 58);
+	var _overlay = __webpack_require__(/*! ./overlay */ 60);
 	
 	var _overlay2 = _interopRequireDefault(_overlay);
 	
-	var _gallery = __webpack_require__(/*! ./gallery */ 62);
+	var _gallery = __webpack_require__(/*! ./gallery */ 64);
 	
 	var _gallery2 = _interopRequireDefault(_gallery);
 	
-	var _projectsProject = __webpack_require__(/*! ./projects/Project */ 57);
+	var _projectsProject = __webpack_require__(/*! ./projects/Project */ 59);
 	
 	var _projectsProject2 = _interopRequireDefault(_projectsProject);
 	
@@ -4551,6 +4559,8 @@
 	        this.navData = core.dom.nav.data();
 	        this.pageData = core.dom.page.data();
 	        this.pageDuration = core.util.getTransitionDuration(core.dom.page[0]);
+	        this.tweenScroll = null;
+	        this.$rootPanel = core.dom.main.find(".js-main--garberco");
 	        this.prepPage();
 	        this.bindEmptyHashLinks();
 	        this.initPageController();
@@ -4674,6 +4684,7 @@
 	        this.controller.on("page-controller-router-refresh-document", this.changeContent.bind(this));
 	        this.controller.on("page-controller-router-transition-in", this.changePageIn.bind(this));
 	        this.controller.on("page-controller-initialized-page", this.initPage.bind(this));
+	        this.controller.on("page-controller-router-samepage", this.samePage.bind(this));
 	
 	        this.controller.initPage();
 	    },
@@ -4734,11 +4745,12 @@
 	     *
 	     * @public
 	     * @method initPage
+	     * @param {object} data The PageController data object
 	     * @memberof router
 	     * @description Perform actions after PageController init callback.
 	     *
 	     */
-	    initPage: function initPage() {
+	    initPage: function initPage() /* data */{
 	        core.dom.nav.detach();
 	        core.dom.page.detach();
 	
@@ -4746,6 +4758,33 @@
 	        core.dom.body.removeClass("is-clipped");
 	
 	        window.addEventListener("popstate", this.handlePopstate.bind(this), false);
+	    },
+	
+	    /**
+	     *
+	     * @public
+	     * @method samePage
+	     * @memberof router
+	     * @description Handle logo click on root index, or homepage.
+	     *
+	     */
+	    samePage: function samePage() {
+	        var _this2 = this;
+	
+	        if (window.location.pathname === this.root && !this.tweenScroll && this.$rootPanel[0].scrollTop > 0) {
+	            this.tweenScroll = new _properjsTween2["default"]({
+	                to: 0,
+	                from: this.$rootPanel[0].scrollTop,
+	                ease: _properjsEasing2["default"].easeInOutCubic,
+	                update: function update(top) {
+	                    _this2.$rootPanel[0].scrollTop = top;
+	                },
+	                complete: function complete() {
+	                    _this2.tweenScroll = null;
+	                },
+	                duration: 400
+	            });
+	        }
 	    },
 	
 	    /**
@@ -4807,10 +4846,10 @@
 	     *
 	     */
 	    loadRootIndex: function loadRootIndex() {
-	        var _this2 = this;
+	        var _this3 = this;
 	
 	        core.api.collection(this.root, { format: "html" }, { dataType: "html" }).then(function (response) {
-	            var doc = _this2.parseDoc(response);
+	            var doc = _this3.parseDoc(response);
 	
 	            core.emitter.fire("app--load-root", doc.pageHtml);
 	        });
@@ -4923,6 +4962,327 @@
 
 /***/ },
 /* 48 */
+/*!*************************************!*\
+  !*** ./~/properjs-easing/Easing.js ***!
+  \*************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	/*!
+	 *
+	 * A base set of easing methods
+	 * Most of which were found here:
+	 * https://gist.github.com/gre/1650294
+	 *
+	 * @Easing
+	 * @author: kitajchuk
+	 *
+	 */
+	(function ( factory ) {
+	    
+	    if ( true ) {
+	        module.exports = factory();
+	
+	    } else if ( typeof window !== "undefined" ) {
+	        window.Easing = factory();
+	    }
+	    
+	})(function () {
+	
+	    /**
+	     *
+	     * Easing functions
+	     * @namespace Easing
+	     * @memberof! <global>
+	     *
+	     */
+	    var Easing = {
+	        /**
+	         *
+	         * Produce a linear ease
+	         * @method linear
+	         * @param {number} t Difference in time
+	         * @memberof Easing
+	         * @returns a new t value
+	         *
+	         */
+	        linear: function ( t ) { return t; },
+	        
+	        /**
+	         *
+	         * Produce a swing ease like in jQuery
+	         * @method swing
+	         * @param {number} t Difference in time
+	         * @memberof Easing
+	         * @returns a new t value
+	         *
+	         */
+	        swing: function ( t ) { return (1-Math.cos( t*Math.PI ))/2; },
+	        
+	        /**
+	         *
+	         * Accelerating from zero velocity
+	         * @method easeInQuad
+	         * @param {number} t Difference in time
+	         * @memberof Easing
+	         * @returns a new t value
+	         *
+	         */
+	        easeInQuad: function ( t ) { return t*t; },
+	        
+	        /**
+	         *
+	         * Decelerating to zero velocity
+	         * @method easeOutQuad
+	         * @param {number} t Difference in time
+	         * @memberof Easing
+	         * @returns a new t value
+	         *
+	         */
+	        easeOutQuad: function ( t ) { return t*(2-t); },
+	        
+	        /**
+	         *
+	         * Acceleration until halfway, then deceleration
+	         * @method easeInOutQuad
+	         * @param {number} t Difference in time
+	         * @memberof Easing
+	         * @returns a new t value
+	         *
+	         */
+	        easeInOutQuad: function ( t ) { return t<0.5 ? 2*t*t : -1+(4-2*t)*t; },
+	        
+	        /**
+	         *
+	         * Accelerating from zero velocity
+	         * @method easeInCubic
+	         * @param {number} t Difference in time
+	         * @memberof Easing
+	         * @returns a new t value
+	         *
+	         */
+	        easeInCubic: function ( t ) { return t*t*t; },
+	        
+	        /**
+	         *
+	         * Decelerating to zero velocity
+	         * @method easeOutCubic
+	         * @param {number} t Difference in time
+	         * @memberof Easing
+	         * @returns a new t value
+	         *
+	         */
+	        easeOutCubic: function ( t ) { return (--t)*t*t+1; },
+	        
+	        /**
+	         *
+	         * Acceleration until halfway, then deceleration
+	         * @method easeInOutCubic
+	         * @param {number} t Difference in time
+	         * @memberof Easing
+	         * @returns a new t value
+	         *
+	         */
+	        easeInOutCubic: function ( t ) { return t<0.5 ? 4*t*t*t : (t-1)*(2*t-2)*(2*t-2)+1; },
+	        
+	        /**
+	         *
+	         * Accelerating from zero velocity
+	         * @method easeInQuart
+	         * @param {number} t Difference in time
+	         * @memberof Easing
+	         * @returns a new t value
+	         *
+	         */
+	        easeInQuart: function ( t ) { return t*t*t*t; },
+	        
+	        /**
+	         *
+	         * Decelerating to zero velocity
+	         * @method easeOutQuart
+	         * @param {number} t Difference in time
+	         * @memberof Easing
+	         * @returns a new t value
+	         *
+	         */
+	        easeOutQuart: function ( t ) { return 1-(--t)*t*t*t; },
+	        
+	        /**
+	         *
+	         * Acceleration until halfway, then deceleration
+	         * @method easeInOutQuart
+	         * @param {number} t Difference in time
+	         * @memberof Easing
+	         * @returns a new t value
+	         *
+	         */
+	        easeInOutQuart: function ( t ) { return t<0.5 ? 8*t*t*t*t : 1-8*(--t)*t*t*t; },
+	        
+	        /**
+	         *
+	         * Accelerating from zero velocity
+	         * @method easeInQuint
+	         * @param {number} t Difference in time
+	         * @memberof Easing
+	         * @returns a new t value
+	         *
+	         */
+	        easeInQuint: function ( t ) { return t*t*t*t*t; },
+	        
+	        /**
+	         *
+	         * Decelerating to zero velocity
+	         * @method easeOutQuint
+	         * @param {number} t Difference in time
+	         * @memberof Easing
+	         * @returns a new t value
+	         *
+	         */
+	        easeOutQuint: function ( t ) { return 1+(--t)*t*t*t*t; },
+	        
+	        /**
+	         *
+	         * Acceleration until halfway, then deceleration
+	         * @method easeInOutQuint
+	         * @param {number} t Difference in time
+	         * @memberof Easing
+	         * @returns a new t value
+	         *
+	         */
+	        easeInOutQuint: function ( t ) { return t<0.5 ? 16*t*t*t*t*t : 1+16*(--t)*t*t*t*t; }
+	    };
+	    
+	    
+	    return Easing;
+	
+	
+	});
+
+/***/ },
+/* 49 */
+/*!***********************************!*\
+  !*** ./~/properjs-tween/Tween.js ***!
+  \***********************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	/*!
+	 *
+	 * A simple tween class using requestAnimationFrame
+	 *
+	 * @Tween
+	 * @author: kitajchuk
+	 *
+	 */
+	(function ( factory ) {
+	    
+	    if ( true ) {
+	        module.exports = factory();
+	
+	    } else if ( typeof window !== "undefined" ) {
+	        window.Tween = factory();
+	    }
+	    
+	})(function () {
+	
+	    var Easing = __webpack_require__( /*! properjs-easing */ 48 ),
+	        defaults = {
+	            ease: Easing.linear,
+	            duration: 600,
+	            from: 0,
+	            to: 0,
+	            delay: 0,
+	            update: function () {},
+	            complete: function () {}
+	        };
+	    
+	    
+	    /**
+	     *
+	     * Tween function
+	     * @constructor Tween
+	     * @requires raf
+	     * @requires Easing
+	     * @param {object} options Tween animation settings
+	     * <ul>
+	     * <li>duration - How long the tween will last</li>
+	     * <li>from - Where to start the tween</li>
+	     * <li>to - When to end the tween</li>
+	     * <li>update - The callback on each iteration</li>
+	     * <li>complete - The callback on end of animation</li>
+	     * <li>ease - The easing function to use</li>
+	     * <li>delay - How long to wait before animation</li>
+	     * </ul>
+	     * @memberof! <global>
+	     *
+	     */
+	    var Tween = function ( options ) {
+	        // Normalize options
+	        options = (options || {});
+	    
+	        // Normalize options
+	        for ( var i in defaults ) {
+	            if ( options[ i ] === undefined ) {
+	                options[ i ] = defaults[ i ];
+	            }
+	        }
+	    
+	        var tweenDiff = (options.to - options.from),
+	            startTime = null,
+	            rafTimer = null,
+	            isStopped = false;
+	    
+	        function animate( rafTimeStamp ) {
+	            if ( isStopped ) {
+	                return;
+	            }
+	    
+	            if ( startTime === null ) {
+	                startTime = rafTimeStamp;
+	            }
+	    
+	            var animDiff = (rafTimeStamp - startTime),
+	                tweenTo = (tweenDiff * options.ease( animDiff / options.duration )) + options.from;
+	    
+	            if ( typeof options.update === "function" ) {
+	                options.update( tweenTo );
+	            }
+	    
+	            if ( animDiff > options.duration ) {
+	                if ( typeof options.complete === "function" ) {
+	                    options.complete( options.to );
+	                }
+	    
+	                cancelAnimationFrame( rafTimer );
+	    
+	                rafTimer = null;
+	    
+	                return false;
+	            }
+	    
+	            rafTimer = requestAnimationFrame( animate );
+	        }
+	    
+	        setTimeout(function () {
+	            rafTimer = requestAnimationFrame( animate );
+	    
+	        }, options.delay );
+	    
+	        this.stop = function () {
+	            isStopped = true;
+	    
+	            cancelAnimationFrame( rafTimer );
+	    
+	            rafTimer = null;
+	        };
+	    };
+	    
+	    
+	    return Tween;
+	
+	
+	});
+
+/***/ },
+/* 50 */
 /*!*****************************************************!*\
   !*** ./~/properjs-pagecontroller/PageController.js ***!
   \*****************************************************/
@@ -4955,7 +5315,7 @@
 	})(function () {
 	
 	    // Useful stuff
-	    var Router = __webpack_require__( /*! properjs-router */ 49 ),
+	    var Router = __webpack_require__( /*! properjs-router */ 51 ),
 	        Controller = __webpack_require__( /*! properjs-controller */ 35 ),
 	
 	        _router = null,
@@ -5453,7 +5813,7 @@
 	});
 
 /***/ },
-/* 49 */
+/* 51 */
 /*!***************************************************************!*\
   !*** ./~/properjs-pagecontroller/~/properjs-router/Router.js ***!
   \***************************************************************/
@@ -5478,9 +5838,9 @@
 	
 	})(function () {
 	
-	    var PushState = __webpack_require__( /*! properjs-pushstate */ 50 ),
-	        MatchRoute = __webpack_require__( /*! properjs-matchroute */ 51 ),
-	        matchElement = __webpack_require__( /*! properjs-matchelement */ 52 ),
+	    var PushState = __webpack_require__( /*! properjs-pushstate */ 52 ),
+	        MatchRoute = __webpack_require__( /*! properjs-matchroute */ 53 ),
+	        matchElement = __webpack_require__( /*! properjs-matchelement */ 54 ),
 	        _initDelay = 200,
 	        _triggerEl;
 	
@@ -6135,7 +6495,7 @@
 	});
 
 /***/ },
-/* 50 */
+/* 52 */
 /*!***************************************************************************************!*\
   !*** ./~/properjs-pagecontroller/~/properjs-router/~/properjs-pushstate/PushState.js ***!
   \***************************************************************************************/
@@ -6532,7 +6892,7 @@
 	});
 
 /***/ },
-/* 51 */
+/* 53 */
 /*!*****************************************************************************************!*\
   !*** ./~/properjs-pagecontroller/~/properjs-router/~/properjs-matchroute/MatchRoute.js ***!
   \*****************************************************************************************/
@@ -6891,7 +7251,7 @@
 	});
 
 /***/ },
-/* 52 */
+/* 54 */
 /*!*************************************************!*\
   !*** ./~/properjs-matchelement/matchElement.js ***!
   \*************************************************/
@@ -6953,7 +7313,7 @@
 	});
 
 /***/ },
-/* 53 */
+/* 55 */
 /*!*******************************!*\
   !*** ./js_src/about/index.js ***!
   \*******************************/
@@ -6974,7 +7334,7 @@
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _About = __webpack_require__(/*! ./About */ 54);
+	var _About = __webpack_require__(/*! ./About */ 56);
 	
 	var _About2 = _interopRequireDefault(_About);
 	
@@ -7073,7 +7433,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 54 */
+/* 56 */
 /*!*******************************!*\
   !*** ./js_src/about/About.js ***!
   \*******************************/
@@ -7192,7 +7552,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 55 */
+/* 57 */
 /*!*********************************!*\
   !*** ./js_src/indexes/index.js ***!
   \*********************************/
@@ -7216,7 +7576,7 @@
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _IndexRoot = __webpack_require__(/*! ./IndexRoot */ 56);
+	var _IndexRoot = __webpack_require__(/*! ./IndexRoot */ 58);
 	
 	var _IndexRoot2 = _interopRequireDefault(_IndexRoot);
 	
@@ -7321,7 +7681,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 56 */
+/* 58 */
 /*!*************************************!*\
   !*** ./js_src/indexes/IndexRoot.js ***!
   \*************************************/
@@ -7353,11 +7713,11 @@
 	
 	var _router2 = _interopRequireDefault(_router);
 	
-	var _projectsProject = __webpack_require__(/*! ../projects/Project */ 57);
+	var _projectsProject = __webpack_require__(/*! ../projects/Project */ 59);
 	
 	var _projectsProject2 = _interopRequireDefault(_projectsProject);
 	
-	var _overlay = __webpack_require__(/*! ../overlay */ 58);
+	var _overlay = __webpack_require__(/*! ../overlay */ 60);
 	
 	var _overlay2 = _interopRequireDefault(_overlay);
 	
@@ -7441,9 +7801,41 @@
 	            if (window.location.pathname === _router2["default"].root) {
 	                animator.stop();
 	                animator.go(this.updateAnimate.bind(this));
+	
+	                this.handleScroll();
 	            } else {
 	                this.updateAnimate();
 	            }
+	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @instance
+	         * @method handleScroll
+	         * @memberof indexes.IndexRoot
+	         * @description Handle active scroll for root panel.
+	         *
+	         */
+	    }, {
+	        key: "handleScroll",
+	        value: function handleScroll() {
+	            var _timeout = null;
+	            var _handleScroll = function _handleScroll() {
+	                _overlay2["default"].suppress(false);
+	            };
+	
+	            this.$target.on("scroll", function () {
+	                try {
+	                    clearTimeout(_timeout);
+	                } catch (error) {
+	                    core.log("warn", error);
+	                }
+	
+	                _overlay2["default"].suppress(true);
+	
+	                _timeout = setTimeout(_handleScroll, 300);
+	            });
 	        }
 	
 	        /**
@@ -7605,6 +7997,8 @@
 	        key: "teardown",
 	        value: function teardown() {
 	            animator.stop();
+	
+	            this.$target.off("scroll");
 	        }
 	    }]);
 	
@@ -7615,7 +8009,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 57 */
+/* 59 */
 /*!************************************!*\
   !*** ./js_src/projects/Project.js ***!
   \************************************/
@@ -7639,11 +8033,11 @@
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _overlay = __webpack_require__(/*! ../overlay */ 58);
+	var _overlay = __webpack_require__(/*! ../overlay */ 60);
 	
 	var _overlay2 = _interopRequireDefault(_overlay);
 	
-	var _Menu = __webpack_require__(/*! ../Menu */ 59);
+	var _Menu = __webpack_require__(/*! ../Menu */ 61);
 	
 	var _Menu2 = _interopRequireDefault(_Menu);
 	
@@ -7831,18 +8225,16 @@
 	        key: "updatePosition",
 	        value: function updatePosition() {
 	            var nodeRect = this.$node[0].getBoundingClientRect();
-	            var $imageloaded = this.$images.filter("[" + core.config.imageLoaderAttr + "]");
+	            //const $imageloaded = this.$images.filter( `[${core.config.imageLoaderAttr}]` );
 	
-	            if ($imageloaded.length !== this.$images.length) {
-	                return;
-	            }
+	            //if ( $imageloaded.length !== this.$images.length ) {
+	            //    return;
+	            //}
 	
 	            if (core.dom.project.element[0].scrollTop !== 0 && Math.floor(nodeRect.bottom) <= 0 && !this.isEnded) {
 	                this.isEnded = true;
 	
-	                setTimeout(function () {
-	                    core.emitter.fire("app--project-ended");
-	                }, core.dom.project.elementTransitionDuration);
+	                core.emitter.fire("app--project-ended");
 	            }
 	        }
 	
@@ -7943,7 +8335,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 58 */
+/* 60 */
 /*!***************************!*\
   !*** ./js_src/overlay.js ***!
   \***************************/
@@ -7962,6 +8354,7 @@
 	var core = _interopRequireWildcard(_core);
 	
 	var _isActive = false;
+	var isSuppressed = false;
 	var transTime = core.util.getTransitionDuration(core.dom.overlay.element[0]);
 	
 	/**
@@ -7998,7 +8391,7 @@
 	     *
 	     */
 	    open: function open() {
-	        if (_isActive) {
+	        if (_isActive || isSuppressed) {
 	            return this;
 	        }
 	
@@ -8055,6 +8448,23 @@
 	    /**
 	     *
 	     * @public
+	     * @method suppress
+	     * @param {boolean} bool Will it be suppressed?
+	     * @memberof overlay
+	     * @description Suppress the overlay.
+	     *
+	     */
+	    suppress: function suppress(bool) {
+	        isSuppressed = bool;
+	
+	        if (isSuppressed && _isActive) {
+	            this.close();
+	        }
+	    },
+	
+	    /**
+	     *
+	     * @public
 	     * @method setTitle
 	     * @param {string} text The text/html to set.
 	     * @memberof overlay
@@ -8062,7 +8472,9 @@
 	     *
 	     */
 	    setTitle: function setTitle(text) {
-	        core.dom.overlay.elementTitle[0].innerHTML = text;
+	        if (!isSuppressed) {
+	            core.dom.overlay.elementTitle[0].innerHTML = text;
+	        }
 	    },
 	
 	    /**
@@ -8086,7 +8498,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 59 */
+/* 61 */
 /*!************************!*\
   !*** ./js_src/Menu.js ***!
   \************************/
@@ -8253,7 +8665,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 60 */
+/* 62 */
 /*!***********************************!*\
   !*** ./js_src/indexes/listing.js ***!
   \***********************************/
@@ -8273,7 +8685,7 @@
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _IndexFull = __webpack_require__(/*! ./IndexFull */ 61);
+	var _IndexFull = __webpack_require__(/*! ./IndexFull */ 63);
 	
 	var _IndexFull2 = _interopRequireDefault(_IndexFull);
 	
@@ -8374,7 +8786,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 61 */
+/* 63 */
 /*!*************************************!*\
   !*** ./js_src/indexes/IndexFull.js ***!
   \*************************************/
@@ -8406,15 +8818,15 @@
 	
 	var _router2 = _interopRequireDefault(_router);
 	
-	var _gallery = __webpack_require__(/*! ../gallery */ 62);
+	var _gallery = __webpack_require__(/*! ../gallery */ 64);
 	
 	var _gallery2 = _interopRequireDefault(_gallery);
 	
-	var _overlay = __webpack_require__(/*! ../overlay */ 58);
+	var _overlay = __webpack_require__(/*! ../overlay */ 60);
 	
 	var _overlay2 = _interopRequireDefault(_overlay);
 	
-	var _properjsTemplate = __webpack_require__(/*! properjs-template */ 64);
+	var _properjsTemplate = __webpack_require__(/*! properjs-template */ 66);
 	
 	var _properjsTemplate2 = _interopRequireDefault(_properjsTemplate);
 	
@@ -8867,7 +9279,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 62 */
+/* 64 */
 /*!***************************!*\
   !*** ./js_src/gallery.js ***!
   \***************************/
@@ -8891,15 +9303,15 @@
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _Menu = __webpack_require__(/*! ./Menu */ 59);
+	var _Menu = __webpack_require__(/*! ./Menu */ 61);
 	
 	var _Menu2 = _interopRequireDefault(_Menu);
 	
-	var _properjsDebounce = __webpack_require__(/*! properjs-debounce */ 63);
+	var _properjsDebounce = __webpack_require__(/*! properjs-debounce */ 65);
 	
 	var _properjsDebounce2 = _interopRequireDefault(_properjsDebounce);
 	
-	var _overlay = __webpack_require__(/*! ./overlay */ 58);
+	var _overlay = __webpack_require__(/*! ./overlay */ 60);
 	
 	var _overlay2 = _interopRequireDefault(_overlay);
 	
@@ -9039,7 +9451,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 63 */
+/* 65 */
 /*!*****************************************!*\
   !*** ./~/properjs-debounce/debounce.js ***!
   \*****************************************/
@@ -9110,7 +9522,7 @@
 	});
 
 /***/ },
-/* 64 */
+/* 66 */
 /*!*****************************************!*\
   !*** ./~/properjs-template/template.js ***!
   \*****************************************/
@@ -9155,7 +9567,7 @@
 	});
 
 /***/ },
-/* 65 */
+/* 67 */
 /*!**********************************!*\
   !*** ./js_src/projects/index.js ***!
   \**********************************/
@@ -9175,7 +9587,7 @@
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _Project = __webpack_require__(/*! ./Project */ 57);
+	var _Project = __webpack_require__(/*! ./Project */ 59);
 	
 	var _Project2 = _interopRequireDefault(_Project);
 	
@@ -9309,7 +9721,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 66 */
+/* 68 */
 /*!*************************!*\
   !*** ./js_src/intro.js ***!
   \*************************/
@@ -9348,11 +9760,13 @@
 	            return;
 	        }
 	
-	        core.dom.intro.removeClass("is-active");
-	
 	        setTimeout(function () {
-	            core.dom.intro.remove();
-	        }, core.util.getTransitionDuration(core.dom.intro[0]));
+	            core.dom.intro.removeClass("is-active");
+	
+	            setTimeout(function () {
+	                return core.dom.intro.remove();
+	            }, core.util.getTransitionDuration(core.dom.intro[0]));
+	        }, 1000);
 	    }
 	};
 	
@@ -9363,7 +9777,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 67 */
+/* 69 */
 /*!************************!*\
   !*** ./js_src/main.js ***!
   \************************/
