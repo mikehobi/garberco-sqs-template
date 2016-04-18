@@ -4556,15 +4556,19 @@
 	     */
 	    init: function init() {
 	        this.state = {};
-	        this.status = 200;
 	        this.navData = core.dom.nav.data();
 	        this.pageData = core.dom.page.data();
 	        this.pageDuration = core.util.getTransitionDuration(core.dom.page[0]);
 	        this.tweenScroll = null;
 	        this.$rootPanel = core.dom.main.find(".js-main--garberco");
-	        this.prepPage();
-	        this.bindEmptyHashLinks();
-	        this.initPageController();
+	
+	        if (this.pageData.stype === "site") {
+	            this.redirect();
+	        } else {
+	            this.prepPage();
+	            this.bindEmptyHashLinks();
+	            this.initPageController();
+	        }
 	
 	        core.log("router initialized");
 	    },
@@ -4669,6 +4673,18 @@
 	    /**
 	     *
 	     * @public
+	     * @method redirect
+	     * @memberof router
+	     * @description Handle 404 / Invalid page hit.
+	     *
+	     */
+	    redirect: function redirect() {
+	        window.location.href = window.location.origin + this.root;
+	    },
+	
+	    /**
+	     *
+	     * @public
 	     * @method initPageController
 	     * @memberof router
 	     * @description Create the PageController instance.
@@ -4751,20 +4767,14 @@
 	     * @description Perform actions after PageController init callback.
 	     *
 	     */
-	    initPage: function initPage(data) {
-	        this.status = data.status;
+	    initPage: function initPage() /* data */{
+	        core.dom.nav.detach();
+	        core.dom.page.detach();
 	
-	        if (this.status === 404) {
-	            window.location.href = window.location.origin + this.root;
-	        } else {
-	            core.dom.nav.detach();
-	            core.dom.page.detach();
+	        core.dom.html.removeClass("is-clipped");
+	        core.dom.body.removeClass("is-clipped");
 	
-	            core.dom.html.removeClass("is-clipped");
-	            core.dom.body.removeClass("is-clipped");
-	
-	            window.addEventListener("popstate", this.handlePopstate.bind(this), false);
-	        }
+	        window.addEventListener("popstate", this.handlePopstate.bind(this), false);
 	    },
 	
 	    /**
@@ -4935,8 +4945,6 @@
 	     *
 	     */
 	    changeContent: function changeContent(data) {
-	        this.status = data.status;
-	
 	        var doc = this.parseDoc(data.response);
 	
 	        core.dom.page[0].innerHTML = doc.pageHtml;
