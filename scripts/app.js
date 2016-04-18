@@ -69,15 +69,15 @@
 	
 	var _overlay2 = _interopRequireDefault(_overlay);
 	
-	var _gallery = __webpack_require__(/*! ./gallery */ 64);
+	var _gallery = __webpack_require__(/*! ./gallery */ 65);
 	
 	var _gallery2 = _interopRequireDefault(_gallery);
 	
-	var _intro = __webpack_require__(/*! ./intro */ 68);
+	var _intro = __webpack_require__(/*! ./intro */ 69);
 	
 	var _intro2 = _interopRequireDefault(_intro);
 	
-	var _main = __webpack_require__(/*! ./main */ 69);
+	var _main = __webpack_require__(/*! ./main */ 70);
 	
 	var _main2 = _interopRequireDefault(_main);
 	
@@ -4522,11 +4522,11 @@
 	
 	var _indexes2 = _interopRequireDefault(_indexes);
 	
-	var _indexesListing = __webpack_require__(/*! ./indexes/listing */ 62);
+	var _indexesListing = __webpack_require__(/*! ./indexes/listing */ 63);
 	
 	var _indexesListing2 = _interopRequireDefault(_indexesListing);
 	
-	var _projects = __webpack_require__(/*! ./projects */ 67);
+	var _projects = __webpack_require__(/*! ./projects */ 68);
 	
 	var _projects2 = _interopRequireDefault(_projects);
 	
@@ -4534,7 +4534,7 @@
 	
 	var _overlay2 = _interopRequireDefault(_overlay);
 	
-	var _gallery = __webpack_require__(/*! ./gallery */ 64);
+	var _gallery = __webpack_require__(/*! ./gallery */ 65);
 	
 	var _gallery2 = _interopRequireDefault(_gallery);
 	
@@ -7557,6 +7557,8 @@
 	            setTimeout(function () {
 	                _this.$anim.addClass("is-active");
 	            }, 10);
+	
+	            core.emitter.fire("app--preload-done");
 	        }
 	
 	        /**
@@ -7637,7 +7639,7 @@
 	        });
 	
 	        core.emitter.on("app--load-root", function (root) {
-	            $_jsElement = (0, _js_libsHoboDistHoboBuild2["default"])(root).find(".js-index");
+	            $_jsElement = (0, _js_libsHoboDistHoboBuild2["default"])(root);
 	
 	            _this.onload();
 	        });
@@ -8073,6 +8075,10 @@
 	
 	var _properjsController2 = _interopRequireDefault(_properjsController);
 	
+	var _bar = __webpack_require__(/*! ../bar */ 62);
+	
+	var _bar2 = _interopRequireDefault(_bar);
+	
 	var isActive = false;
 	var animator = new _properjsController2["default"]();
 	
@@ -8191,6 +8197,8 @@
 	    }, {
 	        key: "onPreload",
 	        value: function onPreload() {
+	            _bar2["default"].stop();
+	
 	            _overlay2["default"].close();
 	
 	            this.cycleAnimation();
@@ -8321,6 +8329,8 @@
 	 */
 	Project.open = function () {
 	    isActive = true;
+	
+	    _bar2["default"].load();
 	
 	    core.dom.html.addClass("is-offcanvas is-offcanvas--project");
 	    core.dom.body.append(core.dom.project.element);
@@ -8694,6 +8704,230 @@
 
 /***/ },
 /* 62 */
+/*!***********************!*\
+  !*** ./js_src/bar.js ***!
+  \***********************/
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var _core = __webpack_require__(/*! ./core */ 1);
+	
+	var core = _interopRequireWildcard(_core);
+	
+	var _properjsTween = __webpack_require__(/*! properjs-tween */ 49);
+	
+	var _properjsTween2 = _interopRequireDefault(_properjsTween);
+	
+	var _properjsEasing = __webpack_require__(/*! properjs-easing */ 48);
+	
+	var _properjsEasing2 = _interopRequireDefault(_properjsEasing);
+	
+	var _js_libsHoboDistHoboBuild = __webpack_require__(/*! js_libs/hobo/dist/hobo.build */ 4);
+	
+	var _js_libsHoboDistHoboBuild2 = _interopRequireDefault(_js_libsHoboDistHoboBuild);
+	
+	var _instance = null;
+	var $_jsBar = (0, _js_libsHoboDistHoboBuild2["default"])('<div class="bar"><div class="bar__inner"></div></div>');
+	var $_jsInner = $_jsBar.find(".bar__inner");
+	
+	/**
+	 *
+	 * @private
+	 * @class Bar
+	 * @classdesc Shimmed load bars set a high initial animation duration
+	 *            that can be stopped and completed upon request.
+	 * @memberof loading
+	 *
+	 */
+	
+	var Bar = (function () {
+	    function Bar() {
+	        _classCallCheck(this, Bar);
+	
+	        this.tween = null;
+	        this.timeout = 5000;
+	    }
+	
+	    /**
+	     *
+	     * @public
+	     * @namespace bar
+	     * @description Performs a loader bar interaction.
+	     * @memberof loading
+	     *
+	     */
+	
+	    /**
+	     *
+	     * @instance
+	     * @method append
+	     * @memberof loading.Bar
+	     * @description Append the element to the DOM.
+	     *
+	     */
+	
+	    _createClass(Bar, [{
+	        key: "append",
+	        value: function append() {
+	            core.dom.body.append($_jsBar);
+	        }
+	
+	        /**
+	         *
+	         * @instance
+	         * @method load
+	         * @memberof loading.Bar
+	         * @description Initialize the load bar ui for progress shim.
+	         *
+	         */
+	    }, {
+	        key: "load",
+	        value: function load() {
+	            this.append();
+	
+	            this.tween = new _properjsTween2["default"]({
+	                from: 0,
+	                to: window.innerWidth,
+	                update: this.update.bind(this),
+	                complete: this.update.bind(this),
+	                ease: _properjsEasing2["default"].easeInOutCubic,
+	                duration: this.timeout
+	            });
+	        }
+	
+	        /**
+	         *
+	         * @instance
+	         * @method stop
+	         * @param {function} callback The function to call when Tween is complete
+	         * @memberof loading.Bar
+	         * @description Terminate the load bar animation.
+	         *
+	         */
+	    }, {
+	        key: "stop",
+	        value: function stop(callback) {
+	            this.tween.stop();
+	            this.tween = new _properjsTween2["default"]({
+	                from: this.getFrom(),
+	                to: window.innerWidth,
+	                update: this.update.bind(this),
+	                complete: this.complete.bind(this, callback),
+	                ease: _properjsEasing2["default"].easeInOutCubic,
+	                duration: 50
+	            });
+	        }
+	
+	        /**
+	         *
+	         * @instance
+	         * @method update
+	         * @param {number} value The new value to tween to
+	         * @memberof loading.Bar
+	         * @description Animate/Tween the load bar ui.
+	         *
+	         */
+	    }, {
+	        key: "update",
+	        value: function update(value) {
+	            $_jsInner[0].style.width = core.util.px(value);
+	        }
+	
+	        /**
+	         *
+	         * @instance
+	         * @method complete
+	         * @param {function} callback The function to call when transition is complete
+	         * @memberof loading.Bar
+	         * @description Complete the load bar ui sequence and detach the node.
+	         *
+	         */
+	    }, {
+	        key: "complete",
+	        value: function complete(callback) {
+	            $_jsBar.addClass("is-done");
+	
+	            setTimeout(function () {
+	                $_jsBar.detach().removeClass("is-done");
+	                $_jsInner.attr("style", "");
+	
+	                callback();
+	            }, core.util.getTransitionDuration($_jsBar[0]));
+	        }
+	
+	        /**
+	         *
+	         * @instance
+	         * @method getFrom
+	         * @memberof loading.Bar
+	         * @description Get the current value to tween from.\
+	         * @returns {number}
+	         *
+	         */
+	    }, {
+	        key: "getFrom",
+	        value: function getFrom() {
+	            return $_jsInner[0].clientWidth;
+	        }
+	    }]);
+	
+	    return Bar;
+	})();
+	
+	var bar = {
+	    /**
+	     *
+	     * @public
+	     * @method load
+	     * @param {string} position The placement position for the load bar.
+	     * @param {string} color The optional color tone for the load bar.
+	     * @memberof loading.bar
+	     * @description Shims a "loading" progress bar based on... nothing!
+	     *
+	     */
+	    load: function load(position, color) {
+	        _instance = new Bar(position, color);
+	        _instance.load();
+	    },
+	
+	    /**
+	     *
+	     * @public
+	     * @method stop
+	     * @memberof loading.bar
+	     * @description Stops load bar animation and removes the bar instance.
+	     *
+	     */
+	    stop: function stop() {
+	        if (_instance) {
+	            _instance.stop(function () {
+	                _instance = null;
+	            });
+	        }
+	    }
+	};
+	
+	/******************************************************************************
+	 * Export
+	*******************************************************************************/
+	exports["default"] = bar;
+	module.exports = exports["default"];
+
+/***/ },
+/* 63 */
 /*!***********************************!*\
   !*** ./js_src/indexes/listing.js ***!
   \***********************************/
@@ -8713,7 +8947,7 @@
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _IndexFull = __webpack_require__(/*! ./IndexFull */ 63);
+	var _IndexFull = __webpack_require__(/*! ./IndexFull */ 64);
 	
 	var _IndexFull2 = _interopRequireDefault(_IndexFull);
 	
@@ -8814,7 +9048,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 63 */
+/* 64 */
 /*!*************************************!*\
   !*** ./js_src/indexes/IndexFull.js ***!
   \*************************************/
@@ -8846,7 +9080,7 @@
 	
 	var _router2 = _interopRequireDefault(_router);
 	
-	var _gallery = __webpack_require__(/*! ../gallery */ 64);
+	var _gallery = __webpack_require__(/*! ../gallery */ 65);
 	
 	var _gallery2 = _interopRequireDefault(_gallery);
 	
@@ -8854,13 +9088,17 @@
 	
 	var _overlay2 = _interopRequireDefault(_overlay);
 	
-	var _properjsTemplate = __webpack_require__(/*! properjs-template */ 66);
+	var _properjsTemplate = __webpack_require__(/*! properjs-template */ 67);
 	
 	var _properjsTemplate2 = _interopRequireDefault(_properjsTemplate);
 	
 	var _properjsController = __webpack_require__(/*! properjs-controller */ 35);
 	
 	var _properjsController2 = _interopRequireDefault(_properjsController);
+	
+	var _bar = __webpack_require__(/*! ../bar */ 62);
+	
+	var _bar2 = _interopRequireDefault(_bar);
 	
 	var instance = null;
 	var animator = new _properjsController2["default"]();
@@ -9128,6 +9366,8 @@
 	    }, {
 	        key: "loadIndex",
 	        value: function loadIndex() {
+	            _bar2["default"].load();
+	
 	            _router2["default"].loadFullIndex(this.onLoadFullIndex.bind(this));
 	        }
 	
@@ -9165,6 +9405,8 @@
 	            this.$target.append(this.$node);
 	
 	            core.images.handleImages(this.$node.find(".js-lazy-image"), function () {
+	                _bar2["default"].stop();
+	
 	                _this2.cycleAnimation();
 	            });
 	        }
@@ -9307,7 +9549,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 64 */
+/* 65 */
 /*!***************************!*\
   !*** ./js_src/gallery.js ***!
   \***************************/
@@ -9335,13 +9577,17 @@
 	
 	var _Menu2 = _interopRequireDefault(_Menu);
 	
-	var _properjsDebounce = __webpack_require__(/*! properjs-debounce */ 65);
+	var _properjsDebounce = __webpack_require__(/*! properjs-debounce */ 66);
 	
 	var _properjsDebounce2 = _interopRequireDefault(_properjsDebounce);
 	
 	var _overlay = __webpack_require__(/*! ./overlay */ 60);
 	
 	var _overlay2 = _interopRequireDefault(_overlay);
+	
+	var _bar = __webpack_require__(/*! ./bar */ 62);
+	
+	var _bar2 = _interopRequireDefault(_bar);
 	
 	/**
 	 *
@@ -9461,6 +9707,7 @@
 	    setImage: function setImage($image) {
 	        var data = $image.data();
 	
+	        _bar2["default"].load();
 	        this.open();
 	        this.$image.removeAttr(core.config.imageLoaderAttr).attr({
 	            "data-img-src": data.imgSrc,
@@ -9468,7 +9715,9 @@
 	            "data-original-size": data.originalSize
 	        });
 	
-	        core.util.loadImages(this.$image, core.util.noop, true, window.innerWidth);
+	        core.util.loadImages(this.$image, core.util.noop, true, window.innerWidth).on("done", function () {
+	            _bar2["default"].stop();
+	        });
 	    }
 	};
 	
@@ -9479,7 +9728,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 65 */
+/* 66 */
 /*!*****************************************!*\
   !*** ./~/properjs-debounce/debounce.js ***!
   \*****************************************/
@@ -9550,7 +9799,7 @@
 	});
 
 /***/ },
-/* 66 */
+/* 67 */
 /*!*****************************************!*\
   !*** ./~/properjs-template/template.js ***!
   \*****************************************/
@@ -9595,7 +9844,7 @@
 	});
 
 /***/ },
-/* 67 */
+/* 68 */
 /*!**********************************!*\
   !*** ./js_src/projects/index.js ***!
   \**********************************/
@@ -9749,7 +9998,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 68 */
+/* 69 */
 /*!*************************!*\
   !*** ./js_src/intro.js ***!
   \*************************/
@@ -9805,7 +10054,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 69 */
+/* 70 */
 /*!************************!*\
   !*** ./js_src/main.js ***!
   \************************/
