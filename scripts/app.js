@@ -4679,7 +4679,7 @@
 	     *
 	     */
 	    redirect: function redirect() {
-	        window.location.href = window.location.origin + this.root;
+	        window.location.href = window.location.origin;
 	    },
 	
 	    /**
