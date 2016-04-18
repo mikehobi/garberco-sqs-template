@@ -7612,7 +7612,7 @@
 	        });
 	
 	        core.emitter.on("app--load-root", function (root) {
-	            $_jsElement = (0, _js_libsHoboDistHoboBuild2["default"])(root);
+	            $_jsElement = (0, _js_libsHoboDistHoboBuild2["default"])(root).find(".js-index");
 	
 	            _this.onload();
 	        });
