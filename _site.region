@@ -1,3 +1,1 @@
-<div class="page js-page" data-type="site">
-    {squarespace.main-content}
-</div>
+{squarespace.main-content}

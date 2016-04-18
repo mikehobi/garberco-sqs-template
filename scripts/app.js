@@ -101,8 +101,12 @@
 	        this.intro = _intro2["default"];
 	        this.analytics = new core.Analytics();
 	
-	        this.bindEvents();
-	        this.initModules();
+	        if (!this.core.dom.page.length) {
+	            this.router.redirect();
+	        } else {
+	            this.bindEvents();
+	            this.initModules();
+	        }
 	
 	        core.log("App", this);
 	    }
@@ -4561,15 +4565,9 @@
 	        this.pageDuration = core.util.getTransitionDuration(core.dom.page[0]);
 	        this.tweenScroll = null;
 	        this.$rootPanel = core.dom.main.find(".js-main--garberco");
-	
-	        debugger;
-	        if (this.pageData.type === "site") {
-	            this.redirect();
-	        } else {
-	            this.prepPage();
-	            this.bindEmptyHashLinks();
-	            this.initPageController();
-	        }
+	        this.prepPage();
+	        this.bindEmptyHashLinks();
+	        this.initPageController();
 	
 	        core.log("router initialized");
 	    },
