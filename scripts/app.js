@@ -5888,7 +5888,7 @@
 	         * @private
 	         *
 	         */
-	        _rFiles: /\.jpg|jpeg|png|gif|pdf|csv|txt|md|doc|docx|xls|xlsx|webm|mp4|mp3$/gi,
+	        _rFiles: /\.(jpg|jpeg|png|gif|pdf|csv|txt|md|doc|docx|xls|xlsx|webm|mp4|mp3)$/gi,
 	
 	        /**
 	         *
@@ -6039,21 +6039,29 @@
 	                self._handlePopstate( url, state );
 	            });
 	
-	            // Fire first route - shim a little and bypass true XHR here
+	            // Fire first route
 	            // Async this in order to allow .get() to work after instantiation
-	            setTimeout(function () {
-	                // https://developer.mozilla.org/en-US/docs/Web/API/XMLSerializer
-	                var doc = new XMLSerializer().serializeToString( document );
-	                var xhr = {
-	                    status: 200,
-	                    responseText: doc
-	                };
+	            if ( this._options.handle404 ) {
+	                this._route( url, function ( response, status ) {
+	                    self._ready = true;
+	                });
 	
-	                self._fire( "get", url, xhr, xhr.status );
-	                self._cache( url, xhr );
-	                self._ready = true;
+	            // Shim a little and bypass true XHR here if not handling 404s
+	            } else {
+	                setTimeout(function () {
+	                    // https://developer.mozilla.org/en-US/docs/Web/API/XMLSerializer
+	                    var doc = new XMLSerializer().serializeToString( document );
+	                    var xhr = {
+	                        status: 200,
+	                        responseText: doc
+	                    };
 	
-	            }, _initDelay );
+	                    self._fire( "get", url, xhr, xhr.status );
+	                    self._cache( url, xhr );
+	                    self._ready = true;
+	    
+	                }, _initDelay );
+	            }
 	        },
 	
 	        /**
@@ -6321,6 +6329,10 @@
 	         *
 	         */
 	        _matchUrl: function ( url ) {
+	            if ( !this._ready ) {
+	                return;
+	            }
+	
 	            for ( var i = this._callbacks.get.length; i--; ) {
 	                var data = this._matcher.parse( url, this._callbacks.get[ i ]._routerRoutes );
 	
