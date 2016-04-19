@@ -61,23 +61,23 @@
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _router = __webpack_require__(/*! ./router */ 48);
+	var _router = __webpack_require__(/*! ./router */ 53);
 	
 	var _router2 = _interopRequireDefault(_router);
 	
-	var _overlay = __webpack_require__(/*! ./overlay */ 61);
+	var _overlay = __webpack_require__(/*! ./overlay */ 66);
 	
 	var _overlay2 = _interopRequireDefault(_overlay);
 	
-	var _gallery = __webpack_require__(/*! ./gallery */ 66);
+	var _gallery = __webpack_require__(/*! ./gallery */ 71);
 	
 	var _gallery2 = _interopRequireDefault(_gallery);
 	
-	var _intro = __webpack_require__(/*! ./intro */ 70);
+	var _intro = __webpack_require__(/*! ./intro */ 74);
 	
 	var _intro2 = _interopRequireDefault(_intro);
 	
-	var _main = __webpack_require__(/*! ./main */ 71);
+	var _main = __webpack_require__(/*! ./main */ 75);
 	
 	var _main2 = _interopRequireDefault(_main);
 	
@@ -129,7 +129,7 @@
 	        key: "initModules",
 	        value: function initModules() {
 	            this.core.detect.init(this);
-	            //this.core.resizes.init( this );
+	            this.core.resizes.init(this);
 	            //this.core.scrolls.init( this );
 	            this.main.init(this);
 	            this.router.init(this);
@@ -248,9 +248,15 @@
 	var _emitter2 = _interopRequireDefault(_emitter);
 	
 	//import scroller from "./scroller";
-	//import resizer from "./resizer";
-	//import resizes from "./resizes";
 	//import scrolls from "./scrolls";
+	
+	var _resizer = __webpack_require__(/*! ./resizer */ 48);
+	
+	var _resizer2 = _interopRequireDefault(_resizer);
+	
+	var _resizes = __webpack_require__(/*! ./resizes */ 50);
+	
+	var _resizes2 = _interopRequireDefault(_resizes);
 	
 	exports.detect = _detect2["default"];
 	exports.dom = _dom2["default"];
@@ -262,12 +268,12 @@
 	exports.api = _api2["default"];
 	exports.cache = _cache2["default"];
 	exports.Analytics = _Analytics2["default"];
-	exports.emitter
+	exports.emitter = _emitter2["default"];
+	exports.
 	//scroller,
-	//resizer,
-	//resizes,
-	//scrolls
-	 = _emitter2["default"];
+	//scrolls,
+	resizer = _resizer2["default"];
+	exports.resizes = _resizes2["default"];
 
 /***/ },
 /* 2 */
@@ -7142,6 +7148,483 @@
 
 /***/ },
 /* 48 */
+/*!********************************!*\
+  !*** ./js_src/core/resizer.js ***!
+  \********************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+	
+	var _properjsResizecontroller = __webpack_require__(/*! properjs-resizecontroller */ 49);
+	
+	var _properjsResizecontroller2 = _interopRequireDefault(_properjsResizecontroller);
+	
+	/**
+	 *
+	 * @description Single app instanceof [ResizeController]{@link https://github.com/ProperJS/ResizeController} for raf resize handling
+	 * @member resizer
+	 * @memberof core
+	 *
+	 */
+	var resizer = new _properjsResizecontroller2["default"]();
+	
+	/******************************************************************************
+	 * Export
+	*******************************************************************************/
+	exports["default"] = resizer;
+	module.exports = exports["default"];
+
+/***/ },
+/* 49 */
+/*!*********************************************************!*\
+  !*** ./~/properjs-resizecontroller/ResizeController.js ***!
+  \*********************************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	/*!
+	 *
+	 * Window resize / orientationchange event controller
+	 *
+	 * @ResizeController
+	 * @author: kitajchuk
+	 *
+	 *
+	 */
+	(function ( factory ) {
+	    
+	    if ( true ) {
+	        module.exports = factory();
+	
+	    } else if ( typeof window !== "undefined" ) {
+	        window.ResizeController = factory();
+	    }
+	    
+	})(function () {
+	
+	    var Controller = __webpack_require__( /*! properjs-controller */ 35 ),
+	
+	        // Orientation?
+	        _hasOrientation = ("orientation" in window),
+	
+	        // Current window viewport
+	        _currentView = null,
+	
+	        // Singleton
+	        _instance = null;
+	
+	    /**
+	     *
+	     * Window resize / orientationchange event controller
+	     * @constructor ResizeController
+	     * @augments Controller
+	     * @requires Controller
+	     * @memberof! <global>
+	     *
+	     * @fires resize
+	     * @fires resizedown
+	     * @fires resizeup
+	     * @fires resizewidth
+	     * @fires resizeheight
+	     * @fires orientationchange
+	     * @fires orientationportrait
+	     * @fires orientationlandscape
+	     *
+	     */
+	    var ResizeController = function () {
+	        // Singleton
+	        if ( !_instance ) {
+	            _instance = this;
+	
+	            // Initial viewport settings
+	            _currentView = _instance.getViewport();
+	
+	            // Call on parent cycle
+	            this.go(function () {
+	                var currentView = _instance.getViewport(),
+	                    isStill = (currentView.width === _currentView.width && currentView.height === _currentView.height),
+	                    isResize = (currentView.width !== _currentView.width || currentView.height !== _currentView.height),
+	                    isResizeUp = (currentView.width > _currentView.width || currentView.height > _currentView.height),
+	                    isResizeDown = (currentView.width < _currentView.width || currentView.height < _currentView.height),
+	                    isResizeWidth = (currentView.width !== _currentView.width),
+	                    isResizeHeight = (currentView.height !== _currentView.height),
+	                    isOrientation = (currentView.orient !== _currentView.orient),
+	                    isOrientationPortrait = (currentView.orient !== _currentView.orient && currentView.orient !== 90),
+	                    isOrientationLandscape = (currentView.orient !== _currentView.orient && currentView.orient === 90);
+	
+	                // Fire blanket resize event
+	                if ( isResize ) {
+	                    /**
+	                     *
+	                     * @event resize
+	                     *
+	                     */
+	                    _instance.fire( "resize" );
+	                }
+	
+	                // Fire resizeup and resizedown
+	                if ( isResizeDown ) {
+	                    /**
+	                     *
+	                     * @event resizedown
+	                     *
+	                     */
+	                    _instance.fire( "resizedown" );
+	
+	                } else if ( isResizeUp ) {
+	                    /**
+	                     *
+	                     * @event resizeup
+	                     *
+	                     */
+	                    _instance.fire( "resizeup" );
+	                }
+	
+	                // Fire resizewidth and resizeheight
+	                if ( isResizeWidth ) {
+	                    /**
+	                     *
+	                     * @event resizewidth
+	                     *
+	                     */
+	                    _instance.fire( "resizewidth" );
+	
+	                } else if ( isResizeHeight ) {
+	                    /**
+	                     *
+	                     * @event resizeheight
+	                     *
+	                     */
+	                    _instance.fire( "resizeheight" );
+	                }
+	
+	                // Fire blanket orientationchange event
+	                if ( isOrientation ) {
+	                    /**
+	                     *
+	                     * @event orientationchange
+	                     *
+	                     */
+	                    _instance.fire( "orientationchange" );
+	                }
+	
+	                // Fire orientationportrait and orientationlandscape
+	                if ( isOrientationPortrait ) {
+	                    /**
+	                     *
+	                     * @event orientationportrait
+	                     *
+	                     */
+	                    _instance.fire( "orientationportrait" );
+	
+	                } else if ( isOrientationLandscape ) {
+	                    /**
+	                     *
+	                     * @event orientationlandscape
+	                     *
+	                     */
+	                    _instance.fire( "orientationlandscape" );
+	                }
+	
+	                _currentView = currentView;
+	            });
+	        }
+	
+	        return _instance;
+	    };
+	
+	    ResizeController.prototype = new Controller();
+	
+	    /**
+	     *
+	     * Returns the current window viewport specs
+	     * @memberof ResizeController
+	     * @method getViewport
+	     * @returns object
+	     *
+	     */
+	    ResizeController.prototype.getViewport = function () {
+	        return {
+	            width: window.innerWidth,
+	            height: window.innerHeight,
+	            orient: _hasOrientation ? Math.abs( window.orientation ) : null
+	        };
+	    };
+	
+	    /**
+	     *
+	     * Tells if the viewport is in protrait mode
+	     * @memberof ResizeController
+	     * @method isPortrait
+	     * @returns boolean
+	     *
+	     */
+	    ResizeController.prototype.isPortrait = function () {
+	        var orient = this.getViewport().orient;
+	
+	        return (orient !== null && orient !== 90);
+	    };
+	
+	    /**
+	     *
+	     * Tells if the viewport is in landscape mode
+	     * @memberof ResizeController
+	     * @method isLandscape
+	     * @returns boolean
+	     *
+	     */
+	    ResizeController.prototype.isLandscape = function () {
+	        var orient = this.getViewport().orient;
+	
+	        return (orient !== null && orient === 90);
+	    };
+	
+	
+	    return ResizeController;
+	
+	});
+
+/***/ },
+/* 50 */
+/*!********************************!*\
+  !*** ./js_src/core/resizes.js ***!
+  \********************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+	
+	var _log = __webpack_require__(/*! ./log */ 38);
+	
+	var _log2 = _interopRequireDefault(_log);
+	
+	var _util = __webpack_require__(/*! ./util */ 33);
+	
+	var util = _interopRequireWildcard(_util);
+	
+	var _emitter = __webpack_require__(/*! ./emitter */ 41);
+	
+	var _emitter2 = _interopRequireDefault(_emitter);
+	
+	var _resizer = __webpack_require__(/*! ./resizer */ 48);
+	
+	var _resizer2 = _interopRequireDefault(_resizer);
+	
+	var _properjsThrottle = __webpack_require__(/*! properjs-throttle */ 51);
+	
+	var _properjsThrottle2 = _interopRequireDefault(_properjsThrottle);
+	
+	var _properjsDebounce = __webpack_require__(/*! properjs-debounce */ 52);
+	
+	var _properjsDebounce2 = _interopRequireDefault(_properjsDebounce);
+	
+	var _throttled = 50;
+	var _debounced = 300;
+	
+	/**
+	 *
+	 * @public
+	 * @namespace resizes
+	 * @memberof core
+	 * @description Handles app-wide emission of various resize detection events.
+	 *
+	 */
+	var resizes = {
+	  /**
+	   *
+	   * @public
+	   * @method init
+	   * @memberof core.resizes
+	   * @description Method binds event listeners for resize controller.
+	   *
+	   */
+	  init: function init() {
+	    _resizer2["default"].on("resize", (0, _properjsThrottle2["default"])(onThrottle, _throttled));
+	
+	    // Hook into resize of `width` only for this handler
+	    // @bug: iOS window size changes when Safari's chrome switches between full and minimal-ui.
+	    _resizer2["default"].on("resizewidth", (0, _properjsDebounce2["default"])(onDebounce, _debounced));
+	
+	    (0, _log2["default"])("resizes initialized");
+	  }
+	};
+	
+	/**
+	 *
+	 * @private
+	 * @method onDebounce
+	 * @memberof core.resizes
+	 * @description Debounced resize events.
+	 *
+	 */
+	var onDebounce = function onDebounce() {
+	  _emitter2["default"].fire("app--resize-debounced");
+	
+	  util.updateImages();
+	};
+	
+	/**
+	 *
+	 * @private
+	 * @method onThrottle
+	 * @memberof core.resizes
+	 * @description Method handles the window resize event via [ResizeController]{@link https://github.com/ProperJS/ResizeController}.
+	 *
+	 */
+	var onThrottle = function onThrottle() {
+	  _emitter2["default"].fire("app--resize");
+	};
+	
+	/******************************************************************************
+	 * Export
+	*******************************************************************************/
+	exports["default"] = resizes;
+	module.exports = exports["default"];
+
+/***/ },
+/* 51 */
+/*!*****************************************!*\
+  !*** ./~/properjs-throttle/throttle.js ***!
+  \*****************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	/*!
+	 *
+	 * Throttle callbacks
+	 *
+	 * @throttle
+	 * @author: kitajchuk
+	 *
+	 */
+	(function ( factory ) {
+	    
+	    if ( true ) {
+	        module.exports = factory();
+	
+	    } else if ( typeof window !== "undefined" ) {
+	        window.throttle = factory();
+	    }
+	    
+	})(function () {
+	
+	
+	    /**
+	     *
+	     * Rev limit your method calls
+	     * @requires debounce
+	     * @memberof! <global>
+	     * @method throttle
+	     * @param {function} callback The method handler
+	     * @param {number} threshold The timeout delay in ms
+	     *
+	     */
+	    var throttle = function ( callback, threshold ) {
+	        var wait = false;
+	
+	        return function () {
+	            if ( !wait ) {
+	                callback.call();
+	                wait = true;
+	
+	                setTimeout(function () {
+	                    wait = false;
+	
+	                }, (threshold || 100) );
+	            }
+	        };
+	    };
+	    
+	    
+	    return throttle;
+	
+	
+	});
+
+/***/ },
+/* 52 */
+/*!*****************************************!*\
+  !*** ./~/properjs-debounce/debounce.js ***!
+  \*****************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	/*!
+	 *
+	 * Debounce methods
+	 * Sourced from here:
+	 * http://unscriptable.com/2009/03/20/debouncing-javascript-methods/
+	 *
+	 * @debounce
+	 * @author: kitajchuk
+	 *
+	 */
+	(function ( factory ) {
+	    
+	    if ( true ) {
+	        module.exports = factory();
+	
+	    } else if ( typeof window !== "undefined" ) {
+	        window.debounce = factory();
+	    }
+	    
+	})(function () {
+	
+	
+	    /**
+	     *
+	     * Limit method calls
+	     * @memberof! <global>
+	     * @method debounce
+	     * @param {function} callback The method handler
+	     * @param {number} threshold The timeout delay in ms
+	     * @param {boolean} execAsap Call function at beginning or end of detection period
+	     *
+	     */
+	    var debounce = function ( callback, threshold, execAsap ) {
+	        var timeout = null;
+	        
+	        return function debounced() {
+	            var args = arguments,
+	                context = this;
+	            
+	            function delayed() {
+	                if ( !execAsap ) {
+	                    callback.apply( context, args );
+	                }
+	                
+	                timeout = null;
+	            }
+	            
+	            if ( timeout ) {
+	                clearTimeout( timeout );
+	                
+	            } else if ( execAsap ) {
+	                callback.apply( context, args );
+	            }
+	            
+	            timeout = setTimeout( delayed, (threshold || 100) );
+	        };
+	    };
+	    
+	    
+	    return debounce;
+	
+	
+	});
+
+/***/ },
+/* 53 */
 /*!**************************!*\
   !*** ./js_src/router.js ***!
   \**************************/
@@ -7157,15 +7640,15 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 	
-	var _properjsEasing = __webpack_require__(/*! properjs-easing */ 49);
+	var _properjsEasing = __webpack_require__(/*! properjs-easing */ 54);
 	
 	var _properjsEasing2 = _interopRequireDefault(_properjsEasing);
 	
-	var _properjsTween = __webpack_require__(/*! properjs-tween */ 50);
+	var _properjsTween = __webpack_require__(/*! properjs-tween */ 55);
 	
 	var _properjsTween2 = _interopRequireDefault(_properjsTween);
 	
-	var _properjsPagecontroller = __webpack_require__(/*! properjs-pagecontroller */ 51);
+	var _properjsPagecontroller = __webpack_require__(/*! properjs-pagecontroller */ 56);
 	
 	var _properjsPagecontroller2 = _interopRequireDefault(_properjsPagecontroller);
 	
@@ -7177,31 +7660,31 @@
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _about = __webpack_require__(/*! ./about */ 56);
+	var _about = __webpack_require__(/*! ./about */ 61);
 	
 	var _about2 = _interopRequireDefault(_about);
 	
-	var _indexes = __webpack_require__(/*! ./indexes */ 58);
+	var _indexes = __webpack_require__(/*! ./indexes */ 63);
 	
 	var _indexes2 = _interopRequireDefault(_indexes);
 	
-	var _indexesListing = __webpack_require__(/*! ./indexes/listing */ 64);
+	var _indexesListing = __webpack_require__(/*! ./indexes/listing */ 69);
 	
 	var _indexesListing2 = _interopRequireDefault(_indexesListing);
 	
-	var _projects = __webpack_require__(/*! ./projects */ 69);
+	var _projects = __webpack_require__(/*! ./projects */ 73);
 	
 	var _projects2 = _interopRequireDefault(_projects);
 	
-	var _overlay = __webpack_require__(/*! ./overlay */ 61);
+	var _overlay = __webpack_require__(/*! ./overlay */ 66);
 	
 	var _overlay2 = _interopRequireDefault(_overlay);
 	
-	var _gallery = __webpack_require__(/*! ./gallery */ 66);
+	var _gallery = __webpack_require__(/*! ./gallery */ 71);
 	
 	var _gallery2 = _interopRequireDefault(_gallery);
 	
-	var _projectsProject = __webpack_require__(/*! ./projects/Project */ 60);
+	var _projectsProject = __webpack_require__(/*! ./projects/Project */ 65);
 	
 	var _projectsProject2 = _interopRequireDefault(_projectsProject);
 	
@@ -7640,7 +8123,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 49 */
+/* 54 */
 /*!*************************************!*\
   !*** ./~/properjs-easing/Easing.js ***!
   \*************************************/
@@ -7837,7 +8320,7 @@
 	});
 
 /***/ },
-/* 50 */
+/* 55 */
 /*!***********************************!*\
   !*** ./~/properjs-tween/Tween.js ***!
   \***********************************/
@@ -7862,7 +8345,7 @@
 	    
 	})(function () {
 	
-	    var Easing = __webpack_require__( /*! properjs-easing */ 49 ),
+	    var Easing = __webpack_require__( /*! properjs-easing */ 54 ),
 	        defaults = {
 	            ease: Easing.linear,
 	            duration: 600,
@@ -7961,7 +8444,7 @@
 	});
 
 /***/ },
-/* 51 */
+/* 56 */
 /*!*****************************************************!*\
   !*** ./~/properjs-pagecontroller/PageController.js ***!
   \*****************************************************/
@@ -7994,7 +8477,7 @@
 	})(function () {
 	
 	    // Useful stuff
-	    var Router = __webpack_require__( /*! properjs-router */ 52 ),
+	    var Router = __webpack_require__( /*! properjs-router */ 57 ),
 	        Controller = __webpack_require__( /*! properjs-controller */ 35 ),
 	
 	        _router = null,
@@ -8492,7 +8975,7 @@
 	});
 
 /***/ },
-/* 52 */
+/* 57 */
 /*!***************************************************************!*\
   !*** ./~/properjs-pagecontroller/~/properjs-router/Router.js ***!
   \***************************************************************/
@@ -8517,9 +9000,9 @@
 	
 	})(function () {
 	
-	    var PushState = __webpack_require__( /*! properjs-pushstate */ 53 ),
-	        MatchRoute = __webpack_require__( /*! properjs-matchroute */ 54 ),
-	        matchElement = __webpack_require__( /*! properjs-matchelement */ 55 ),
+	    var PushState = __webpack_require__( /*! properjs-pushstate */ 58 ),
+	        MatchRoute = __webpack_require__( /*! properjs-matchroute */ 59 ),
+	        matchElement = __webpack_require__( /*! properjs-matchelement */ 60 ),
 	        _initDelay = 200,
 	        _triggerEl;
 	
@@ -9186,7 +9669,7 @@
 	});
 
 /***/ },
-/* 53 */
+/* 58 */
 /*!***************************************************************************************!*\
   !*** ./~/properjs-pagecontroller/~/properjs-router/~/properjs-pushstate/PushState.js ***!
   \***************************************************************************************/
@@ -9583,7 +10066,7 @@
 	});
 
 /***/ },
-/* 54 */
+/* 59 */
 /*!*****************************************************************************************!*\
   !*** ./~/properjs-pagecontroller/~/properjs-router/~/properjs-matchroute/MatchRoute.js ***!
   \*****************************************************************************************/
@@ -9942,7 +10425,7 @@
 	});
 
 /***/ },
-/* 55 */
+/* 60 */
 /*!*************************************************!*\
   !*** ./~/properjs-matchelement/matchElement.js ***!
   \*************************************************/
@@ -10004,7 +10487,7 @@
 	});
 
 /***/ },
-/* 56 */
+/* 61 */
 /*!*******************************!*\
   !*** ./js_src/about/index.js ***!
   \*******************************/
@@ -10025,7 +10508,7 @@
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _About = __webpack_require__(/*! ./About */ 57);
+	var _About = __webpack_require__(/*! ./About */ 62);
 	
 	var _About2 = _interopRequireDefault(_About);
 	
@@ -10124,7 +10607,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 57 */
+/* 62 */
 /*!*******************************!*\
   !*** ./js_src/about/About.js ***!
   \*******************************/
@@ -10245,7 +10728,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 58 */
+/* 63 */
 /*!*********************************!*\
   !*** ./js_src/indexes/index.js ***!
   \*********************************/
@@ -10269,7 +10752,7 @@
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _IndexRoot = __webpack_require__(/*! ./IndexRoot */ 59);
+	var _IndexRoot = __webpack_require__(/*! ./IndexRoot */ 64);
 	
 	var _IndexRoot2 = _interopRequireDefault(_IndexRoot);
 	
@@ -10374,7 +10857,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 59 */
+/* 64 */
 /*!*************************************!*\
   !*** ./js_src/indexes/IndexRoot.js ***!
   \*************************************/
@@ -10402,15 +10885,15 @@
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _router = __webpack_require__(/*! ../router */ 48);
+	var _router = __webpack_require__(/*! ../router */ 53);
 	
 	var _router2 = _interopRequireDefault(_router);
 	
-	var _projectsProject = __webpack_require__(/*! ../projects/Project */ 60);
+	var _projectsProject = __webpack_require__(/*! ../projects/Project */ 65);
 	
 	var _projectsProject2 = _interopRequireDefault(_projectsProject);
 	
-	var _overlay = __webpack_require__(/*! ../overlay */ 61);
+	var _overlay = __webpack_require__(/*! ../overlay */ 66);
 	
 	var _overlay2 = _interopRequireDefault(_overlay);
 	
@@ -10702,7 +11185,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 60 */
+/* 65 */
 /*!************************************!*\
   !*** ./js_src/projects/Project.js ***!
   \************************************/
@@ -10726,11 +11209,11 @@
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _overlay = __webpack_require__(/*! ../overlay */ 61);
+	var _overlay = __webpack_require__(/*! ../overlay */ 66);
 	
 	var _overlay2 = _interopRequireDefault(_overlay);
 	
-	var _Menu = __webpack_require__(/*! ../Menu */ 62);
+	var _Menu = __webpack_require__(/*! ../Menu */ 67);
 	
 	var _Menu2 = _interopRequireDefault(_Menu);
 	
@@ -10738,7 +11221,7 @@
 	
 	var _properjsController2 = _interopRequireDefault(_properjsController);
 	
-	var _bar = __webpack_require__(/*! ../bar */ 63);
+	var _bar = __webpack_require__(/*! ../bar */ 68);
 	
 	var _bar2 = _interopRequireDefault(_bar);
 	
@@ -11036,7 +11519,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 61 */
+/* 66 */
 /*!***************************!*\
   !*** ./js_src/overlay.js ***!
   \***************************/
@@ -11198,7 +11681,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 62 */
+/* 67 */
 /*!************************!*\
   !*** ./js_src/Menu.js ***!
   \************************/
@@ -11365,7 +11848,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 63 */
+/* 68 */
 /*!***********************!*\
   !*** ./js_src/bar.js ***!
   \***********************/
@@ -11389,11 +11872,11 @@
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _properjsTween = __webpack_require__(/*! properjs-tween */ 50);
+	var _properjsTween = __webpack_require__(/*! properjs-tween */ 55);
 	
 	var _properjsTween2 = _interopRequireDefault(_properjsTween);
 	
-	var _properjsEasing = __webpack_require__(/*! properjs-easing */ 49);
+	var _properjsEasing = __webpack_require__(/*! properjs-easing */ 54);
 	
 	var _properjsEasing2 = _interopRequireDefault(_properjsEasing);
 	
@@ -11589,7 +12072,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 64 */
+/* 69 */
 /*!***********************************!*\
   !*** ./js_src/indexes/listing.js ***!
   \***********************************/
@@ -11609,7 +12092,7 @@
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _IndexFull = __webpack_require__(/*! ./IndexFull */ 65);
+	var _IndexFull = __webpack_require__(/*! ./IndexFull */ 70);
 	
 	var _IndexFull2 = _interopRequireDefault(_IndexFull);
 	
@@ -11710,7 +12193,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 65 */
+/* 70 */
 /*!*************************************!*\
   !*** ./js_src/indexes/IndexFull.js ***!
   \*************************************/
@@ -11738,19 +12221,19 @@
 	
 	var _js_libsHoboDistHoboBuild2 = _interopRequireDefault(_js_libsHoboDistHoboBuild);
 	
-	var _router = __webpack_require__(/*! ../router */ 48);
+	var _router = __webpack_require__(/*! ../router */ 53);
 	
 	var _router2 = _interopRequireDefault(_router);
 	
-	var _gallery = __webpack_require__(/*! ../gallery */ 66);
+	var _gallery = __webpack_require__(/*! ../gallery */ 71);
 	
 	var _gallery2 = _interopRequireDefault(_gallery);
 	
-	var _overlay = __webpack_require__(/*! ../overlay */ 61);
+	var _overlay = __webpack_require__(/*! ../overlay */ 66);
 	
 	var _overlay2 = _interopRequireDefault(_overlay);
 	
-	var _properjsTemplate = __webpack_require__(/*! properjs-template */ 68);
+	var _properjsTemplate = __webpack_require__(/*! properjs-template */ 72);
 	
 	var _properjsTemplate2 = _interopRequireDefault(_properjsTemplate);
 	
@@ -11758,7 +12241,7 @@
 	
 	var _properjsController2 = _interopRequireDefault(_properjsController);
 	
-	var _bar = __webpack_require__(/*! ../bar */ 63);
+	var _bar = __webpack_require__(/*! ../bar */ 68);
 	
 	var _bar2 = _interopRequireDefault(_bar);
 	
@@ -12217,7 +12700,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 66 */
+/* 71 */
 /*!***************************!*\
   !*** ./js_src/gallery.js ***!
   \***************************/
@@ -12241,19 +12724,19 @@
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _Menu = __webpack_require__(/*! ./Menu */ 62);
+	var _Menu = __webpack_require__(/*! ./Menu */ 67);
 	
 	var _Menu2 = _interopRequireDefault(_Menu);
 	
-	var _properjsDebounce = __webpack_require__(/*! properjs-debounce */ 67);
+	var _properjsDebounce = __webpack_require__(/*! properjs-debounce */ 52);
 	
 	var _properjsDebounce2 = _interopRequireDefault(_properjsDebounce);
 	
-	var _overlay = __webpack_require__(/*! ./overlay */ 61);
+	var _overlay = __webpack_require__(/*! ./overlay */ 66);
 	
 	var _overlay2 = _interopRequireDefault(_overlay);
 	
-	var _bar = __webpack_require__(/*! ./bar */ 63);
+	var _bar = __webpack_require__(/*! ./bar */ 68);
 	
 	var _bar2 = _interopRequireDefault(_bar);
 	
@@ -12261,11 +12744,11 @@
 	
 	var _hammerjs2 = _interopRequireDefault(_hammerjs);
 	
-	var _properjsEasing = __webpack_require__(/*! properjs-easing */ 49);
+	var _properjsEasing = __webpack_require__(/*! properjs-easing */ 54);
 	
 	var _properjsEasing2 = _interopRequireDefault(_properjsEasing);
 	
-	var _properjsTween = __webpack_require__(/*! properjs-tween */ 50);
+	var _properjsTween = __webpack_require__(/*! properjs-tween */ 55);
 	
 	var _properjsTween2 = _interopRequireDefault(_properjsTween);
 	
@@ -12554,78 +13037,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 67 */
-/*!*****************************************!*\
-  !*** ./~/properjs-debounce/debounce.js ***!
-  \*****************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	/*!
-	 *
-	 * Debounce methods
-	 * Sourced from here:
-	 * http://unscriptable.com/2009/03/20/debouncing-javascript-methods/
-	 *
-	 * @debounce
-	 * @author: kitajchuk
-	 *
-	 */
-	(function ( factory ) {
-	    
-	    if ( true ) {
-	        module.exports = factory();
-	
-	    } else if ( typeof window !== "undefined" ) {
-	        window.debounce = factory();
-	    }
-	    
-	})(function () {
-	
-	
-	    /**
-	     *
-	     * Limit method calls
-	     * @memberof! <global>
-	     * @method debounce
-	     * @param {function} callback The method handler
-	     * @param {number} threshold The timeout delay in ms
-	     * @param {boolean} execAsap Call function at beginning or end of detection period
-	     *
-	     */
-	    var debounce = function ( callback, threshold, execAsap ) {
-	        var timeout = null;
-	        
-	        return function debounced() {
-	            var args = arguments,
-	                context = this;
-	            
-	            function delayed() {
-	                if ( !execAsap ) {
-	                    callback.apply( context, args );
-	                }
-	                
-	                timeout = null;
-	            }
-	            
-	            if ( timeout ) {
-	                clearTimeout( timeout );
-	                
-	            } else if ( execAsap ) {
-	                callback.apply( context, args );
-	            }
-	            
-	            timeout = setTimeout( delayed, (threshold || 100) );
-	        };
-	    };
-	    
-	    
-	    return debounce;
-	
-	
-	});
-
-/***/ },
-/* 68 */
+/* 72 */
 /*!*****************************************!*\
   !*** ./~/properjs-template/template.js ***!
   \*****************************************/
@@ -12670,7 +13082,7 @@
 	});
 
 /***/ },
-/* 69 */
+/* 73 */
 /*!**********************************!*\
   !*** ./js_src/projects/index.js ***!
   \**********************************/
@@ -12690,7 +13102,7 @@
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _Project = __webpack_require__(/*! ./Project */ 60);
+	var _Project = __webpack_require__(/*! ./Project */ 65);
 	
 	var _Project2 = _interopRequireDefault(_Project);
 	
@@ -12824,7 +13236,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 70 */
+/* 74 */
 /*!*************************!*\
   !*** ./js_src/intro.js ***!
   \*************************/
@@ -12880,7 +13292,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 71 */
+/* 75 */
 /*!************************!*\
   !*** ./js_src/main.js ***!
   \************************/
