@@ -11416,6 +11416,8 @@
 	            if (core.dom.project.element[0].scrollTop !== 0 && Math.floor(nodeRect.bottom) <= 0 && !this.isEnded) {
 	                this.isEnded = true;
 	
+	                core.dom.project.element.addClass("is-hidden");
+	
 	                core.emitter.fire("app--project-ended");
 	            }
 	        }
@@ -11507,7 +11509,7 @@
 	
 	    setTimeout(function () {
 	        core.dom.html.removeClass(core.config.offcanvasClasses);
-	        core.dom.project.element.detach().addClass("is-noscroll");
+	        core.dom.project.element.detach().addClass("is-noscroll").removeClass("is-hidden");
 	        core.dom.project.elementPane[0].innerHTML = "";
 	    }, core.dom.project.elementTransitionDuration);
 	};
