@@ -7868,7 +7868,7 @@
 	        // Indexes will already have the root gridwall loaded
 	        // Offcanvas/Project paths will need to manually load the root index
 	        if (this.pageData.type !== "index") {
-	            if (this.pageData.type === "offcanvas" || !this.navData.appTree.length) {
+	            if (this.pageData.type === "offcanvas") {
 	                this.root = "/";
 	            } else {
 	                this.navData.appTree.forEach(function (indexItem) {
@@ -11347,7 +11347,7 @@
 	
 	            this.cycleAnimation();
 	
-	            setTimeout(_overlay2["default"].close(), core.dom.project.elementTransitionDuration);
+	            setTimeout(_overlay2["default"].close(), core.dom.project.elementTransitionDuration * 2);
 	        }
 	
 	        /**
