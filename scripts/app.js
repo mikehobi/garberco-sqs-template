@@ -11476,11 +11476,6 @@
 	        key: "updatePosition",
 	        value: function updatePosition() {
 	            var nodeRect = this.$node[0].getBoundingClientRect();
-	            //const $imageloaded = this.$images.filter( `[${core.config.imageLoaderAttr}]` );
-	
-	            //if ( $imageloaded.length !== this.$images.length ) {
-	            //    return;
-	            //}
 	
 	            if (core.dom.project.element[0].scrollTop !== 0 && Math.floor(nodeRect.bottom) <= 0 && !this.isEnded) {
 	                this.isEnded = true;
@@ -11505,6 +11500,8 @@
 	        value: function onUpdateEmitter() {
 	            this.updatePlates();
 	            this.updatePosition();
+	
+	            core.emitter.fire("app--project-scroll");
 	        }
 	
 	        /**
@@ -13901,7 +13898,7 @@
 	                this._onScroll();
 	            }
 	
-	            core.emitter.on("app--scroll", this._onScroll);
+	            core.emitter.on("app--project-scroll", this._onScroll);
 	        }
 	
 	        /**
@@ -13937,7 +13934,7 @@
 	    }, {
 	        key: "destroy",
 	        value: function destroy() {
-	            core.emitter.off("app--scroll", this._onScroll);
+	            core.emitter.off("app--project-scroll", this._onScroll);
 	        }
 	    }]);
 	
