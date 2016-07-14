@@ -69,15 +69,15 @@
 	
 	var _overlay2 = _interopRequireDefault(_overlay);
 	
-	var _gallery = __webpack_require__(/*! ./gallery */ 71);
+	var _gallery = __webpack_require__(/*! ./gallery */ 75);
 	
 	var _gallery2 = _interopRequireDefault(_gallery);
 	
-	var _intro = __webpack_require__(/*! ./intro */ 74);
+	var _intro = __webpack_require__(/*! ./intro */ 78);
 	
 	var _intro2 = _interopRequireDefault(_intro);
 	
-	var _main = __webpack_require__(/*! ./main */ 75);
+	var _main = __webpack_require__(/*! ./main */ 79);
 	
 	var _main2 = _interopRequireDefault(_main);
 	
@@ -247,9 +247,6 @@
 	
 	var _emitter2 = _interopRequireDefault(_emitter);
 	
-	//import scroller from "./scroller";
-	//import scrolls from "./scrolls";
-	
 	var _resizer = __webpack_require__(/*! ./resizer */ 48);
 	
 	var _resizer2 = _interopRequireDefault(_resizer);
@@ -269,10 +266,7 @@
 	exports.cache = _cache2["default"];
 	exports.Analytics = _Analytics2["default"];
 	exports.emitter = _emitter2["default"];
-	exports.
-	//scroller,
-	//scrolls,
-	resizer = _resizer2["default"];
+	exports.resizer = _resizer2["default"];
 	exports.resizes = _resizes2["default"];
 
 /***/ },
@@ -6597,6 +6591,28 @@
 	                reject(error);
 	            });
 	        });
+	    },
+	
+	    /**
+	     *
+	     * @public
+	     * @method vimeo
+	     * @param {string} id The vimeo video ID
+	     * @memberof core.api
+	     * @description Retrieves vimeo video information.
+	     *              Returned Promise resolves with api data {object}
+	     * @returns {Promise}
+	     *
+	     */
+	    vimeo: function vimeo(id) {
+	        return _js_libsHoboDistHoboBuild2["default"].ajax({
+	            url: "https://api.vimeo.com/videos/" + id,
+	            method: "GET",
+	            data: {
+	                access_token: "4fe810e95b5a32a53133739750ef23e4"
+	            },
+	            dataType: "json"
+	        });
 	    }
 	};
 	
@@ -7668,11 +7684,11 @@
 	
 	var _indexes2 = _interopRequireDefault(_indexes);
 	
-	var _indexesListing = __webpack_require__(/*! ./indexes/listing */ 69);
+	var _indexesListing = __webpack_require__(/*! ./indexes/listing */ 73);
 	
 	var _indexesListing2 = _interopRequireDefault(_indexesListing);
 	
-	var _projects = __webpack_require__(/*! ./projects */ 73);
+	var _projects = __webpack_require__(/*! ./projects */ 77);
 	
 	var _projects2 = _interopRequireDefault(_projects);
 	
@@ -7680,7 +7696,7 @@
 	
 	var _overlay2 = _interopRequireDefault(_overlay);
 	
-	var _gallery = __webpack_require__(/*! ./gallery */ 71);
+	var _gallery = __webpack_require__(/*! ./gallery */ 75);
 	
 	var _gallery2 = _interopRequireDefault(_gallery);
 	
@@ -11225,6 +11241,10 @@
 	
 	var _bar2 = _interopRequireDefault(_bar);
 	
+	var _videoVideoVimeo = __webpack_require__(/*! ../video/VideoVimeo */ 69);
+	
+	var _videoVideoVimeo2 = _interopRequireDefault(_videoVideoVimeo);
+	
 	var isActive = false;
 	var animator = new _properjsController2["default"]();
 	
@@ -11252,10 +11272,12 @@
 	        this.data = data;
 	        this.$plates = this.$node.find(".js-project-plate");
 	        this.$images = this.$node.find(".js-lazy-image");
+	        this.$videos = this.$node.find(".js-video");
 	        this.isEnded = false;
 	
 	        this.bindEvents();
 	        this.loadProject();
+	        this.loadVideos();
 	
 	        core.log("Project", this);
 	    }
@@ -11306,6 +11328,53 @@
 	            core.dom.project.elementPane.append(this.$node);
 	
 	            core.images.handleImages(this.$images, this.onPreload.bind(this));
+	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @instance
+	         * @method loadVideos
+	         * @memberof projects.Project
+	         * @description Load videos from vimeo.
+	         *
+	         */
+	    }, {
+	        key: "loadVideos",
+	        value: function loadVideos() {
+	            var _this = this;
+	
+	            this.$videos.forEach(function (elem, i) {
+	                var $video = _this.$videos.eq(i);
+	                var data = $video.data();
+	
+	                $video.data("instance", new _videoVideoVimeo2["default"]($video, data));
+	            });
+	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @instance
+	         * @method killVideos
+	         * @memberof projects.Project
+	         * @description Kill videos from vimeo.
+	         *
+	         */
+	    }, {
+	        key: "killVideos",
+	        value: function killVideos() {
+	            var _this2 = this;
+	
+	            this.$videos.forEach(function (elem, i) {
+	                var $video = _this2.$videos.eq(i);
+	                var data = $video.data();
+	
+	                if (data.instance) {
+	                    data.instance.destroy();
+	                    data.instance = null;
+	                }
+	            });
 	        }
 	
 	        /**
@@ -11454,6 +11523,8 @@
 	                this.$infoScreen.on("click", this._onClickInfo);
 	                this.$infoButton.on("click", this._onClickInfo);
 	            }
+	
+	            this.killVideos();
 	
 	            Project.close();
 	        }
@@ -12075,6 +12146,1809 @@
 
 /***/ },
 /* 69 */
+/*!************************************!*\
+  !*** ./js_src/video/VideoVimeo.js ***!
+  \************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var _core = __webpack_require__(/*! ../core */ 1);
+	
+	var core = _interopRequireWildcard(_core);
+	
+	var _mediabox = __webpack_require__(/*! ./mediabox */ 70);
+	
+	var _mediabox2 = _interopRequireDefault(_mediabox);
+	
+	var _AutoplayHandler = __webpack_require__(/*! ./AutoplayHandler */ 72);
+	
+	var _AutoplayHandler2 = _interopRequireDefault(_AutoplayHandler);
+	
+	/**
+	 *
+	 * @public
+	 * @class VideoVimeo
+	 * @memberof video
+	 * @classdesc Video default for third-party service embeds.
+	 * @param {Hobo} $node The element to inject the video module into
+	 * @param {object} data The video data to work with
+	 *
+	 */
+	
+	var VideoVimeo = (function () {
+	    function VideoVimeo($node, data) {
+	        _classCallCheck(this, VideoVimeo);
+	
+	        this.$node = $node;
+	        this.$video = this.$node.find(".js-video-element");
+	        this.$poster = this.$node.find(".js-video-poster");
+	        this.$playback = this.$node.find(".js-video-playback");
+	        this.data = data;
+	        this._files = {};
+	        this._video = null;
+	
+	        this.loadVimeoData();
+	    }
+	
+	    /******************************************************************************
+	     * Export
+	    *******************************************************************************/
+	
+	    /**
+	     *
+	     * @public
+	     * @instance
+	     * @method loadVimeoData
+	     * @memberof VideoVimeo
+	     * @description Attempt to utilize the Vimeo JS API for source files.
+	     *
+	     */
+	
+	    _createClass(VideoVimeo, [{
+	        key: "loadVimeoData",
+	        value: function loadVimeoData() {
+	            var _this = this;
+	
+	            var vimeoId = this.data.vimeoUrl.split("/").pop();
+	
+	            core.api.vimeo(vimeoId).then(function (vData) {
+	                _this.handleVimeoData(vData);
+	            });
+	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @instance
+	         * @method logVideoFiles
+	         * @param {object} vData The api response from Vimeo
+	         * @memberof VideoVimeo
+	         * @description Organize the files array into something easier to use.
+	         *
+	         */
+	    }, {
+	        key: "logVideoFiles",
+	        value: function logVideoFiles(vData) {
+	            var i = vData.files.length;
+	
+	            for (i; i--;) {
+	                if (!this._files[vData.files[i].quality] || this._files[vData.files[i].quality] && vData.files[i].size > this._files[vData.files[i].quality].size) {
+	                    this._files[vData.files[i].quality] = vData.files[i];
+	                }
+	            }
+	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @instance
+	         * @method handleVimeoData
+	         * @param {object} vData The response data from Vimeo's API
+	         * @memberof VideoVimeo
+	         * @description Process Vimeo API data and find an HD version to use.
+	         *
+	         */
+	    }, {
+	        key: "handleVimeoData",
+	        value: function handleVimeoData(vData) {
+	            this.vData = vData;
+	
+	            // Organize video files
+	            this.logVideoFiles(vData);
+	
+	            // Assign source file to data
+	            this.data.sourceUrl = (core.detect.isDevice() ? this._files.mobile || this._files.sd : this._files.hd || this._files.sd).link;
+	
+	            // Assign poster thumbnail
+	            this.data.posterUrl = this.vData.pictures.sizes[this.vData.pictures.sizes.length - 1].link;
+	
+	            if (core.detect.isDevice()) {
+	                this.initMobile();
+	            } else {
+	                this.initVideo();
+	            }
+	
+	            this.applyAspect();
+	            this.createMediaNode(this.data.id, this.data.sourceUrl, this.$video[0]);
+	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @instance
+	         * @method initMobile
+	         * @memberof VideoVimeo
+	         * @description Initialize videos for modile devices.
+	         *
+	         */
+	    }, {
+	        key: "initMobile",
+	        value: function initMobile() {
+	            this.$video[0].setAttribute("controls", true);
+	            this.$video[0].setAttribute("loop", false);
+	            this.$video[0].setAttribute("poster", this.data.posterUrl);
+	            this.$poster.remove();
+	            this.$playback.remove();
+	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @instance
+	         * @method initVideo
+	         * @memberof VideoVimeo
+	         * @description Initialize videos for browsers.
+	         *
+	         */
+	    }, {
+	        key: "initVideo",
+	        value: function initVideo() {
+	            var _this2 = this;
+	
+	            this.$video.on("loadedmetadata", function () {
+	                if (_this2.data.autoplayLoop) {
+	                    _this2.bindAutoplayLoop();
+	                } else if (_this2.data.clickToPlay) {
+	                    _this2.loadThumbFile();
+	                    _this2.bindClickToPlay();
+	                }
+	            });
+	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @instance
+	         * @method loadThumbFile
+	         * @memberof VideoVimeo
+	         * @description Load poster image from vimeo.
+	         *
+	         */
+	    }, {
+	        key: "loadThumbFile",
+	        value: function loadThumbFile() {
+	            this.$poster.attr("data-img-src", this.data.posterUrl);
+	
+	            core.util.loadImages(this.$poster);
+	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @instance
+	         * @method bindAutoplayLoop
+	         * @memberof VideoVimeo
+	         * @description Handle autoplay loop video option.
+	         *
+	         */
+	    }, {
+	        key: "bindAutoplayLoop",
+	        value: function bindAutoplayLoop() {
+	            this._autoplayHandler = new _AutoplayHandler2["default"](this.$node, this.data.id);
+	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @instance
+	         * @method bindClickToPlay
+	         * @memberof VideoVimeo
+	         * @description Handle click-to-play video option.
+	         *
+	         */
+	    }, {
+	        key: "bindClickToPlay",
+	        value: function bindClickToPlay() {
+	            var _this3 = this;
+	
+	            this.$video.on("click", function () {
+	                if (_mediabox2["default"].isPlaying(_this3.data.id)) {
+	                    _this3.$node.removeClass("is-playing");
+	                    _mediabox2["default"].stopMedia(_this3.data.id);
+	                } else {
+	                    _this3.$node.addClass("is-playing");
+	                    _mediabox2["default"].playMedia(_this3.data.id);
+	                }
+	            });
+	
+	            _mediabox2["default"].addMediaEvent(this.data.id, "play", function () {
+	                _this3.$node.addClass("is-active");
+	            });
+	
+	            _mediabox2["default"].addMediaEvent(this.data.id, "ended", function () {
+	                _mediabox2["default"].stopMedia(_this3.data.id).setMediaProp(_this3.data.id, "currentTime", 0);
+	
+	                _this3.$node.removeClass("is-active is-playing");
+	            });
+	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @instance
+	         * @method createMediaNode
+	         * @param {string} id The media id
+	         * @param {string} url The media source url
+	         * @param {element} node The <video /> element
+	         * @memberof VideoVimeo
+	         * @description Execute the MediaBox implementation adding this video to the `library`.
+	         *
+	         */
+	    }, {
+	        key: "createMediaNode",
+	        value: function createMediaNode(id, url, node) {
+	            _mediabox2["default"].addVideo({
+	                id: id,
+	                src: url.split(","),
+	                element: node,
+	                channel: "vid"
+	            });
+	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @instance
+	         * @method applyAspect
+	         * @memberof VideoVimeo
+	         * @description Apply the video's aspect ratio.
+	         *
+	         */
+	    }, {
+	        key: "applyAspect",
+	        value: function applyAspect() {
+	            this.$node[0].style.paddingBottom = this.vData.height / this.vData.width * 100 + "%";
+	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @instance
+	         * @method destroy
+	         * @memberof VideoVimeo
+	         * @description Removes events and media for the video instance.
+	         *
+	         */
+	    }, {
+	        key: "destroy",
+	        value: function destroy() {
+	            this.$video.off("click loadedmetadata");
+	
+	            if (this._autoplayHandler) {
+	                this._autoplayHandler.destroy();
+	            }
+	
+	            if (_mediabox2["default"].getMedia(this.data.id)) {
+	                _mediabox2["default"].destroyMedia(this.data.id);
+	            }
+	        }
+	    }]);
+	
+	    return VideoVimeo;
+	})();
+	
+	exports["default"] = VideoVimeo;
+	module.exports = exports["default"];
+
+/***/ },
+/* 70 */
+/*!**********************************!*\
+  !*** ./js_src/video/mediabox.js ***!
+  \**********************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+	
+	var _properjsMediabox = __webpack_require__(/*! properjs-mediabox */ 71);
+	
+	var _properjsMediabox2 = _interopRequireDefault(_properjsMediabox);
+	
+	/**
+	 *
+	 * @description Single app instanceof [MediaBox]{@link https://github.com/ProperJS/MediaBox} for custom audio/video
+	 * @member mediabox
+	 * @memberof video
+	 *
+	 */
+	var mediabox = new _properjsMediabox2["default"]();
+	
+	/******************************************************************************
+	 * Export
+	*******************************************************************************/
+	exports["default"] = mediabox;
+	module.exports = exports["default"];
+
+/***/ },
+/* 71 */
+/*!*****************************************!*\
+  !*** ./~/properjs-mediabox/MediaBox.js ***!
+  \*****************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	/*!
+	 *
+	 * A lightweight manager for HTML5 audio and video.
+	 *
+	 * @MediaBox
+	 * @singleton
+	 * @author: kitajchuk
+	 *
+	 * @useful web pages with information on this stuffs
+	 * https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Media_events
+	 * https://developer.mozilla.org/en-US/docs/Web/API/HTMLAudioElement
+	 * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/video
+	 * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/audio
+	 * https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement
+	 *
+	 */
+	(function ( factory ) {
+	    
+	    if ( true ) {
+	        module.exports = factory();
+	
+	    } else if ( typeof window !== "undefined" ) {
+	        window.MediaBox = factory();
+	    }
+	    
+	})(function () {
+	
+	
+	    var Easing = __webpack_require__( /*! properjs-easing */ 54 ),
+	        Tween = __webpack_require__( /*! properjs-tween */ 55 ),
+	        raf = window.requestAnimationFrame,
+	        caf = window.cancelAnimationFrame,
+	
+	    /******************************************************************************
+	     * @Private API
+	    *******************************************************************************/
+	    
+	    /**
+	     *
+	     * Expression match hashbang/querystring
+	     * @member rHashQuery
+	     * @private
+	     *
+	     */
+	    rHashQuery = /[#|?].*$/g,
+	    
+	    
+	    /**
+	     *
+	     * Replace "no" in canPlayType strings
+	     * @member rNos
+	     * @private
+	     *
+	     */
+	    rNos = /^no$/,
+	    
+	    
+	    /**
+	     *
+	     * Clean up all those typeof's
+	     * @method isFunction
+	     * @returns boolean
+	     * @private
+	     *
+	     */
+	    isFunction = function ( fn ) {
+	        return (typeof fn === "function");
+	    },
+	    
+	    
+	    /**
+	     *
+	     * Test that an object is an Element
+	     * @method isElement
+	     * @returns boolean
+	     * @private
+	     *
+	     */
+	    isElement = function ( el ) {
+	        return (el instanceof HTMLElement);
+	    },
+	    
+	    
+	    /**
+	     *
+	     * Borrowed(ish)
+	     * Modernizr v3.0.0-alpha.4 on master branch
+	     * https://github.com/Modernizr/Modernizr/blob/master/feature-detects/audio.js
+	     * @method getAudioSupport
+	     * @returns object
+	     * @private
+	     *
+	     */
+	    getAudioSupport = function () {
+	        var elem = document.createElement( "audio" ),
+	            ret = {};
+	    
+	        try {
+	            if ( elem.canPlayType ) {
+	                ret.ogg = elem.canPlayType( 'audio/ogg; codecs="vorbis"' ).replace( rNos, "" );
+	                ret.mp3 = elem.canPlayType( 'audio/mpeg;' ).replace( rNos, "" );
+	                ret.opus = elem.canPlayType( 'audio/ogg; codecs="opus"' ).replace( rNos, "" );
+	    
+	                // Mimetypes accepted:
+	                // developer.mozilla.org/En/Media_formats_supported_by_the_audio_and_video_elements
+	                // bit.ly/iphoneoscodecs
+	                ret.wav = elem.canPlayType( 'audio/wav; codecs="1"' ).replace( rNos, "" );
+	                ret.m4a = (elem.canPlayType( 'audio/x-m4a;' ) || elem.canPlayType( 'audio/aac;' )).replace( rNos, "" );
+	            }
+	    
+	        } catch ( e ) {}
+	    
+	        return ret;
+	    },
+	    
+	    
+	    /**
+	     *
+	     * Borrowed(ish)
+	     * Modernizr v3.0.0-alpha.4 on master branch
+	     * https://github.com/Modernizr/Modernizr/blob/master/feature-detects/video.js
+	     * @method getVideoSupport
+	     * @returns object
+	     * @private
+	     *
+	     */
+	    getVideoSupport = function () {
+	        var elem = document.createElement( "video" ),
+	            ret = {};
+	    
+	        try {
+	            if ( elem.canPlayType ) {
+	                ret.ogg = elem.canPlayType( 'video/ogg; codecs="theora"' ).replace( rNos, "" );
+	    
+	                // Without QuickTime, this value will be `undefined`. github.com/Modernizr/Modernizr/issues/546
+	                ret.h264 = elem.canPlayType( 'video/mp4; codecs="avc1.42E01E"' ).replace( rNos, "" );
+	                ret.webm = elem.canPlayType( 'video/webm; codecs="vp8, vorbis"' ).replace( rNos, "" );
+	                ret.vp9 = elem.canPlayType( 'video/webm; codecs="vp9"' ).replace( rNos, "" );
+	                ret.hls = elem.canPlayType( 'application/x-mpegURL; codecs="avc1.42E01E"' ).replace( rNos, "" );
+	            }
+	    
+	        } catch ( e ) {}
+	    
+	        return ret;
+	    },
+	    
+	    
+	    /**
+	     *
+	     * Get mimetype string from media source
+	     * @method getMimeForMedia
+	     * @param {string} src media file source
+	     * @private
+	     *
+	     */
+	    getMimeForMedia = function ( type, src ) {
+	        var ext = src.split( "." ).pop().toLowerCase().replace( rHashQuery, "" ),
+	            ret;
+	    
+	        if ( type === "video" ) {
+	            switch ( ext ) {
+	                case "webm":
+	                    ret = "video/webm";
+	                    break;
+	                case "mp4":
+	                case "m4v":
+	                    ret = "video/mp4";
+	                    break;
+	                case "ogv":
+	                    ret = "video/ogg";
+	                    break;
+	            }
+	    
+	        } else {
+	            switch ( ext ) {
+	                case "aac":
+	                    ret = "audio/aac";
+	                    break;
+	                case "m4a":
+	                    ret = "audio/x-m4a";
+	                    break;
+	                case "mp4":
+	                    ret = "audio/mp4";
+	                    break;
+	                case "mp1":
+	                case "mp2":
+	                case "mp3":
+	                case "mpg":
+	                case "mpeg":
+	                    ret = "audio/mpeg";
+	                    break;
+	                case "oga":
+	                case "ogg":
+	                    ret = "audio/ogg";
+	                    break;
+	                case "wav":
+	                    ret = "audio/wav";
+	                    break;
+	            }
+	        }
+	    
+	        return ret;
+	    },
+	    
+	    
+	    /**
+	     *
+	     * Get the audio source that should be used
+	     * @method getCanPlaySource
+	     * @param {string} media the media type to check
+	     * @param {array} sources Array of media sources
+	     * @returns object
+	     * @private
+	     *
+	     */
+	    getCanPlaySource = function ( media, sources ) {
+	        var source, canPlay;
+	    
+	        for ( var i = 0, len = sources.length; i < len; i++ ) {
+	            var src = sources[ i ].split( "." ).pop().toLowerCase().replace( rHashQuery, "" );
+	    
+	    
+	            // The only time we break, this honors webm > mp4
+	            if ( src === "webm" && MediaBox.support[ media ][ src ] === "probably" ) {
+	                source = sources[ i ];
+	                canPlay = MediaBox.support[ media ][ src ];
+	                break;
+	            }
+	    
+	            if ( MediaBox.support[ media ][ src ] === "probably" || MediaBox.support[ media ][ src ] === "maybe" ) {
+	                source = sources[ i ];
+	                canPlay = MediaBox.support[ media ][ src ];
+	            }
+	    
+	            if ( (src === "ogv" || src === "oga") && (MediaBox.support[ media ].ogg === "probably" || MediaBox.support[ media ].ogg === "maybe") ) {
+	                source = sources[ i ];
+	                canPlay = MediaBox.support[ media ].ogg;
+	            }
+	    
+	            if ( (src === "mp4" || src === "m4v") && (MediaBox.support[ media ].h264 === "probably" || MediaBox.support[ media ].h264 === "maybe") ) {
+	                source = sources[ i ];
+	                canPlay = MediaBox.support[ media ].h264;
+	            }
+	    
+	            if ( src === "aac" && (MediaBox.support[ media ].m4a === "probably" || MediaBox.support[ media ].m4a === "maybe") ) {
+	                source = sources[ i ];
+	                canPlay = MediaBox.support[ media ].m4a;
+	            }
+	    
+	            if ( (src === "mp1" || src === "mp2" || src === "mpg" || src === "mpeg") && (MediaBox.support[ media ].mp3 === "probably" || MediaBox.support[ media ].mp3 === "maybe") ) {
+	                source = sources[ i ];
+	                canPlay = MediaBox.support[ media ].mp3;
+	            }
+	    
+	/*
+	            if ( source ) {
+	                break;
+	            }
+	*/
+	        }
+	    
+	        return {
+	            source: source,
+	            canPlay: canPlay
+	        };
+	    },
+	    
+	    
+	    /**
+	     *
+	     * MediaBox clear a timeupdate interval for audio/video tracks
+	     * @method clearPlaybackUpdate
+	     * @param {object} track The media object
+	     *
+	     */
+	    clearPlaybackUpdate = function ( track ) {
+	        if ( track._updateId ) {
+	            caf( track._updateId );
+	    
+	            track._updateId = null;
+	            track._updateFn = null;
+	        }
+	    },
+	    
+	    
+	    /**
+	     *
+	     * MediaBox crossbrowser create audio context
+	     * @method createAudioContext
+	     * @returns instance of audio context
+	     *
+	     */
+	    createAudioContext = function () {
+	        var AudioContext;
+	    
+	        if ( window.AudioContext ) {
+	            AudioContext = window.AudioContext;
+	    
+	        } else if ( window.webkitAudioContext ) {
+	            AudioContext = window.webkitAudioContext;
+	        }
+	    
+	        return ( AudioContext ) ? new AudioContext() : AudioContext;
+	    },
+	    
+	    
+	    /**
+	     *
+	     * MediaBox Open a new XMLHttpRequest
+	     * @method createRequest
+	     * @returns instance of audio context
+	     *
+	     */
+	    createRequest = function ( url, config, callback ) {
+	        var xhr = new XMLHttpRequest();
+	    
+	        xhr.open( "GET", url, true );
+	    
+	        if ( config ) {
+	            for ( var i in config ) {
+	                xhr[ i ] = config[ i ];
+	            }
+	        }
+	    
+	        xhr.onreadystatechange = function ( e ) {
+	            if ( this.readyState === 4 ) {
+	                if ( this.status === 200 ) {
+	                    try {
+	                        if ( !config.responseType ) {
+	                            this.responseJSON = JSON.parse( this.responseText );
+	                        }
+	    
+	                        if ( isFunction( callback ) ) {
+	                            callback( this );
+	                        }
+	    
+	                    } catch ( error ) {
+	                        throw new Error([
+	                            error.name,
+	                            error.message
+	    
+	                        ].join( " : " ));
+	                    }
+	                }
+	            }
+	        };
+	    
+	        xhr.send();
+	    
+	        return xhr;
+	    },
+	    
+	    
+	    /**
+	     *
+	     * MediaBox init constructor for singleton
+	     * @method init
+	     * @private
+	     *
+	     */
+	    init = function () {
+	        _instance = this;
+	    },
+	    
+	    
+	    /**
+	     *
+	     * MediaBox default volume setting
+	     * @member _volume
+	     * @private
+	     *
+	     */
+	    _volume = 1,
+	    
+	    
+	    /**
+	     *
+	     * MediaBox information for each channel.
+	     * These are default channels you can use.
+	     * <ul>
+	     * <li>bgm - background music channel</li>
+	     * <li>sfx - sound effects channel</li>
+	     * <li>vid - video channel</li>
+	     * </ul>
+	     * @member _channels
+	     * @private
+	     *
+	     */
+	    _channels = {
+	        bgm: {
+	            volume: _volume,
+	            _builtIn: true
+	        },
+	        sfx: {
+	            volume: _volume,
+	            _builtIn: true
+	        },
+	        vid: {
+	            volume: _volume,
+	            _builtIn: true
+	        }
+	    },
+	    
+	    /**
+	     *
+	     * MediaBox holds all audio tracks
+	     * @member _audio
+	     * @private
+	     *
+	     */
+	    _audio = {},
+	    
+	    /**
+	     *
+	     * MediaBox holds all video tracks
+	     * @member _video
+	     * @private
+	     *
+	     */
+	    _video = {},
+	    
+	    
+	    /**
+	     *
+	     * The singleton instance for MediaBox
+	     * @member _instance
+	     * @private
+	     *
+	     */
+	    _instance = null,
+	    
+	    
+	    /**
+	     *
+	     * Master audio context instance
+	     * @member _context
+	     * @private
+	     *
+	     */
+	    _context = createAudioContext(),
+	    
+	    
+	    /******************************************************************************
+	     * @Public API
+	    *******************************************************************************/
+	    
+	    /**
+	     *
+	     * A complete management tool for html5 video and audio context
+	     * @constructor MediaBox
+	     * @requires Tween
+	     * @memberof! <global>
+	     *
+	     */
+	    MediaBox = function () {
+	        return (_instance || init.apply( this, arguments ));
+	    };
+	    
+	    
+	    /**
+	     *
+	     * MediaBox types object
+	     * @memberof MediaBox
+	     * @member types
+	     *
+	     */
+	    MediaBox.types = {
+	        AUDIO: "audio",
+	        VIDEO: "video"
+	    };
+	    
+	    
+	    /**
+	     *
+	     * MediaBox support object
+	     * @memberof MediaBox
+	     * @member support
+	     *
+	     */
+	    MediaBox.support = {
+	        audio: getAudioSupport(),
+	        video: getVideoSupport()
+	    };
+	    
+	    
+	    /**
+	     *
+	     * MediaBox stopped state constant
+	     * @memberof MediaBox
+	     * @member STATE_STOPPED
+	     *
+	     */
+	    MediaBox.STATE_STOPPED = 0;
+	    
+	    
+	    /**
+	     *
+	     * MediaBox stopping state constant
+	     * @memberof MediaBox
+	     * @member STATE_STOPPING
+	     *
+	     */
+	    MediaBox.STATE_STOPPING = 1;
+	    
+	    
+	    /**
+	     *
+	     * MediaBox paused state constant
+	     * @memberof MediaBox
+	     * @member STATE_PAUSED
+	     *
+	     */
+	    MediaBox.STATE_PAUSED = 2;
+	    
+	    
+	    /**
+	     *
+	     * MediaBox playing state constant
+	     * @memberof MediaBox
+	     * @member STATE_PLAYING
+	     *
+	     */
+	    MediaBox.STATE_PLAYING = 3;
+	    
+	    
+	    /**
+	     *
+	     * MediaBox prototype
+	     *
+	     */
+	    MediaBox.prototype = {
+	        constructor: MediaBox,
+	    
+	        /**
+	         *
+	         * MediaBox check if media is loaded via ajax
+	         * @memberof MediaBox
+	         * @method isLoaded
+	         * @param {string} id reference id for media
+	         * @returns boolean
+	         *
+	         */
+	        isLoaded: function ( id ) {
+	            var obj = this.getMedia( id );
+	    
+	            return (obj.loaded === true);
+	        },
+	    
+	        /**
+	         *
+	         * MediaBox check stopped/paused status for audio/video
+	         * @memberof MediaBox
+	         * @method isStopped
+	         * @param {string} id reference id for media
+	         * @returns boolean
+	         *
+	         */
+	        isStopped: function ( id ) {
+	            var obj = this.getMedia( id );
+	    
+	            return (obj.state === MediaBox.STATE_STOPPED);
+	        },
+	    
+	        /**
+	         *
+	         * MediaBox check stopped/paused status for audio/video
+	         * @memberof MediaBox
+	         * @method isPaused
+	         * @param {string} id reference id for media
+	         * @returns boolean
+	         *
+	         */
+	        isPaused: function ( id ) {
+	            var obj = this.getMedia( id );
+	    
+	            return (obj.state === MediaBox.STATE_PAUSED);
+	        },
+	    
+	        /**
+	         *
+	         * MediaBox check playing status for audio/video
+	         * @memberof MediaBox
+	         * @method isPlaying
+	         * @param {string} id reference id for media
+	         * @returns boolean
+	         *
+	         */
+	        isPlaying: function ( id ) {
+	            var obj = this.getMedia( id );
+	    
+	            return (obj.state === MediaBox.STATE_PLAYING || obj.state === MediaBox.STATE_STOPPING);
+	        },
+	    
+	        /**
+	         *
+	         * MediaBox set volume for audio OR video
+	         * @memberof MediaBox
+	         * @method setVolume
+	         * @param {string} id reference id for media
+	         * @param {number} volume the volume to set to
+	         *
+	         */
+	        setVolume: function ( id, volume ) {
+	            var obj = this.getMedia( id );
+	    
+	            obj._node.volume = volume;
+	    
+	            return _instance;
+	        },
+	    
+	        /**
+	         *
+	         * MediaBox set volume for audio OR video
+	         * @memberof MediaBox
+	         * @method getVolume
+	         * @param {string} id reference id for media
+	         * @returns number
+	         *
+	         */
+	        getVolume: function ( id ) {
+	            var obj = this.getMedia( id );
+	    
+	            return obj._node.volume;
+	        },
+	    
+	        /**
+	         *
+	         * MediaBox get an audio nodes property
+	         * @memberof MediaBox
+	         * @method getAudioProp
+	         * @param {string} id Audio id
+	         * @param {string} prop The property to access
+	         *
+	         */
+	        getMediaProp: function ( id, prop ) {
+	            var obj = this.getMedia( id );
+	    
+	            if ( obj ) {
+	                return obj._node[ prop ];
+	            }
+	        },
+	    
+	        /**
+	         *
+	         * MediaBox set an audio nodes property/attribute
+	         * @memberof MediaBox
+	         * @method setAudioProp
+	         * @param {string} id Audio id
+	         * @param {string} prop The property to set
+	         * @param {mixed} value The value to assign
+	         *
+	         */
+	        setMediaProp: function ( id, prop, value ) {
+	            var obj = this.getMedia( id );
+	    
+	            if ( obj ) {
+	                obj._node[ prop ] = value;
+	            }
+	    
+	            return _instance;
+	        },
+	    
+	        /**
+	         *
+	         * MediaBox get an audio nodes attribute
+	         * @memberof MediaBox
+	         * @method getAudioAttr
+	         * @param {string} id Audio id
+	         * @param {string} prop The property to access
+	         *
+	         */
+	        getMediaAttr: function ( id, prop ) {
+	            var obj = this.getMedia( id );
+	    
+	            if ( obj ) {
+	                return obj._node.getAttribute( prop );
+	            }
+	        },
+	    
+	        /**
+	         *
+	         * MediaBox set an audio nodes attribute
+	         * @memberof MediaBox
+	         * @method setAudioAttr
+	         * @param {string} id Audio id
+	         * @param {string} prop The property to set
+	         * @param {mixed} value The value to assign
+	         *
+	         */
+	        setMediaAttr: function ( id, prop, value ) {
+	            var obj = this.getMedia( id );
+	    
+	            if ( obj ) {
+	                obj._node.setAttribute( prop, value );
+	            }
+	    
+	            return _instance;
+	        },
+	    
+	        /**
+	         *
+	         * MediaBox add an audio nodes event listener
+	         * @memberof MediaBox
+	         * @method addAudioEvent
+	         * @param {string} id Audio id to add event for
+	         * @param {string} event Event to add
+	         * @param {function} callback The event handler to call
+	         *
+	         */
+	        addMediaEvent: function ( id, event, callback ) {
+	            var obj = this.getMedia( id );
+	    
+	            if ( obj ) {
+	                // Capture timeupdate to run at 60fps instead
+	                if ( event === "timeupdate" ) {
+	                    obj._events.timeupdate = callback;
+	    
+	                    return _instance;
+	                }
+	    
+	                obj._events[ event ] = function () {
+	                    if ( isFunction( callback ) ) {
+	                        callback.apply( this, arguments );
+	                    }
+	                };
+	    
+	                obj._node.addEventListener( event, obj._events[ event ], false );
+	            }
+	    
+	            return _instance;
+	        },
+	    
+	        /**
+	         *
+	         * MediaBox remove an audio nodes event listener
+	         * @memberof MediaBox
+	         * @method removeAudioEvent
+	         * @param {string} id Audio id to remove event for
+	         * @param {string} event Event to remove
+	         *
+	         */
+	        removeMediaEvent: function ( id, event ) {
+	            var obj = this.getMedia( id );
+	    
+	            if ( obj ) {
+	                // Capture timeupdate to run at 60fps instead
+	                if ( event === "timeupdate" ) {
+	                    clearPlaybackUpdate( obj );
+	                }
+	    
+	                obj._node.removeEventListener( event, obj._events[ event ], false );
+	    
+	                obj._events[ event ] = null;
+	            }
+	    
+	            return _instance;
+	        },
+	    
+	        /**
+	         *
+	         * MediaBox play audio node by id
+	         * @memberof MediaBox
+	         * @method playAudio
+	         * @param {string} id reference id for media
+	         *
+	         */
+	        playMedia: function ( id ) {
+	            var obj = this.getMedia( id );
+	    
+	            if ( obj && this.isLoaded( id ) && (this.isStopped( id ) || this.isPaused( id )) ) {
+	                obj._node.volume = _channels[ obj.channel ].volume;
+	                obj._node.play();
+	                obj.state = MediaBox.STATE_PLAYING;
+	    
+	                if ( !obj._updateId && isFunction( obj._events.timeupdate ) ) {
+	                    obj._updateFn = function () {
+	                        obj._events.timeupdate.call( obj._node, null );
+	                        
+	                        obj._updateId = raf( obj._updateFn );
+	                    };
+	                    
+	                    obj._updateId = raf( obj._updateFn );
+	                }
+	            }
+	    
+	            return _instance;
+	        },
+	    
+	        /**
+	         *
+	         * MediaBox stop audio node by id with a paused state
+	         * @memberof MediaBox
+	         * @method pauseAudio
+	         * @param {string} id reference id for media
+	         *
+	         */
+	        pauseMedia: function ( id ) {
+	            var obj = this.getMedia( id );
+	    
+	            if ( obj && this.isLoaded( id ) && this.isPlaying( id ) ) {
+	                obj._node.pause();
+	                obj.state = MediaBox.STATE_PAUSED;
+	    
+	                clearPlaybackUpdate( obj );
+	            }
+	    
+	            return _instance;
+	        },
+	    
+	        /**
+	         *
+	         * MediaBox stop audio node by id with a stopped state
+	         * @memberof MediaBox
+	         * @method stopAudio
+	         * @param {string} id reference id for media
+	         *
+	         */
+	        stopMedia: function ( id ) {
+	            var obj = this.getMedia( id );
+	    
+	            if ( obj && this.isLoaded( id ) && this.isPlaying( id ) ) {
+	                obj._node.pause();
+	                obj.state = MediaBox.STATE_STOPPED;
+	    
+	                clearPlaybackUpdate( obj );
+	            }
+	    
+	            return _instance;
+	        },
+	    
+	        /**
+	         *
+	         * MediaBox get audio object by id
+	         * @memberof getMedia
+	         * @method getAudio
+	         * @param {string} id reference id for media
+	         * @returns object
+	         *
+	         */
+	        getMedia: function ( id ) {
+	            return _video[ id ] ? _video[ id ] : _audio[ id ];
+	        },
+	    
+	        /**
+	         *
+	         * MediaBox get all audio objects
+	         * @memberof MediaBox
+	         * @method getAudios
+	         * @returns object
+	         *
+	         */
+	        getAudios: function () {
+	            return _audio;
+	        },
+	    
+	        /**
+	         *
+	         * MediaBox get all video objects
+	         * @memberof MediaBox
+	         * @method getVideos
+	         * @returns object
+	         *
+	         */
+	        getVideos: function () {
+	            return _video;
+	        },
+	    
+	        /**
+	         *
+	         * MediaBox kill a media object abstractly
+	         * @memberof MediaBox
+	         * @method destroyMedia
+	         * @param {string} id reference id for media
+	         *
+	         */
+	        destroyMedia: function ( id ) {
+	            var obj = this.getMedia( id );
+	    
+	            this.stopMedia( id );
+	    
+	            if ( obj.type === MediaBox.types.AUDIO ) {
+	                delete _audio[ id ];
+	    
+	            } else {
+	                delete _video[ id ];
+	            }
+	    
+	            return _instance;
+	        },
+	    
+	        /**
+	         *
+	         * MediaBox load media config JSON formatted in a json bundle
+	         * @memberof MediaBox
+	         * @method loadMedia
+	         * @param {string} url The url to the JSON config
+	         * @param {function} callback The function to fire when done loading
+	         *
+	         */
+	        loadMedia: function ( url, callback ) {
+	            var self = this;
+	    
+	            createRequest( url, null, function ( xhr ) {
+	                self.addMedia( xhr.responseJSON );
+	    
+	                if ( isFunction( callback ) ) {
+	                    callback();
+	                }
+	            });
+	    
+	            return _instance;
+	        },
+	    
+	        /**
+	         *
+	         * MediaBox add media from bundle json
+	         * @memberof MediaBox
+	         * @method addMedia
+	         * @param {object} bundle Formatted media bundle JSON
+	         *
+	         */
+	        addMedia: function ( bundle ) {
+	            for ( var m in bundle ) {
+	                for ( var i = bundle[ m ].length; i--; ) {
+	                    // this.addVideo() / this.addAudio()
+	                    if ( isFunction( this[ m ] ) ) {
+	                        this[ m ]( bundle[ m ][ i ] );
+	                    }
+	                }
+	            }
+	    
+	            return _instance;
+	        },
+	    
+	        /**
+	         *
+	         * MediaBox add a video element
+	         * @memberof MediaBox
+	         * @method addVideo
+	         * @param {object} obj Formatted media bundle
+	         *
+	         */
+	        addVideo: function ( obj ) {
+	            var id = obj.id,
+	                src = obj.src,
+	                props = {
+	                    element: obj.element,
+	                    channel: obj.channel
+	                };
+	    
+	            // Disallow overrides / Require id and src props
+	            if ( _video[ id ] || !id || !src ) {
+	                return _instance;
+	            }
+	    
+	            // Allow new channels to exist
+	            if ( !_channels[ props.channel ] ) {
+	                _channels[ props.channel ] = {
+	                    volume: _volume
+	                };
+	            }
+	    
+	            // Create video object
+	            _video[ id ] = {};
+	            _video[ id ].type = MediaBox.types.VIDEO;
+	            _video[ id ].state = MediaBox.STATE_STOPPED;
+	            _video[ id ].loaded = true;
+	            _video[ id ].channel = props.channel;
+	            _video[ id ].sources = src;
+	            _video[ id ]._source = getCanPlaySource( MediaBox.types.VIDEO, src );
+	            _video[ id ]._events = {};
+	            _video[ id ]._updateId = null;
+	            _video[ id ]._updateFn = null;
+	            _video[ id ]._node = (props.element || document.createElement( "video" ));
+	            _video[ id ]._nodeSource = document.createElement( "source" );
+	            _video[ id ]._nodeSource.src = _video[ id ]._source.source;
+	            _video[ id ]._nodeSource.type = getMimeForMedia( MediaBox.types.VIDEO, _video[ id ]._source.source );
+	            _video[ id ]._node.appendChild( _video[ id ]._nodeSource );
+	    
+	            return _instance;
+	        },
+	    
+	        /**
+	         *
+	         * MediaBox add an audio context
+	         * @memberof MediaBox
+	         * @method addAudio
+	         * @param {object} obj Formatted media bundle
+	         *
+	         */
+	        addAudio: function ( obj ) {
+	            var id = obj.id,
+	                src = obj.src,
+	                props = {
+	                    channel: obj.channel,
+	                    CORS: (obj.CORS || false)
+	                };
+	    
+	            // Disallow overrides / Require id and src props
+	            if ( _audio[ id ] || !id || !src ) {
+	                return _instance;
+	            }
+	            
+	            // Allow new channels to exist
+	            if ( !_channels[ props.channel ] ) {
+	                _channels[ props.channel ] = {
+	                    volume: _volume
+	                };
+	            }
+	    
+	            // Create audio object
+	            _audio[ id ] = {};
+	            _audio[ id ].type = MediaBox.types.AUDIO;
+	            _audio[ id ].state = MediaBox.STATE_STOPPED;
+	            _audio[ id ].loaded = true;
+	            _audio[ id ].channel = props.channel;
+	            _audio[ id ].sources = src;
+	            _audio[ id ]._source = getCanPlaySource( MediaBox.types.AUDIO, src );
+	            _audio[ id ]._events = {};
+	            _audio[ id ]._updateId = null;
+	            _audio[ id ]._updateFn = null;
+	            _audio[ id ]._node = new Audio( _audio[ id ]._source.source );
+	    
+	            // Get the media as a buffer
+	            if ( isFunction( obj.onloaded ) && !props.CORS ) {
+	                createRequest( _audio[ id ]._source.source, {responseType: "arraybuffer"}, function ( xhr ) {
+	                    _context.decodeAudioData( xhr.response, obj.onloaded );
+	                });
+	            }
+	    
+	            return _instance;
+	        },
+	    
+	        /**
+	         *
+	         * MediaBox fade in audio/video volume
+	         * @memberof MediaBox
+	         * @method fadeMediaIn
+	         * @param {string} id string reference id for audio
+	         * @param {number} duration tween time in ms
+	         * @param {function} easing optional easing to use
+	         *
+	         */
+	        fadeMediaIn: function ( id, duration, easing ) {
+	            var obj = this.getMedia( id ),
+	                self = this,
+	                volume;
+	    
+	            if ( obj && obj.state === MediaBox.STATE_PLAYING ) {
+	                return _instance;
+	            }
+	    
+	            if ( obj ) {
+	                volume = _channels[ obj.channel ].volume;
+	    
+	                // Only reset volume and play if object is stopped
+	                // Object state could be STATE_STOPPING at this point
+	                if ( obj.state === MediaBox.STATE_STOPPED ) {
+	                    this.playMedia( id );
+	                    this.setVolume( id, 0 );
+	    
+	                } else if ( obj.state === MediaBox.STATE_STOPPING ) {
+	                    obj.state = MediaBox.STATE_PLAYING;
+	                }
+	    
+	                new Tween({
+	                    to: volume,
+	                    from: 0,
+	                    ease: ( isFunction( easing ) ) ? easing : Easing.linear,
+	                    duration: (duration || 1000),
+	                    update: function ( v ) {
+	                        self.setVolume( id, (v > volume) ? volume : v );
+	                    },
+	                    complete: function () {
+	                        self.setVolume( id, volume );
+	                    }
+	                });
+	            }
+	    
+	            return _instance;
+	        },
+	    
+	        /**
+	         *
+	         * MediaBox fade out audio/video volume
+	         * @memberof MediaBox
+	         * @method fadeMediaOut
+	         * @param {string} id string reference id for audio
+	         * @param {number} duration tween time in ms
+	         * @param {function} easing optional easing to use
+	         *
+	         */
+	        fadeMediaOut: function ( id, duration, easing ) {
+	            var obj = this.getMedia( id );
+	    
+	            if ( obj && obj.state === MediaBox.STATE_STOPPING ) {
+	                return _instance;
+	            }
+	    
+	            var self = this,
+	                handler = function ( v ) {
+	                    // Check audio state on fadeout in case it is started again
+	                    // before the duration of the fadeout is complete.
+	                    if ( obj.state === MediaBox.STATE_STOPPING ) {
+	                        self.setVolume( id, (v < 0) ? 0 : v );
+	    
+	                        if ( self.getVolume( id ) === 0 ) {
+	                            self.stopMedia( id );
+	                        }
+	                    }
+	                };
+	    
+	            if ( obj ) {
+	                obj.state = MediaBox.STATE_STOPPING;
+	    
+	                new Tween({
+	                    to: 0,
+	                    from: self.getVolume( id ),
+	                    ease: ( isFunction( easing ) ) ? easing : Easing.linear,
+	                    duration: (duration || 1000),
+	                    update: handler,
+	                    complete: handler
+	                });
+	            }
+	    
+	            return _instance;
+	        },
+	    
+	        /**
+	         *
+	         * MediaBox pause all playing audio for a given channel id
+	         * @memberof MediaBox
+	         * @method stopChannel
+	         * @param {string} channel string reference id for channel
+	         *
+	         */
+	        stopChannel: function ( channel ) {
+	            var id;
+	    
+	            // Look at video index
+	            for ( id in _video ) {
+	                if ( _video[ id ].channel === channel && _video[ id ].state === MediaBox.STATE_PLAYING ) {
+	                    this.pauseMedia( id );
+	                }
+	            }
+	    
+	            // Look at audio index
+	            for ( id in _audio ) {
+	                if ( _audio[ id ].channel === channel && _audio[ id ].state === MediaBox.STATE_PLAYING ) {
+	                    this.pauseMedia( id );
+	                }
+	            }
+	    
+	            return _instance;
+	        },
+	    
+	        /**
+	         *
+	         * MediaBox resume all playing audio for a given channel id
+	         * @memberof MediaBox
+	         * @method playChannel
+	         * @param {string} channel string reference id for channel
+	         *
+	         */
+	        playChannel: function ( channel ) {
+	            var id;
+	    
+	            // Look at video index
+	            for ( id in _video ) {
+	                if ( _video[ id ].channel === channel && _video[ id ].state === MediaBox.STATE_PAUSED ) {
+	                    this.playMedia( id );
+	                }
+	            }
+	    
+	            // Look at audio index
+	            for ( id in _audio ) {
+	                if ( _audio[ id ].channel === channel && _audio[ id ].state === MediaBox.STATE_PAUSED ) {
+	                    this.playMedia( id );
+	                }
+	            }
+	    
+	            return _instance;
+	        },
+	    
+	        /**
+	         *
+	         * MediaBox fade out all playing audio/video for a given channel id
+	         * @memberof MediaBox
+	         * @method fadeChannelOut
+	         * @param {string} channel string reference id for channel
+	         * @param {number} duration tween time in ms
+	         *
+	         */
+	        fadeChannelOut: function ( channel, duration ) {
+	            var id;
+	    
+	            // Look at video index
+	            for ( id in _video ) {
+	                if ( _video[ id ].channel === channel && _video[ id ].state === MediaBox.STATE_PLAYING ) {
+	                    this.fadeMediaOut( id, duration );
+	                }
+	            }
+	    
+	            // Look at audio index
+	            for ( id in _audio ) {
+	                if ( _audio[ id ].channel === channel && _audio[ id ].state === MediaBox.STATE_PLAYING ) {
+	                    this.fadeMediaOut( id, duration );
+	                }
+	            }
+	    
+	            return _instance;
+	        },
+	    
+	        /**
+	         *
+	         * MediaBox fade in all playing audio/video for a given channel id
+	         * @memberof MediaBox
+	         * @method fadeChannelIn
+	         * @param {string} channel string reference id for channel
+	         * @param {number} duration tween time in ms
+	         *
+	         */
+	        fadeChannelIn: function ( channel, duration ) {
+	            var id;
+	    
+	            // Look at video index
+	            for ( id in _video ) {
+	                if ( _video[ id ].channel === channel && _video[ id ].state === MediaBox.STATE_STOPPED ) {
+	                    this.fadeMediaIn( id, duration );
+	                }
+	            }
+	    
+	            // Look at audio index
+	            for ( id in _audio ) {
+	                if ( _audio[ id ].channel === channel && _audio[ id ].state === MediaBox.STATE_STOPPED ) {
+	                    this.fadeMediaIn( id, duration );
+	                }
+	            }
+	    
+	            return _instance;
+	        },
+	    
+	        /**
+	         *
+	         * MediaBox crossfade volume between multiple channels
+	         * @memberof MediaBox
+	         * @method crossFadeChannel
+	         * @param {string} channel string reference id for channel
+	         * @param {string} objId string reference id for object to fade in
+	         * @param {number} duration tween time in ms
+	         *
+	         */
+	        crossFadeChannel: function ( channel, objId, duration ) {
+	            var id;
+	            
+	            // Look at video index
+	            for ( id in _video ) {
+	                if ( _video[ id ].channel === channel && _video[ id ].state === MediaBox.STATE_PLAYING ) {
+	                    this.fadeMediaOut( id, duration );
+	                }
+	            }
+	    
+	            // Look at audio index
+	            for ( id in _audio ) {
+	                if ( _audio[ id ].channel === channel && _audio[ id ].state === MediaBox.STATE_PLAYING ) {
+	                    this.fadeMediaOut( id, duration );
+	                }
+	            }
+	    
+	            return this.fadeMediaIn( objId, duration );
+	        },
+	    
+	        /**
+	         *
+	         * MediaBox set the property for a channel
+	         * @memberof MediaBox
+	         * @method setChannelProp
+	         * @param {string} id string id reference to channel
+	         * @param {string} key string prop key
+	         * @param {string} val prop val
+	         *
+	         */
+	        setChannelProp: function ( id, key, val ) {
+	            if ( _channels[ id ] ) {
+	                _channels[ id ][ key ] = val;
+	            }
+	    
+	            return _instance;
+	        },
+	    
+	        /**
+	         *
+	         * MediaBox get the property for a channel
+	         * @memberof MediaBox
+	         * @method getChannelProp
+	         * @param {string} id string id reference to channel
+	         * @param {string} key string prop key
+	         *
+	         */
+	        getChannelProp: function ( id, key ) {
+	            if ( _channels[ id ] ) {
+	                return _channels[ id ][ key ];
+	            }
+	        },
+	        
+	        
+	        /**
+	         *
+	         * MediaBox get the channels config
+	         * @memberof MediaBox
+	         * @method _channels
+	         *
+	         */
+	        getChannels: function () {
+	            return _channels;
+	        }
+	    };
+	    
+	    
+	    return MediaBox;
+	
+	
+	});
+
+/***/ },
+/* 72 */
+/*!*****************************************!*\
+  !*** ./js_src/video/AutoplayHandler.js ***!
+  \*****************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var _core = __webpack_require__(/*! ../core */ 1);
+	
+	var core = _interopRequireWildcard(_core);
+	
+	var _mediabox = __webpack_require__(/*! ./mediabox */ 70);
+	
+	var _mediabox2 = _interopRequireDefault(_mediabox);
+	
+	/**
+	 *
+	 * @public
+	 * @class AutoplayHandler
+	 * @classdesc Handle starting / stopping autoplay videos.
+	 * @param {Hobo} $node The element to work with
+	 * @param {string} id The MediaBox ID to work with
+	 * @memberof video
+	 *
+	 */
+	
+	var AutoplayHandler = (function () {
+	    function AutoplayHandler($node, id) {
+	        _classCallCheck(this, AutoplayHandler);
+	
+	        this.$node = $node;
+	        this.id = id;
+	
+	        this.bindEvents();
+	    }
+	
+	    /******************************************************************************
+	     * Export
+	    *******************************************************************************/
+	
+	    /**
+	     *
+	     * @public
+	     * @instance
+	     * @method bindEvents
+	     * @memberof AutoplayHandler
+	     * @description Bind the scroll event for toggling playback.
+	     *
+	     */
+	
+	    _createClass(AutoplayHandler, [{
+	        key: "bindEvents",
+	        value: function bindEvents() {
+	            this._onScroll = this.onScroll.bind(this);
+	
+	            if (_mediabox2["default"].getMedia(this.id)) {
+	                this._onScroll();
+	            }
+	
+	            core.emitter.on("app--scroll", this._onScroll);
+	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @instance
+	         * @method onScroll
+	         * @memberof AutoplayHandler
+	         * @description Scroll handler for toggling video playback.
+	         *
+	         */
+	    }, {
+	        key: "onScroll",
+	        value: function onScroll() {
+	            if (core.util.isElementInViewport(this.$node[0])) {
+	                if (!_mediabox2["default"].isPlaying(this.id)) {
+	                    _mediabox2["default"].playMedia(this.id);
+	                }
+	            } else if (_mediabox2["default"].isPlaying(this.id)) {
+	                _mediabox2["default"].stopMedia(this.id);
+	            }
+	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @instance
+	         * @method destroy
+	         * @memberof AutoplayHandler
+	         * @description Remove the scroll handler.
+	         *
+	         */
+	    }, {
+	        key: "destroy",
+	        value: function destroy() {
+	            core.emitter.off("app--scroll", this._onScroll);
+	        }
+	    }]);
+	
+	    return AutoplayHandler;
+	})();
+	
+	exports["default"] = AutoplayHandler;
+	module.exports = exports["default"];
+
+/***/ },
+/* 73 */
 /*!***********************************!*\
   !*** ./js_src/indexes/listing.js ***!
   \***********************************/
@@ -12094,7 +13968,7 @@
 	
 	var core = _interopRequireWildcard(_core);
 	
-	var _IndexFull = __webpack_require__(/*! ./IndexFull */ 70);
+	var _IndexFull = __webpack_require__(/*! ./IndexFull */ 74);
 	
 	var _IndexFull2 = _interopRequireDefault(_IndexFull);
 	
@@ -12195,7 +14069,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 70 */
+/* 74 */
 /*!*************************************!*\
   !*** ./js_src/indexes/IndexFull.js ***!
   \*************************************/
@@ -12227,7 +14101,7 @@
 	
 	var _router2 = _interopRequireDefault(_router);
 	
-	var _gallery = __webpack_require__(/*! ../gallery */ 71);
+	var _gallery = __webpack_require__(/*! ../gallery */ 75);
 	
 	var _gallery2 = _interopRequireDefault(_gallery);
 	
@@ -12235,7 +14109,7 @@
 	
 	var _overlay2 = _interopRequireDefault(_overlay);
 	
-	var _properjsTemplate = __webpack_require__(/*! properjs-template */ 72);
+	var _properjsTemplate = __webpack_require__(/*! properjs-template */ 76);
 	
 	var _properjsTemplate2 = _interopRequireDefault(_properjsTemplate);
 	
@@ -12702,7 +14576,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 71 */
+/* 75 */
 /*!***************************!*\
   !*** ./js_src/gallery.js ***!
   \***************************/
@@ -13039,7 +14913,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 72 */
+/* 76 */
 /*!*****************************************!*\
   !*** ./~/properjs-template/template.js ***!
   \*****************************************/
@@ -13084,7 +14958,7 @@
 	});
 
 /***/ },
-/* 73 */
+/* 77 */
 /*!**********************************!*\
   !*** ./js_src/projects/index.js ***!
   \**********************************/
@@ -13238,7 +15112,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 74 */
+/* 78 */
 /*!*************************!*\
   !*** ./js_src/intro.js ***!
   \*************************/
@@ -13294,7 +15168,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 75 */
+/* 79 */
 /*!************************!*\
   !*** ./js_src/main.js ***!
   \************************/
