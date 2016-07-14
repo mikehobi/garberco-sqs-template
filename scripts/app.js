@@ -14412,10 +14412,12 @@
 	                var $grid = (0, _js_libsHoboDistHoboBuild2["default"])(_gridWrapTpl.replace(/\n/g, ""));
 	
 	                collection.items.forEach(function (item) {
-	                    $grid.append((0, _properjsTemplate2["default"])(_gridItemTpl.replace(/\n/g, ""), item));
+	                    if (!item.customContent.vimeoVideoUrl) {
+	                        $grid.append((0, _properjsTemplate2["default"])(_gridItemTpl.replace(/\n/g, ""), item));
 	
-	                    if (item.customContent && item.customContent.diptychImage && item.customContent.diptychImage.systemDataVariants) {
-	                        $grid.append((0, _properjsTemplate2["default"])(_gridItemTpl.replace(/\n/g, ""), item.customContent.diptychImage));
+	                        if (item.customContent && item.customContent.diptychImage && item.customContent.diptychImage.systemDataVariants) {
+	                            $grid.append((0, _properjsTemplate2["default"])(_gridItemTpl.replace(/\n/g, ""), item.customContent.diptychImage));
+	                        }
 	                    }
 	                });
 	
