@@ -11818,14 +11818,6 @@
 	            core.dom.html.addClass("is-menu-open");
 	            core.dom.body.append(this.$node);
 	
-	            // Handle scroll suppression
-	
-	            // 0.2 => Get the current scroll position
-	            //this.scrollPos = core.scroller.getScrollY();
-	
-	            // 0.3 => Suppress the scrolls emitter
-	            //core.scrolls.suppress( true );
-	
 	            // 0.4 => Broadcast the open menu
 	            core.emitter.fire("app--menu-opened");
 	
@@ -11856,14 +11848,6 @@
 	            this.$node.removeClass("is-active is-active-events");
 	            core.dom.html.removeClass("is-clipped");
 	            core.dom.body.removeClass("is-clipped");
-	
-	            // Handle scroll suppression
-	
-	            // 0.1 => Reset the document scroll position
-	            //core.dom.body[ 0 ].scrollTop = this.scrollPos;
-	
-	            // 0.2 => Un-suppress the scrolls emitter
-	            //core.scrolls.suppress( false );
 	
 	            // 0.3 => Broadcast the closed menu
 	            core.emitter.fire("app--menu-closed");
@@ -12200,9 +12184,17 @@
 	        this.loadVimeoData();
 	    }
 	
-	    /******************************************************************************
-	     * Export
-	    *******************************************************************************/
+	    /**
+	     *
+	     * @public
+	     * @static
+	     * @method logVideoFiles
+	     * @param {object} vData The api response from Vimeo
+	     * @memberof VideoVimeo
+	     * @description Organize the files array into something easier to use.
+	     * @returns {object}
+	     *
+	     */
 	
 	    /**
 	     *
@@ -12230,28 +12222,6 @@
 	         *
 	         * @public
 	         * @instance
-	         * @method logVideoFiles
-	         * @param {object} vData The api response from Vimeo
-	         * @memberof VideoVimeo
-	         * @description Organize the files array into something easier to use.
-	         *
-	         */
-	    }, {
-	        key: "logVideoFiles",
-	        value: function logVideoFiles(vData) {
-	            var i = vData.files.length;
-	
-	            for (i; i--;) {
-	                if (!this._files[vData.files[i].quality] || this._files[vData.files[i].quality] && vData.files[i].size > this._files[vData.files[i].quality].size) {
-	                    this._files[vData.files[i].quality] = vData.files[i];
-	                }
-	            }
-	        }
-	
-	        /**
-	         *
-	         * @public
-	         * @instance
 	         * @method handleVimeoData
 	         * @param {object} vData The response data from Vimeo's API
 	         * @memberof VideoVimeo
@@ -12264,10 +12234,10 @@
 	            this.vData = vData;
 	
 	            // Organize video files
-	            this.logVideoFiles(vData);
+	            this._files = VideoVimeo.logVideoFiles(vData);
 	
 	            // Assign source file to data
-	            this.data.sourceUrl = (core.detect.isDevice() ? this._files.mobile || this._files.sd : this._files.hd || this._files.sd).link;
+	            this.data.sourceUrl = VideoVimeo.getVideoFile(this._files);
 	
 	            // Assign poster thumbnail
 	            this.data.posterUrl = this.vData.pictures.sizes[this.vData.pictures.sizes.length - 1].link;
@@ -12457,6 +12427,37 @@
 	    return VideoVimeo;
 	})();
 	
+	VideoVimeo.logVideoFiles = function (vData) {
+	    var i = vData.files.length;
+	    var files = {};
+	
+	    for (i; i--;) {
+	        if (!files[vData.files[i].quality] || files[vData.files[i].quality] && vData.files[i].size > files[vData.files[i].quality].size) {
+	            files[vData.files[i].quality] = vData.files[i];
+	        }
+	    }
+	
+	    return files;
+	};
+	
+	/**
+	 *
+	 * @public
+	 * @static
+	 * @method getVideoFile
+	 * @param {object} files The logged video files
+	 * @memberof VideoVimeo
+	 * @description Get the file to play.
+	 * @returns {string}
+	 *
+	 */
+	VideoVimeo.getVideoFile = function (files) {
+	    return (core.detect.isDevice() ? files.mobile || files.sd : files.hd || files.sd).link;
+	};
+	
+	/******************************************************************************
+	 * Export
+	*******************************************************************************/
 	exports["default"] = VideoVimeo;
 	module.exports = exports["default"];
 
@@ -14128,6 +14129,9 @@
 	var _gridWrapTpl = "<div class=\"listing__grid js-listing-project grid grid--index\"></div>";
 	var _gridItemTpl = "\n<div class=\"listing__tile grid__item__small js-listing-tile\">\n    <div class=\"grid__photo grid__photo--small animate animate--fade js-animate\">\n        <figure class=\"figure\">\n            <img class=\"figure__image image js-lazy-image\" data-img-src=\"{assetUrl}\" data-variants=\"{systemDataVariants}\" data-original-size=\"{originalSize}\" />\n        </figure>\n    </div>\n</div>\n";
 	
+	// @vimeoVideoUrl
+	var _gridVideoTpl = "\n<div class=\"listing__tile grid__item__small js-listing-tile\">\n    <div class=\"grid__photo grid__photo--small animate animate--fade js-animate\">\n        <figure class=\"figure\">\n            <img class=\"figure__image image image--wide js-vimeo-image\" />\n            <span class=\"icon icon--svg icon--playback _video__playback\">\n                <svg class=\"icon__svg\" xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" x=\"0\" y=\"0\" viewBox=\"-188 216.1 261.3 209.9\" xml:space=\"preserve\"><polygon points=\"35.8 296.4 -86.3 216.1 -86.3 426 73.3 321.1 \"/><rect x=\"-188\" y=\"216.1\" class=\"st0\" width=\"59.2\" height=\"209.9\"/></svg>\n            </span>\n        </figure>\n    </div>\n</div>\n";
+	
 	/**
 	 *
 	 * @public
@@ -14175,6 +14179,7 @@
 	            this.$image = null;
 	            this.$target = core.dom.main.find(".js-main--" + this.data.target);
 	            this.$anims = null;
+	            this.vimeos = {};
 	
 	            this.bindEvents();
 	            this.loadIndex();
@@ -14242,10 +14247,12 @@
 	            var _this = this;
 	
 	            this.$node.on("click", ".js-listing-tile", function (e) {
-	                var $target = (0, _js_libsHoboDistHoboBuild2["default"])(e.target);
-	                var $tile = $target.is(".js-listing-tile") ? $target : $target.closest(".js-listing-tile");
+	                if (!_gallery2["default"].menu.isActive()) {
+	                    var $target = (0, _js_libsHoboDistHoboBuild2["default"])(e.target);
+	                    var $tile = $target.is(".js-listing-tile") ? $target : $target.closest(".js-listing-tile");
 	
-	                _this.bindGallery($tile);
+	                    _this.bindGallery($tile);
+	                }
 	            });
 	        }
 	
@@ -14262,19 +14269,53 @@
 	    }, {
 	        key: "bindGallery",
 	        value: function bindGallery($elem) {
+	            console.log("open");
+	            var data = $elem.data();
+	
 	            this.$tile = $elem;
 	            this.$image = this.$tile.find(core.config.lazyImageSelector);
+	
+	            // @vimeoVideoUrl
+	            if (data.vimeoId) {
+	                _gallery2["default"].setVideo(this.vimeos[data.vimeoId]);
+	            } else {
+	                _gallery2["default"].setImage(this.$image);
+	            }
 	
 	            this._onKeyDown = this.onKeyDown.bind(this);
 	            this._onGalleryImage = this.onGalleryImage.bind(this);
 	            this._onGalleryBack = this.onGalleryBack.bind(this);
 	
-	            _gallery2["default"].setImage(this.$image);
-	
 	            core.emitter.on("app--gallery-image", this._onGalleryImage);
 	            core.emitter.on("app--gallery-background", this._onGalleryBack);
 	
 	            core.dom.doc.on("keydown", this._onKeyDown);
+	        }
+	
+	        /**
+	         *
+	         * @public
+	         * @instance
+	         * @method nextTile
+	         * @param {Hobo} $tile The tile element
+	         * @memberof indexes.IndexFull
+	         * @description Transition to the next tile in a project.
+	         *
+	         */
+	    }, {
+	        key: "nextTile",
+	        value: function nextTile($tile) {
+	            var data = $tile.data();
+	
+	            this.$tile = $tile;
+	            this.$image = this.$tile.find(core.config.lazyImageSelector);
+	
+	            // @vimeoVideoUrl
+	            if (data.vimeoId) {
+	                _gallery2["default"].setVideo(this.vimeos[data.vimeoId]);
+	            } else {
+	                _gallery2["default"].setImage(this.$image);
+	            }
 	        }
 	
 	        /**
@@ -14358,28 +14399,6 @@
 	         *
 	         * @public
 	         * @instance
-	         * @method nextTile
-	         * @param {Hobo} $tile The tile element
-	         * @memberof indexes.IndexFull
-	         * @description Transition to the next tile in a project.
-	         *
-	         */
-	    }, {
-	        key: "nextTile",
-	        value: function nextTile($tile) {
-	            // Tile?
-	            this.$tile = $tile;
-	
-	            // Image?
-	            this.$image = this.$tile.find(core.config.lazyImageSelector);
-	
-	            _gallery2["default"].setImage(this.$image);
-	        }
-	
-	        /**
-	         *
-	         * @public
-	         * @instance
 	         * @method loadIndex
 	         * @memberof indexes.IndexFull
 	         * @description Load the full Index JSON to build the UI.
@@ -14396,6 +14415,31 @@
 	        /**
 	         *
 	         * @public
+	         * @instance
+	         * @method loadVideo
+	         * @param {string} url The vimeo embed url
+	         * @param {Hobo} $node The grid node in the index
+	         * @memberof indexes.IndexFull
+	         * @description Load the vimeo api data for a video injection.
+	         *
+	         */
+	    }, {
+	        key: "loadVideo",
+	        value: function loadVideo(url, $node) {
+	            var _this2 = this;
+	
+	            var vimeoId = url.split("/").pop();
+	
+	            core.api.vimeo(vimeoId).then(function (vData) {
+	                _this2.vimeos[vimeoId] = vData;
+	
+	                $node.data("vimeoId", vimeoId).find(".js-vimeo-image").removeAttr("data-img-src").removeAttr("data-variants").removeAttr("data-original-size").attr("src", vData.pictures.sizes[vData.pictures.sizes.length - 1].link);
+	            });
+	        }
+	
+	        /**
+	         *
+	         * @public
 	         * @method onLoadFullIndex
 	         * @param {object} json The collection json
 	         * @memberof indexes.IndexFull
@@ -14405,14 +14449,22 @@
 	    }, {
 	        key: "onLoadFullIndex",
 	        value: function onLoadFullIndex(json) {
-	            var _this2 = this;
+	            var _this3 = this;
 	
 	            json.collection.collections.forEach(function (collection) {
 	                var $title = (0, _js_libsHoboDistHoboBuild2["default"])((0, _properjsTemplate2["default"])(_gridTitleTpl.replace(/\n/g, ""), { text: collection.title, title: collection.description || collection.title }));
 	                var $grid = (0, _js_libsHoboDistHoboBuild2["default"])(_gridWrapTpl.replace(/\n/g, ""));
+	                var $node = null;
 	
 	                collection.items.forEach(function (item) {
-	                    if (!item.customContent.vimeoVideoUrl) {
+	                    // @vimeoVideoUrl
+	                    if (item.customContent.vimeoVideoUrl) {
+	                        $node = (0, _js_libsHoboDistHoboBuild2["default"])(_gridVideoTpl);
+	
+	                        $grid.append($node);
+	
+	                        _this3.loadVideo(item.customContent.vimeoVideoUrl, $node);
+	                    } else {
 	                        $grid.append((0, _properjsTemplate2["default"])(_gridItemTpl.replace(/\n/g, ""), item));
 	
 	                        if (item.customContent && item.customContent.diptychImage && item.customContent.diptychImage.systemDataVariants) {
@@ -14421,8 +14473,8 @@
 	                    }
 	                });
 	
-	                _this2.$node.append($title);
-	                _this2.$node.append($grid);
+	                _this3.$node.append($title);
+	                _this3.$node.append($grid);
 	            });
 	
 	            // Node must be in DOM for image size to work
@@ -14431,7 +14483,7 @@
 	            core.images.handleImages(this.$node.find(".js-lazy-image"), function () {
 	                _bar2["default"].stop();
 	
-	                _this2.cycleAnimation();
+	                _this3.cycleAnimation();
 	            });
 	        }
 	
@@ -14627,6 +14679,10 @@
 	
 	var _properjsTween2 = _interopRequireDefault(_properjsTween);
 	
+	var _videoVideoVimeo = __webpack_require__(/*! ./video/VideoVimeo */ 69);
+	
+	var _videoVideoVimeo2 = _interopRequireDefault(_videoVideoVimeo);
+	
 	/**
 	 *
 	 * @public
@@ -14646,11 +14702,21 @@
 	    init: function init() {
 	        this.tween = null;
 	        this.menu = new _Menu2["default"](core.dom.gallery.element);
-	        this.klasa = "gallery__image figure__image image";
+	
+	        // Image
 	        this.$image = (0, _js_libsHoboDistHoboBuild2["default"])(new Image());
-	        this.$image[0].className = this.klasa;
+	        this.$image[0].className = "gallery__image figure__image image";
+	
+	        // Video
+	        this.videoData = null;
+	        this.$videoWrap = (0, _js_libsHoboDistHoboBuild2["default"])(document.createElement("div"));
+	        this.$videoWrap[0].className = "_video gallery__video";
+	        this.$video = (0, _js_libsHoboDistHoboBuild2["default"])(document.createElement("video"));
+	        this.$video[0].className = "_video__element";
+	        this.$videoWrap.append(this.$video);
 	
 	        core.dom.gallery.elementNode.append(this.$image);
+	        core.dom.gallery.elementNode.append(this.$videoWrap);
 	
 	        if (core.detect.isDevice()) {
 	            this.bindSwipe();
@@ -14676,7 +14742,7 @@
 	        this.tap = new _hammerjs2["default"](core.dom.gallery.element[0], core.util.getDefaultHammerOptions());
 	        this.tap.on("tap", this._onTap);
 	
-	        this.swipe = new _hammerjs2["default"](this.$image[0], core.util.getDefaultHammerOptions());
+	        this.swipe = new _hammerjs2["default"](core.dom.gallery.elementNode[0], core.util.getDefaultHammerOptions());
 	        this.swipe.on("panmove", this._onPanmove);
 	        this.swipe.on("panend", this._onPanend);
 	        this.swipe.on("swipe", this._onSwipe);
@@ -14704,7 +14770,7 @@
 	     *
 	     */
 	    onTap: function onTap(e) {
-	        if (e.target !== this.$image) {
+	        if (e.target !== this.$video[0]) {
 	            core.emitter.fire("app--gallery-background");
 	        }
 	    },
@@ -14722,7 +14788,7 @@
 	        e.preventDefault();
 	
 	        if (!this.tween) {
-	            core.util.translate3d(this.$image[0], core.util.px(e.deltaX / 3), 0, 0);
+	            core.util.translate3d(core.dom.gallery.elementNode[0], core.util.px(e.deltaX / 3), 0, 0);
 	        }
 	    },
 	
@@ -14740,7 +14806,7 @@
 	
 	        if (!this.tween) {
 	            (function () {
-	                var transform = core.util.getTransformValues(_this.$image[0]);
+	                var transform = core.util.getTransformValues(core.dom.gallery.elementNode[0]);
 	                var isLeft = transform.x < 0;
 	
 	                _this.tween = new _properjsTween2["default"]({
@@ -14748,7 +14814,7 @@
 	                    from: Math.abs(transform.x),
 	                    ease: _properjsEasing2["default"].easeInOutCubic,
 	                    update: function update(x) {
-	                        core.util.translate3d(_this.$image[0], core.util.px(isLeft ? -x : x), 0, 0);
+	                        core.util.translate3d(core.dom.gallery.elementNode[0], core.util.px(isLeft ? -x : x), 0, 0);
 	                    },
 	                    complete: function complete() {
 	                        _this.tween = null;
@@ -14773,7 +14839,7 @@
 	
 	        e.preventDefault();
 	
-	        var transform = core.util.getTransformValues(this.$image[0]);
+	        var transform = core.util.getTransformValues(core.dom.gallery.elementNode[0]);
 	        var isLeft = e.direction === _hammerjs2["default"].DIRECTION_LEFT;
 	
 	        if (!this.tween) {
@@ -14782,7 +14848,7 @@
 	                from: Math.abs(transform.x),
 	                ease: _properjsEasing2["default"].easeInOutCubic,
 	                update: function update(x) {
-	                    core.util.translate3d(_this2.$image[0], core.util.px(isLeft ? -x : x), 0, 0);
+	                    core.util.translate3d(core.dom.gallery.elementNode[0], core.util.px(isLeft ? -x : x), 0, 0);
 	                },
 	                complete: function complete() {
 	                    _this2.empty();
@@ -14792,7 +14858,7 @@
 	                    setTimeout(function () {
 	                        _this2.tween = null;
 	
-	                        core.util.translate3d(_this2.$image[0], 0, 0, 0);
+	                        core.util.translate3d(core.dom.gallery.elementNode[0], 0, 0, 0);
 	                    }, _overlay2["default"].isActive() ? core.dom.overlay.elementTransitionDuration : 10);
 	                },
 	                duration: 200
@@ -14827,7 +14893,7 @@
 	     *
 	     */
 	    handleClick: function handleClick(e) {
-	        var rect = this.$image[0].getBoundingClientRect();
+	        var rect = (this.videoData ? this.$video[0] : this.$image[0]).getBoundingClientRect();
 	        var direction = null;
 	
 	        if (e.clientX <= rect.width / 2 + rect.left && !_overlay2["default"].isActive()) {
@@ -14864,6 +14930,8 @@
 	    close: function close() {
 	        if (this.menu.isActive()) {
 	            this.menu.close();
+	
+	            this.empty();
 	        }
 	    },
 	
@@ -14877,6 +14945,11 @@
 	     */
 	    empty: function empty() {
 	        this.$image[0].src = "";
+	
+	        if (this.videoData) {
+	            this.$video[0].innerHTML = "";
+	            this.videoData = null;
+	        }
 	    },
 	
 	    /**
@@ -14889,7 +14962,11 @@
 	     *
 	     */
 	    setImage: function setImage($image) {
+	        this.empty();
+	
 	        var data = $image.data();
+	
+	        core.dom.gallery.element.removeClass("is-video");
 	
 	        _bar2["default"].load();
 	        this.open();
@@ -14902,6 +14979,38 @@
 	        core.util.loadImages(this.$image, core.util.noop, true, window.innerWidth).on("done", function () {
 	            _bar2["default"].stop();
 	        });
+	    },
+	
+	    /**
+	     *
+	     * @public
+	     * @method setVideo
+	     * @param {object} vData The vimeo api data.
+	     * @memberof gallery
+	     * @description Apply a video to the gallery view.
+	     *
+	     */
+	    setVideo: function setVideo(vData) {
+	        this.empty();
+	        this.videoData = vData;
+	
+	        var files = _videoVideoVimeo2["default"].logVideoFiles(this.videoData);
+	        var file = _videoVideoVimeo2["default"].getVideoFile(files);
+	
+	        core.dom.gallery.element.addClass("is-video");
+	
+	        this.open();
+	        this.$videoWrap[0].style.paddingBottom = this.videoData.height / this.videoData.width * 100 + "%";
+	
+	        // Avoid always playing the first video loaded each time
+	        if (core.detect.isDevice()) {
+	            this.$video[0].setAttribute("poster", this.videoData.pictures.sizes[this.videoData.pictures.sizes.length - 1].link);
+	            this.$video[0].setAttribute("controls", true);
+	        }
+	
+	        this.$video[0].src = file;
+	        this.$video[0].load();
+	        this.$video[0].play();
 	    }
 	};
 	
