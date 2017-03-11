@@ -734,6 +734,11 @@ a {
 .project__image--full:last-child {
   padding-bottom: 0; }
 
+.project__image--wide .image {
+  padding-left: 8.34615%;
+  padding-right: 8.34615%;
+  width: 100%; }
+
 .project__image--threeq {
   text-align: center; }
   .project__image--threeq .image {
@@ -879,10 +884,12 @@ a {
     text-align: right; }
   .project__diptych--gutters-even .diptych__left,
   .project__diptych--gutters-even .diptych__right {
-    width: calc( ~"(100% - 8.34615%) / 2" ); }
+    width: 50%; }
   .project__diptych--gutters-even .diptych__left {
-    padding-left: 8.34615%; }
+    padding-left: 8.34615%;
+    padding-right: calc( ~"8.34615% / 2" ); }
   .project__diptych--gutters-even .diptych__right {
+    padding-left: calc( ~"8.34615% / 2" );
     padding-right: 8.34615%; }
 
 .animate {
@@ -1046,9 +1053,6 @@ a {
 
 .-text--left {
   text-align: left; }
-
-.-spacer {
-  width: 8.34615%; }
 
 .-valign-top {
   vertical-align: top; }
