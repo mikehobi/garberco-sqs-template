@@ -1171,26 +1171,7 @@ a {
       width: 100%; }
     .index.grid .grid__photo .image--tall {
       height: 85vw; }
-  .project__image {
-    padding-bottom: 40px;
-    padding-top: 40px; }
-    .project__image .image {
-      margin: 0 !important;
-      max-width: 100% !important;
-      width: 100% !important; }
-  .project__image:not(.project__image--full) {
-    padding-left: 22.5px;
-    padding-right: 22.5px; }
-  .project__image--third .image,
-  .project__image--third-left .image,
-  .project__image--third-right .image,
-  .project__image--half .image,
-  .project__image--half-left .image,
-  .project__image--half-right .image,
-  .project__image--half-left-pad .image,
-  .project__image--half-right-pad .image {
-    max-width: 75% !important;
-    width: 75% !important; }
+  .project__image,
   .project__diptych {
     padding-bottom: 40px;
     padding-top: 40px; }
