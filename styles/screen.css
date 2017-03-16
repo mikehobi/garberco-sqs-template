@@ -1171,12 +1171,10 @@ a {
       width: 100%; }
     .index.grid .grid__photo .image--tall {
       height: 85vw; }
-  .project__image,
-  .project__diptych {
+  .project__image {
     padding-bottom: 40px;
     padding-top: 40px; }
-    .project__image .image,
-    .project__diptych .image {
+    .project__image .image {
       margin: 0 !important;
       max-width: 100% !important;
       width: 100% !important; }
@@ -1193,16 +1191,9 @@ a {
   .project__image--half-right-pad .image {
     max-width: 75% !important;
     width: 75% !important; }
-  .project__diptych:not(.project__diptych--text) .diptych__left,
-  .project__diptych:not(.project__diptych--text) .diptych__right {
-    margin: 0 !important;
-    width: 50% !important; }
-  .project__diptych:not(.project__diptych--text) .diptych__left {
-    padding-left: 22.5px !important;
-    padding-right: 11.25px !important; }
-  .project__diptych:not(.project__diptych--text) .diptych__right {
-    padding-left: 11.25px !important;
-    padding-right: 22.5px !important; }
+  .project__diptych {
+    padding-bottom: 40px;
+    padding-top: 40px; }
   .project__diptych--text .diptych__left,
   .project__diptych--text .diptych__right {
     width: 100% !important; }
