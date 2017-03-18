@@ -904,6 +904,9 @@ a {
   padding-left: 8.34615%;
   padding-right: 8.34615%; }
 
+.diptych__mobile__text__right {
+  display: none; }
+
 .animate {
   opacity: 0;
   transform: translate3d(0, 80px, 0);
@@ -1180,6 +1183,10 @@ a {
     width: 100% !important; }
   .project__diptych--text .diptych__right {
     margin-top: 40px; }
+  .diptych__left.is-text {
+    display: none; }
+  .diptych__mobile__text__right {
+    display: inline-block; }
   .about,
   .index,
   .listing {
