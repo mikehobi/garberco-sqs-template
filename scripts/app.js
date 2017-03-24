@@ -15198,7 +15198,7 @@ module.exports = g;
 
 
 Object.defineProperty(exports, "__esModule", {
-  value: true
+    value: true
 });
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -15243,89 +15243,93 @@ __webpack_require__(30);
  *
  */
 var App = function () {
-  function App() {
-    _classCallCheck(this, App);
+    function App() {
+        _classCallCheck(this, App);
 
-    this.core = core;
-    this.main = _main2.default;
-    this.router = _router2.default;
-    this.overlay = _overlay2.default;
-    this.gallery = _gallery2.default;
-    this.intro = _intro2.default;
-    this.analytics = new core.Analytics();
+        this.core = core;
+        this.main = _main2.default;
+        this.router = _router2.default;
+        this.overlay = _overlay2.default;
+        this.gallery = _gallery2.default;
+        this.intro = _intro2.default;
+        this.analytics = new core.Analytics();
 
-    if (!this.core.dom.page.length) {
-      //this.router.redirect();
+        if (!this.core.dom.page.length) {
+            //this.router.redirect();
 
-    } else {
-      this.bindEvents();
-      this.initModules();
-    }
+        } else {
+            this.bindEvents();
+            this.initModules();
+        }
 
-    core.log("App", this);
-  }
+        if (core.env.isConfig()) {
+            core.dom.html.addClass("is-config");
+        }
 
-  /**
-   *
-   * @public
-   * @instance
-   * @method initModules
-   * @memberof App
-   * @description Initialize modules.
-   *
-   */
-
-
-  _createClass(App, [{
-    key: "initModules",
-    value: function initModules() {
-      this.core.detect.init(this);
-      this.core.resizes.init(this);
-      //this.core.scrolls.init( this );
-      this.main.init(this);
-      this.router.init(this);
-      this.overlay.init(this);
-      this.gallery.init(this);
+        core.log("App", this);
     }
 
     /**
      *
      * @public
      * @instance
-     * @method bindEvents
+     * @method initModules
      * @memberof App
-     * @description Bind top-level app events.
+     * @description Initialize modules.
      *
      */
 
-  }, {
-    key: "bindEvents",
-    value: function bindEvents() {
-      this._onPreloadDone = this.onPreloadDone.bind(this);
 
-      this.core.emitter.on("app--preload-done", this._onPreloadDone);
-    }
+    _createClass(App, [{
+        key: "initModules",
+        value: function initModules() {
+            this.core.detect.init(this);
+            this.core.resizes.init(this);
+            //this.core.scrolls.init( this );
+            this.main.init(this);
+            this.router.init(this);
+            this.overlay.init(this);
+            this.gallery.init(this);
+        }
 
-    /**
-     *
-     * @public
-     * @instance
-     * @method onPreloadDone
-     * @memberof App
-     * @description Handle intro teardown.
-     *
-     */
+        /**
+         *
+         * @public
+         * @instance
+         * @method bindEvents
+         * @memberof App
+         * @description Bind top-level app events.
+         *
+         */
 
-  }, {
-    key: "onPreloadDone",
-    value: function onPreloadDone() {
-      this.core.emitter.off("app--preload-done", this._onPreloadDone);
+    }, {
+        key: "bindEvents",
+        value: function bindEvents() {
+            this._onPreloadDone = this.onPreloadDone.bind(this);
 
-      this.intro.teardown();
-    }
-  }]);
+            this.core.emitter.on("app--preload-done", this._onPreloadDone);
+        }
 
-  return App;
+        /**
+         *
+         * @public
+         * @instance
+         * @method onPreloadDone
+         * @memberof App
+         * @description Handle intro teardown.
+         *
+         */
+
+    }, {
+        key: "onPreloadDone",
+        value: function onPreloadDone() {
+            this.core.emitter.off("app--preload-done", this._onPreloadDone);
+
+            this.intro.teardown();
+        }
+    }]);
+
+    return App;
 }();
 
 /******************************************************************************
