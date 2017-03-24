@@ -6859,7 +6859,6 @@ var env = {
    */
   isConfig: function isConfig() {
     return window.parent.location.pathname.indexOf("/config") !== -1;
-    // return true;
   },
 
 
