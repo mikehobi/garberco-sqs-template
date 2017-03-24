@@ -2096,7 +2096,7 @@ var gallery = {
      */
     init: function init() {
         this.tween = null;
-        this.menu = new _Menu2.default(core.dom.gallery.element);
+        this.menu = new _Menu2.default(core.dom.gallery.element, true);
 
         // Image
         this.$image = (0, _properjsHobo2.default)(new Image());
@@ -2650,7 +2650,11 @@ var router = {
      */
     initPage: function initPage() /* data */{
         core.dom.nav.detach();
-        core.dom.page.detach();
+        // core.dom.page.detach();
+
+        if (!core.env.isConfig()) {
+            core.dom.page.detach();
+        }
 
         core.dom.html.removeClass("is-clipped");
         core.dom.body.removeClass("is-clipped");
@@ -3276,7 +3280,7 @@ var Project = function () {
         this.$node = $node;
         this.$infoScreen = $info;
         this.$infoButton = core.dom.header.find(".js-project-info");
-        this.menu = new _Menu2.default(this.$infoScreen);
+        this.menu = new _Menu2.default(this.$infoScreen, false);
         this.data = data;
         this.$plates = this.$node.find(".js-project-plate");
         this.$images = this.$node.find(".js-lazy-image");
@@ -6287,15 +6291,18 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  *
  */
 var Menu = function () {
-    function Menu($node) {
+    function Menu($node, detached) {
         _classCallCheck(this, Menu);
 
         this.$node = $node;
         this.tDuration = core.util.getTransitionDuration(this.$node[0]);
         this.isOpen = false;
+        this.isDetach = detached;
         //this.scrollPos = core.scroller.getScrollY();
 
-        this.$node.detach();
+        if (this.isDetach) {
+            this.$node.detach();
+        }
     }
 
     /**
@@ -6317,7 +6324,10 @@ var Menu = function () {
             this.isOpen = true;
 
             core.dom.html.addClass("is-menu-open");
-            core.dom.body.append(this.$node);
+
+            if (this.isDetach) {
+                core.dom.body.append(this.$node);
+            }
 
             // 0.4 => Broadcast the open menu
             core.emitter.fire("app--menu-opened");
@@ -6357,7 +6367,10 @@ var Menu = function () {
             setTimeout(function () {
                 _this2.isOpen = false;
                 core.dom.html.removeClass("is-menu-open");
-                _this2.$node.detach();
+
+                if (_this2.isDetach) {
+                    _this2.$node.detach();
+                }
             }, this.tDuration * 2);
         }
 
@@ -6845,7 +6858,8 @@ var env = {
    *
    */
   isConfig: function isConfig() {
-    return window.parent.location.pathname.indexOf("/config") !== -1;
+    // return (window.parent.location.pathname.indexOf( "/config" ) !== -1);
+    return true;
   },
 
 
