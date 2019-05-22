@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html class='is-clipped {.equal? collection.typeName "custom-photo"}is-offcanvas is-offcanvas--project{.end}{.equal? collection.urlId "about"}is-offcanvas is-offcanvas--about{.end}{.equal? collection.urlId "index"}is-offcanvas is-offcanvas--index{.end}'>
     <head>
-        {@|apply head-credits.block}
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="apple-touch-icon" sizes="57x57" href="/assets/touch/apple-touch-icon-57x57.png?v={squarespace.template-revision}" />
