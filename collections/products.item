@@ -1,0 +1,45 @@
+// {.section item}
+//   <div id="productWrapper">
+//
+//     <!-- This displays all images/videos associated with the product. Style this accordingly. -->
+//     <div id="productSlideshow">
+//       {.repeated section items}
+//         {.image?}
+//           <img {@|image-meta} />
+//         {.end}
+//         {.video?}
+//           {@|video}
+//         {.end}
+//       {.end}
+//     </div>
+//
+//     <!-- This shows the status (sold out/on sale), price, and description (excerpt) text -->
+//     <div id="productDetails">
+//       {@|product-status}
+//
+//       <h1 class="product-title">{title}</h1>
+//
+//       {@|product-price}
+//
+//       {.excerpt?}
+//         <div class="product-excerpt">
+//           {excerpt}
+//         </div>
+//       {.end}
+//
+//       {@|product-checkout}
+//     </div>
+//
+//     <!-- This displays any text/blocks added to the Additional Info tab -->
+//     {.section body}
+//     <div class="product-description">
+//       {@}
+//     </div>
+//
+//   </div>
+// {.end}
+
+
+<div class="product js-product">
+    <script type="application/json">{@|json}</script>
+</div>
