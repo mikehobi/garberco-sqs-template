@@ -1,51 +1,63 @@
 
-{.section item}
+
+
+<div class="page js-page" data-type="project" data-id="{collection.id}" data-website-id="{website.id}" {.section collection}data-collection-id="{collection.id}" data-collection-title="{.if collection.homepage}{website.siteTitle}{.or}{collection.title} – {website.siteTitle}{.end}"{.end} {.section item}data-item-id="{item.id}" data-item-title="{item.title} – {collection.title} – {website.siteTitle}"{.end}>
+    <div class="project js-project" data-target="project" data-id="{collection.id}">
+
+    {.section item}
+
+
+
+    {.repeated section items}
+      {.image?}
+      <figure class="figure">
+          <img class="figure__image image js-lazy-image image--wide" data-img-src="{assetUrl}" data-variants="{systemDataVariants}" data-original-size="{originalSize}" />
+      </figure>
+      {.end}
+
+    {.end}
 
 
 
 
+    <!-- product information, like price and title -->
+    <div class="product-meta">
+      {.section title}
+        <p class="product-title p">{@}</p>
+      {.end}
+
+      {@|product-price}
 
 
-{.repeated section items}
-  {.image?}
-  <figure class="figure">
-      <img class="figure__image image js-lazy-image image--wide" data-img-src="{assetUrl}" data-variants="{systemDataVariants}" data-original-size="{originalSize}" />
-  </figure>
-  {.end}
+      {.section body}
+      <div class="product-description">
+        {@}
+      </div>
+     {.end}
 
-{.end}
-
-
-
-
-<!-- product information, like price and title -->
-<div class="product-meta">
-  {.section title}
-    <p class="product-title p">{@}</p>
-  {.end}
-
-  {@|product-price}
+      {.excerpt?}
+        <div class="product-excerpt p">
+          {excerpt}
+        </div>
+      {.end}
 
 
-  {.section body}
-  <div class="product-description">
-    {@}
-  </div>
- {.end}
 
-  {.excerpt?}
-    <div class="product-excerpt p">
-      {excerpt}
+
     </div>
-  {.end}
+
+     {@|product-checkout}
+
+    {@|product-status}
+
+    {.end}
 
 
 
-
+    </div>
+    <div class="info js-info screen -text--center ghost">
+        <div class="info__text ghost__child h3">
+            <squarespace:block-field id="project-info--{collection.urlId}" columns="1" />
+        </div>
+    </div>
 </div>
-
- {@|product-checkout}
-
-{@|product-status}
-
-{.end}
