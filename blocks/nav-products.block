@@ -1,2 +1,2 @@
 {# Find a better way to store the nav tree json #}
-<nav class="nav nav--products js-products" data-app-tree="{.if nodeServer}{items|json-pretty|htmlattr}{.or}{items|json|htmlattr}{.end}"></nav>
+<nav class="nav nav--products js-products" data-app-tree="{items|json|htmlattr}"></nav>

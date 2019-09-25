@@ -2,6 +2,8 @@
     <div class="project-view__pane js-project-view-pane -topper"></div>
 </div>
 
+
+
 <div class='overlay js-overlay screen -text--center ghost {.equal? collection.typeName "custom-photo"}is-active is-intro{.end}'>
     <div class="ghost__child">
         <h1 class="h1 js-overlay-title">

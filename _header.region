@@ -21,6 +21,5 @@
     </head>
     <body class="is-clipped">
         <squarespace:navigation navigationId="projects" template="nav-projects" />
-        <squarespace:navigation navigationId="products" template="nav-products" />
         <squarespace:navigation navigationId="header" template="nav-header" />
         {@|apply screens.block}
