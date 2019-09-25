@@ -13,8 +13,6 @@
                     <p class="product-price p">{@}</p>
                   {.end}
 
-
-                    {.end}
                   <p class="p">{@|product-price}
                   {.excerpt?}
                     <span class="product-excerpt">
