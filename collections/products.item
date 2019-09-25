@@ -6,7 +6,11 @@
 
     {.section item}
 
+    <figure class="figure">
+        <img class="figure__image image js-lazy-image image--wide" data-img-src="{assetUrl}" data-variants="{systemDataVariants}" data-original-size="{originalSize}" />
+    </figure>
 
+    <p>After lead</p>
 
     {.repeated section items}
       {.image?}
