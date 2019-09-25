@@ -7,6 +7,10 @@
                         <img class="figure__image image js-lazy-image image--wide" data-img-src="{assetUrl}" data-variants="{systemDataVariants}" data-original-size="{originalSize}" />
                     </figure>
                   </a>
+
+                    {.product-price}
+                      <p class="product-price p">{product-price}</p>
+                    {.end}
                   <p class="p">{@|product-price}
                   {.excerpt?}
                     <span class="product-excerpt">
