@@ -1,1 +1,26 @@
-TEST
+<div id="productList" class="bullshit">
+  {.repeated section items}
+    <a href="{fullUrl}" class="product">
+      <div>
+        <!-- Display product image -->
+          {.main-image?}
+            <div class="product-image">
+              <img {@|image-meta} />
+            </div>
+          {.end}
+
+        <!-- product information, like price and title -->
+        <div class="product-meta">
+          {.section title}
+            <p class="product-title">{@}</p>
+          {.end}
+          <p class="product-price">{@|product-price}</p>
+        </div>
+
+        <!-- this will place the 'SOLD OUT' or 'SALE' flag on the product appropriately -->
+        {@|product-status}
+
+      </div>
+    </a>
+  {.end}
+</div>
