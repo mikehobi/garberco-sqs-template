@@ -1,53 +1,21 @@
 <div class="page js-page" data-type="index" data-id="{collection.id}" data-website-id="{website.id}" {.section collection}data-collection-id="{collection.id}" data-collection-title="{.if collection.homepage}{website.siteTitle}{.or}{collection.title} – {website.siteTitle}{.end}"{.end} {.section item}data-item-id="{item.id}" data-item-title="{item.title} – {collection.title} – {website.siteTitle}"{.end}>
     <section class="index js-index grid grid--garberco -topper" data-target="garberco" data-id="{collection.id}">
-        {.section collection}
-            {.repeated section collections}
-                <div class="grid__item expander-bottom">
-                    <a href="{fullUrl}" class="grid__photo js-index-tile animate animate--fade js-animate" data-title="{.if description}{description}{.or}{title}{.end}">
-                        {.section mainImage}
-                            {@|apply image.block}
-                        {.end}
-                    </a>
-                    <p class="p">{@|product-price}
-                    {.excerpt?}
-                      <span class="product-excerpt">
-                        {excerpt}
-                      </span>
-                    {.end}</p>
+          {.repeated section items}
+              <div class="grid__item expander-bottom">
+                  <a href="{fullUrl}" class="grid__photo js-index-tile animate animate--fade js-animate" data-title="{.if description}{description}{.or}{title}{.end}">
+                      {.section mainImage}
+                          {@|apply image.block}
+                      {.end}
+                  </a>
+                  <p class="p">{@|product-price}
+                  {.excerpt?}
+                    <span class="product-excerpt">
+                      {excerpt}
+                    </span>
+                  {.end}</p>
 
-                    <h3 class="grid__title h3">{.if description}{description}{.or}{title}{.end}</h3>
-                </div>
-            {.end}
+                  <h3 class="grid__title h3">{.if description}{description}{.or}{title}{.end}</h3>
+              </div>
         {.end}
     </section>
-</div>
-
-
-
-
-<div id="productList" class="bullshit">
-  {.repeated section items}
-    <a href="{fullUrl}" class="product">
-      <div>
-        <!-- Display product image -->
-          {.main-image?}
-            <div class="product-image">
-              <img {@|image-meta} />
-            </div>
-          {.end}
-
-        <!-- product information, like price and title -->
-        <div class="product-meta">
-          {.section title}
-            <p class="product-title">{@}</p>
-          {.end}
-          <p class="product-price">{@|product-price}</p>
-        </div>
-
-        <!-- this will place the 'SOLD OUT' or 'SALE' flag on the product appropriately -->
-        {@|product-status}
-
-      </div>
-    </a>
-  {.end}
 </div>
