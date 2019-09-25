@@ -8,8 +8,12 @@
                     </figure>
                   </a>
 
-                    {.product-price}
-                      <p class="product-price p">{product-price}</p>
+
+                  {.section product-price}
+                    <p class="product-price p">{@}</p>
+                  {.end}
+
+
                     {.end}
                   <p class="p">{@|product-price}
                   {.excerpt?}
