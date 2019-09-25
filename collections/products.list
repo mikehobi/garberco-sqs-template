@@ -9,16 +9,21 @@
                   </a>
 
 
-                  {.section product-price}
-                    <p class="product-price p">{@}</p>
-                  {.end}
 
-                  <p class="p">{@|product-price}
-                  {.excerpt?}
-                    <span class="product-excerpt">
-                      {excerpt}
-                    </span>
-                  {.end}</p>
+                    {@|product-price}
+
+
+                    {.section body}
+                    <div class="product-description">
+                      {@}
+                    </div>
+                   {.end}
+
+                    {.excerpt?}
+                      <div class="product-excerpt p">
+                        {excerpt}
+                      </div>
+                    {.end}
 
                   <h3 class="grid__title h3">{.if description}{description}{.or}{title}{.end}</h3>
               </div>
