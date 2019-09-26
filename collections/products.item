@@ -43,14 +43,12 @@
         </div>
       {.end}
 
-
+   {@|product-checkout}
 
 
     </div>
 
-     {@|product-checkout}
 
-    {@|product-status}
 
     {.end}
 
