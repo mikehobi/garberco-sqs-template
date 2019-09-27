@@ -50,6 +50,18 @@
 
 
 
+                        <div class="product-meta -text--center">
+                          {@|product-price}
+                          {.excerpt?}
+                            <div class="product-excerpt p">
+                              {excerpt}
+                            </div>
+                          {.end}
+                        </div>
+                      </a>
+
+
+
     {.end}
 
 
