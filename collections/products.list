@@ -7,16 +7,16 @@
                     <figure class="figure">
                         <img class="figure__image image js-lazy-image image--wide" data-img-src="{assetUrl}" data-variants="{systemDataVariants}" data-original-size="{originalSize}" />
                     </figure>
+                    
+                    <div class="product-meta">
+                      {@|product-price}
+                      {.excerpt?}
+                        <div class="product-excerpt p">
+                          {excerpt}
+                        </div>
+                      {.end}
+                    </div>
                   </a>
-
-                  <div class="product-meta">
-                    {@|product-price}
-                    {.excerpt?}
-                      <div class="product-excerpt p">
-                        {excerpt}
-                      </div>
-                    {.end}
-                  </div>
 
                   <h3 class="grid__title h3">{.if description}{description}{.or}{title}{.end}</h3>
               </div>
