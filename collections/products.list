@@ -9,16 +9,6 @@
                         <figcaption>{@|product-price}</figcaption>
                     </figure>
 
-                    <div class="product-meta -text--center">
-                      {@|product-price}
-                      {.excerpt?}
-                        <div class="product-excerpt p">
-                          {excerpt}
-                        </div>
-                      {.end}
-                    </div>
-                  </a>
-
                   <h3 class="grid__title h3">{.if description}{description}{.or}{title}{.end}</h3>
               </div>
         {.end}
