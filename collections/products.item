@@ -11,9 +11,9 @@
     </div>
 
 
-    <div class="product-meta js-project-plate animate animate--fade js-animate">
+    <div class="product-description js-project-plate animate animate--fade js-animate">
       {.section title}
-        <p class="product-title p">{@}</p>
+        <p class="p -text--center">{@}</p>
       {.end}
 
       {@|product-price}
@@ -41,7 +41,7 @@
 
 
     {.section body}
-    <div class="product-meta js-project-plate animate animate--fade js-animate">
+    <div class="product-description js-project-plate animate animate--fade js-animate">
       {@}
     </div>
     {.end}
