@@ -11,18 +11,15 @@
     </div>
 
 
-    <div class="product-description js-project-plate animate animate--fade js-animate">
+    <div class="product-description -text--center js-project-plate animate animate--fade js-animate">
       {.section title}
-        <p class="h2 -text--center">{@}</p>
+        <p class="h2">{@}</p>
       {.end}
 
-      {.excerpt?}
-        <div class="product-excerpt p -text--center">
-          {excerpt}
-        </div>
-      {.end}
-
-      {@|product-price}
+      <div class="p">
+        {excerpt}
+        {@|product-price}
+      </div>
 
       {@|product-checkout}
 
@@ -41,7 +38,7 @@
 
 
     {.section body}
-    <div class="product-description js-project-plate animate animate--fade js-animate">
+    <div class="product-description -text--center js-project-plate animate animate--fade js-animate">
       {@}
     </div>
     {.end}
