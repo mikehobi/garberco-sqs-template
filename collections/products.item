@@ -8,34 +8,12 @@
         <img class="figure__image image js-lazy-image image--wide" data-img-src="{assetUrl}" data-variants="{systemDataVariants}" data-original-size="{originalSize}" />
     </figure>
 
-    <p>After lead</p>
-
-    {.repeated section items}
-      {.image?}
-      <figure class="figure">
-          <img class="figure__image image js-lazy-image image--wide" data-img-src="{assetUrl}" data-variants="{systemDataVariants}" data-original-size="{originalSize}" />
-      </figure>
-      {.end}
-
-    {.end}
-
-
-
-
-    <!-- product information, like price and title -->
-    <div class="product-meta">
+    <div class="product-meta animate animate--fade js-animate">
       {.section title}
         <p class="product-title p">{@}</p>
       {.end}
 
       {@|product-price}
-
-
-      {.section body}
-      <div class="product-description">
-        {@}
-      </div>
-     {.end}
 
       {.excerpt?}
         <div class="product-excerpt p">
@@ -43,29 +21,26 @@
         </div>
       {.end}
 
-   {@|product-checkout}
-
+      {@|product-checkout}
 
     </div>
 
 
-
-                        <div class="product-meta -text--center">
-                          {@|product-price}
-                          {.excerpt?}
-                            <div class="product-excerpt p">
-                              {excerpt}
-                            </div>
-                          {.end}
-                        </div>
-                      </a>
-
-
-
+    {.repeated section items}
+      {.image?}
+      <figure class="figure">
+          <img class="figure__image image js-lazy-image image--wide" data-img-src="{assetUrl}" data-variants="{systemDataVariants}" data-original-size="{originalSize}" />
+      </figure>
+      {.end}
     {.end}
 
 
-
+    {.section body}
+    <div class="product-meta -text--center animate animate--fade js-animate">
+      {@}
     </div>
+    {.end}
+
+    {.end}
 
 </div>
