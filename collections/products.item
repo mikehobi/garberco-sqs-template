@@ -38,19 +38,14 @@
       {.end}
     {.end}
 
-
     {.section body}
-    <div class="project__text product__description -text--center js-project-plate animate animate--fade js-animate">
-        {@}
-    </div>
-    {.end}
-      {.section body}
     <div class="info js-info screen -text--center ghost">
         <div class="info__text ghost__child h3">
             {@}
         </div>
     </div>
     {.end}
+
     {.end}
 
 </div>
