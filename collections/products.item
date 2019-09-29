@@ -11,12 +11,12 @@
     </div>
 
 
-    <div class="product-description -text--center js-project-plate animate animate--fade js-animate">
+    <div class="product__description -text--center js-project-plate animate animate--fade js-animate">
       {.section title}
         <p class="h2">{@}</p>
       {.end}
 
-      <div class="product-excerpt p">
+      <div class="product__excerpt p">
         {excerpt}
         {@|product-price}
       </div>
@@ -38,7 +38,7 @@
 
 
     {.section body}
-    <div class="product-description -text--center js-project-plate animate animate--fade js-animate">
+    <div class="product__description product__text -text--center js-project-plate animate animate--fade js-animate">
       {@}
     </div>
     {.end}

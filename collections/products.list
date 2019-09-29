@@ -6,7 +6,7 @@
                   <a href="{fullUrl}" class="grid__photo js-index-tile animate animate--fade js-animate" data-title="{.if description}{description}{.or}{title}{.end}">
                     <figure class="figure">
                         <img class="figure__image image js-lazy-image" data-img-src="{assetUrl}" data-variants="{systemDataVariants}" data-original-size="{originalSize}" />
-                        <figcaption class="product-meta -text--center">{@|product-price}</figcaption>
+                        <figcaption class="product__meta -text--center">{@|product-price}</figcaption>
                     </figure>
                   </a>
 
