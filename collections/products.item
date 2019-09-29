@@ -11,7 +11,7 @@
     </div>
 
 
-    <div class="product__description -text--center js-project-plate animate animate--fade js-animate">
+    <div class="project__text -text--center js-project-plate animate animate--fade js-animate">
       {.section title}
         <p class="h2">{@}</p>
       {.end}
@@ -38,7 +38,7 @@
 
 
     {.section body}
-    <div class="product__description product__text -text--center js-project-plate animate animate--fade js-animate">
+    <div class="product__description project__text -text--center js-project-plate animate animate--fade js-animate">
       {@}
     </div>
     {.end}
