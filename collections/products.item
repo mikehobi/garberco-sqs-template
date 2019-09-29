@@ -16,7 +16,7 @@
         <p class="h2">{@}</p>
       {.end}
 
-      <div class="p">
+      <div class="product-information p">
         {excerpt}
         {@|product-price}
       </div>
