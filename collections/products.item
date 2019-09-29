@@ -6,7 +6,7 @@
 
     <div class="project__image project__image--threeq js-project-plate animate animate--fade">
       <figure class="figure">
-          <img class="figure__image image js-lazy-image" data-img-src="{assetUrl}" data-variants="{systemDataVariants}" data-original-size="{originalSize}" />
+          <img class="figure__image image image--tall js-lazy-image" data-img-src="{assetUrl}" data-variants="{systemDataVariants}" data-original-size="{originalSize}" />
       </figure>
     </div>
 
