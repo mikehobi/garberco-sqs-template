@@ -13,16 +13,16 @@
 
     <div class="product-description js-project-plate animate animate--fade js-animate">
       {.section title}
-        <p class="p -text--center">{@}</p>
+        <p class="h2 -text--center">{@}</p>
       {.end}
 
-      {@|product-price}
-
       {.excerpt?}
-        <div class="product-excerpt p">
+        <div class="product-excerpt p -text--center">
           {excerpt}
         </div>
       {.end}
+
+      {@|product-price}
 
       {@|product-checkout}
 
