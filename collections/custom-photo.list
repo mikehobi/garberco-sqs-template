@@ -3,9 +3,9 @@
         {.repeated section items}
             {@|apply custom-photo.block}
 
-            {.if description}<div class="info__text h3 js-project-plate animate animate--fade">
+            <div class="info__text h3 js-project-plate animate animate--fade">
                 <squarespace:block-field id="project-info--{collection.urlId}" columns="1" />
-            </div>{.end}
+            </div>
 
 
         {.end}
