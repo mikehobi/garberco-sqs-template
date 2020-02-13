@@ -2,8 +2,7 @@
     <div class="project js-project" data-target="project" data-id="{collection.id}">
         {.repeated section items}
         {.section collection}
-          <h1>{title}</h1>
-          <p>{body}</p>
+          <squarespace:block-field id="project-info--{collection.urlId}" columns="1" />
         {.end}
             {@|apply custom-photo.block}
             {.if equal? @index 2}
